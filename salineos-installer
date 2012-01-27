@@ -1,0 +1,481 @@
+#!/bin/bash
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+# Copyright 2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
+# Some code borrowed from the Remastersys Installer by Tony Brijeski 
+################### Remastersys-installer original copyright notice ##########################
+#  remastersys-installer is an alternative installer for remastered livecd/dvd's
+#
+#
+#  Created by Tony "Fragadelic" Brijeski
+#
+#  Copyright 2008,2009,2010 Under the GNU GPL2 License
+#
+#  Originally Created September 12th,2008
+#
+################### End Original copyright notice ###########################################
+
+
+## Set options for yet another dialog, this makes creating dialogs much easier.
+
+Info='yad --center --on-top --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+
+Question='yad --on-top --wrap --center --image "dialog-question" --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+
+SingleMenu='yad  --on-top --center --list --column="Please choose one." --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+
+Menu='yad --print-column=1 --on-top --center --list --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+
+Progress='yad --on-top --center --progress --title=SalineOS-Installer --no-buttons --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+
+TextEntry='yad --on-top --center --entry --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+
+progressbar () {
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="$@" 
+}
+
+## Check for root and cry like a little girl if we don't have it.
+
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ $Info --button=gtk-ok --text="Must be run as root - press ok to exit"
+ exit 1
+fi
+
+
+## Get variables from the live system configuration. 
+. /etc/live/config.conf
+
+SetTimeZone () {
+
+TimeZones=""
+
+cat /usr/share/zoneinfo/zone.tab | awk '{print $3}' | grep "/" | sort > /tmp/SalineOS-TimeZones
+for i in $(cat /tmp/SalineOS-TimeZones); do
+ TimeZones="$TimeZones $i"
+done
+rm /tmp/SalineOS-TimeZones
+
+TimeZone=$(yad --on-top --width=300 --height=450 --center --list --column="Select your time zone:" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --button=$"gtk-ok:2" $TimeZones)
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ SetTimeZone
+ exit 0 
+elif [ "$TimeZone" = "" ]; then
+ $Info --text="The time zone cannot be blank, please select your time zone."
+ SetTimeZone
+ exit 0
+fi
+
+TimeZone="$(echo $TimeZone | awk -F '|' '{print $1}')"
+
+
+}
+
+
+SetHostname () {
+
+
+TargetHostname=""
+
+TargetHostname=$($TextEntry --text="Enter a hostname for the installed system. You can enter anything\nyou like here, except spaces and special characters" --button=$"About Hostname:3" --button=$"OK:2")
+
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ SetHostname
+ exit 0
+elif [ "$ret" = "3" ]; then
+ $Info --text="The system\'s hostname is used to identify the machine on a network,\nsuch as a local area network or the internet.\n\nFor PCs the hostname is used mostly for easing administration of devices\n on LAN, such as switches, routers, and wireless access points." --button=$"gtk-ok:1"
+ SetHostname
+ exit 0
+elif [ "$TargetHostname" = "" ]; then
+ $Info --text="The hostname cannot be blank." --width=200 --button=$"gtk-ok:1"
+ SetHostname
+ exit 0
+fi
+
+
+## Make the hostname lower case, to avoid random issues with bad software.
+TargetHostname="$(echo "$TargetHostname" | awk '{print tolower ($0)}')"
+## Remove spaces just in case
+TargetHostname="$(echo "$TargetHostname" | sed -e 's| ||g')"
+
+SetTimeZone
+
+}
+
+UserSetup () {
+
+if [ -f /etc/salineos-utils/BACKUP ]; then
+ GrubSelect
+ exit 0
+fi
+
+## Reset all variables just in case
+
+UserStuff=""
+TargetUserRealName=""
+TargetUser=""
+TargetUserPassword1=""
+TargetUserPassword2=""
+RequirePassword=""
+UserStuff=$(yad --center --on-top --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK")
+
+ret=$?
+
+if [ "$ret" = "1" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 1
+  else
+   UserSetup
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ UserSetup
+fi
+
+TargetUserRealName="$(echo "$UserStuff" | awk -F '|' '{print $1}')"
+TargetUser="$(echo "$UserStuff" | awk -F '|' '{print $2}')"
+## Change capital letters in username to lowercase
+TargetUser="$(echo "$TargetUser" | awk '{print tolower ($0)}')"
+TargetUserPassword1="$(echo "$UserStuff" | awk -F '|' '{print $3}')"
+TargetUserPassword2="$(echo "$UserStuff" | awk -F '|' '{print $4}')"
+RequirePassword="$(echo "$UserStuff" | awk -F '|' '{print $5}')"
+
+
+if [ "$TargetUserRealName" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="User\'s real name field cannot be left blank, please try again."
+ UserSetup
+ exit 0
+elif [ "$TargetUser" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="User\'s Nickname cannot be left blank, please try again."
+ UserSetup
+ exit 0
+elif [ "$TargetUserPassword1" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="User\'s Password cannot be blank, please try again."
+ UserSetup
+ exit 0
+elif [ "$TargetUserPassword2" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="User\'s Password cannot be blank, please try again."
+ UserSetup
+ exit 0
+elif [ "$TargetUserPassword1" != "$TargetUserPassword2" ]; then
+ $Info --button=$"gtk-ok:1" --text="Passwords do not match, please try again."
+ UserSetup
+ exit 0
+fi
+
+SetHostname
+
+
+}
+
+
+
+SelectSwapPart () {
+
+SwapPartMenu=""
+
+## Find swap partitions and find out which to use.
+TargetSwap=$(fdisk -l | grep swap | cut -d " " -f1)
+TargetSwap=$(echo $TargetSwap | sed -r "s/\/dev\///g")
+
+for i in $TargetSwap; do
+ SwapPart="$i"
+ SwapPartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+ SwapPartMenu="$SwapPartMenu $SwapPart $SwapPartSize"
+done
+
+
+Swap=$($Menu --width=300 --height=250 --column=Partition --column="Partition Size" --button=$"Exit:3" --button=$"OK:2" $SwapPartMenu)
+
+ret=$?
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 1
+  else
+   SelectSwapPart
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ SelectSwapPart
+ exit 0 
+elif [ "$Swap" = "" ]; then
+ SelectSwapPart
+ exit 0
+else
+ UserSetup
+ exit 0
+fi
+ 
+}
+
+SwapFile () {
+
+SwapFileSize=""
+
+SwapFileSize=$($Menu --column="Size" --column=" " --text="Please select the size of the SalineOS swap file to be created." --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2"  128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+
+
+ret=$?
+
+if [ "$ret" = "3" ]; then
+ SelectSwapPart
+ UseSwapFile="False"
+ exit 0
+elif [ "$SwapFileSize" = "" ]; then
+ SwapFile
+ exit 0
+else
+ UseSwapFile="True"
+ SwapFileSize=$(echo "$SwapFileSize" | awk -F '|' '{print $1}') 
+ if [ -f /tmp/Finished-Menu ]; then
+  FinishedMenu
+  exit 0
+ fi
+UserSetup
+exit 0
+fi
+
+}
+
+
+
+
+## Choose the partition to install to
+
+SelectRootPart () { 
+
+PartMenu=""
+
+Partitions=$(cat /proc/partitions | grep "$PartDrive" | awk '{ print $4}' | grep "[0-9]")
+InstallPart="$(echo $Partitions)"
+for i in $Partitions; do
+TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+if [ "$TempSize" = "1" ]; then
+ InstallPart=$(echo $InstallPart | sed -r "s/$i//")
+fi
+done
+
+
+for i in $InstallPart; do
+  Part="$i"
+  PartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  PartMenu="$PartMenu $Part $PartSize"
+done
+
+
+TargetPart=$($Menu --height=300 --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Reopen GParted:5" --button=$"Use Selected:2" --text="Please select a partition to install the SalineOS root (Main) directory to." $PartMenu )
+
+ret=$?
+
+
+
+if [ "$ret" = "252" ]; then
+ SelectRootPart
+ exit 0
+elif [ "$ret" = "3" ]; then
+   $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 1
+  else
+   SelectRootPart
+   exit 0
+  fi
+elif [ "$ret" = "5" ]; then
+ ChooseDrive
+ exit 0
+elif [ "$TargetPart" = "" ]; then
+ SelectRootPart
+ exit 0
+fi
+
+if [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
+ exit 0
+else
+ SwapFile
+ exit 0
+fi
+}
+
+
+
+
+## Choose the drive to partition
+
+ChooseDrive () { 
+
+GrubMenu=""
+PartDriveMenu=""
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v major | grep -v "^$" | awk '{ print $4}' | grep -v "[0-9]")
+
+for i in $Drives; do
+  PartDrive="$i"
+  PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  PartDriveMenu="$PartDriveMenu $PartDrive $PartDriveSize"
+  GrubMenu="$PartDrive Master-Boot-Record $GrubMenu"
+done
+
+if [ "$AutoPart" = "Auto" ]; then
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive erase and use." --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+else
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition." --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+fi
+
+
+ret=$?
+
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 1
+  else
+   ChooseDrive
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ ChooseDrive
+ exit 0
+elif [ "$PartDrive" = "" ]; then
+ ChooseDrive
+ exit 0
+fi 
+
+PartDrive=$(echo "$PartDrive" | awk -F '|' '{print $1}')
+## Launch GParted
+if [ "$AutoPart" != "Auto" ]; then
+gparted /dev/$PartDrive
+fi
+
+if [ -f /tmp/Called-By-RootPart ]; then
+ FinishedMenu
+ exit 0
+elif [ -f /tmp/Called-By-Swap ]; then
+ SelectSwapPart
+ exit 0
+elif [ "$AutoPart" = "True" ]; then
+ SwapFile
+ exit 0
+else
+ SelectRootPart
+ exit 0
+fi
+}
+
+
+
+
+
+## Ask the user if they wish to use automatic partitioning.
+
+AutoPartitioning () {
+$Info --width=500 --text="You will need at least one partition in order to install SalineOS.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
+
+ret=$?
+
+if [ "$ret" = "252" ]; then
+ AutoPartitioning 
+elif [ "$ret" = "5" ]; then
+ AutoPart="Auto"
+ SwapFile
+ exit 0
+elif [ "$ret" = "3" ]; then
+ AutoPart="Manual"
+ ChooseDrive
+ exit 0
+fi 
+
+}
+
+
+
+
+## Tell the user that there are instructions in the user manual 
+Instruction (){ $Info --text="Complete installation instructions are included\nin the user manual if needed." '--button=gtk-ok:1'
+AutoPartitioning
+exit 0
+}
+
+
+
+
+## Check for internet connectivity and inform the user that some features require connectivity
+
+InternetTest2 () {
+
+$Info --button=$"Continue without an internet connection:3" --button=$"Retry connection:5" --text="No internet connection detected, some features of this installer will be disabled.\n\nYou can configure your network settings by right clicking the on the network adapter\nicon in the upper right hand corner, on the top panel.\n\n"
+
+ret=$?
+
+if [ "$ret" = "3" ]; then
+ Internet=Continue
+ Instruction
+ exit 0
+elif [ "$ret" = "252" ]; then
+ InternetTest2 
+else
+ InternetTest
+ exit 0
+fi
+
+}
+
+
+
+InternetTest () {
+
+
+if [ -f /etc/salineos-utils/BACKUP ]; then
+ Instruction
+ exit 0
+fi
+
+
+TestInternet="$(httping -g http://www.google.com -c 1 -t 15)"
+Internet="$(echo "$TestInternet" | grep "0.00% failed")"
+
+progressbar "Checking for an active internet connection, please wait.\n" &
+sleep 4
+killall -KILL tail
+
+if [ "$Internet" = "" ]; then 
+ InternetTest2
+ exit 0
+else
+ Instruction
+ exit 0
+fi
+
+
+}
+
+InternetTest
+
+exit
+
