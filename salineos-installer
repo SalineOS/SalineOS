@@ -18,6 +18,8 @@
 ####################################################################################################
 # Copyright 2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
 # Some code borrowed from the Remastersys Installer by Tony Brijeski 
+#
+#
 ################### Remastersys-installer original copyright notice ##########################
 #  remastersys-installer is an alternative installer for remastered livecd/dvd's
 #
@@ -80,7 +82,7 @@ if [ "$ret" = "252" ]; then
  SetTimeZone
  exit 0 
 elif [ "$TimeZone" = "" ]; then
- $Info --text="The time zone cannot be blank, please select your time zone."
+ $Info --text="The time zone cannot be blank, please select your time zone." --button=$"gtk-ok:1"
  SetTimeZone
  exit 0
 fi
@@ -343,7 +345,7 @@ for i in $Drives; do
 done
 
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive erase and use." --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use." --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
 else
 PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition." --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
 fi
