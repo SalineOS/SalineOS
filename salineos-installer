@@ -169,7 +169,7 @@ if [ "$TargetUserRealName" = "" ]; then
  UserSetup
  exit 0
 elif [ "$TargetUser" = "" ]; then
- $Info --button=$"gtk-ok:1" --text="User\'s Nickname cannot be left blank, please try again."
+ $Info --button=$"gtk-ok:1" --text="Username cannot be left blank, please try again."
  UserSetup
  exit 0
 elif [ "$TargetUserPassword1" = "" ]; then
