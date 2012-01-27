@@ -153,6 +153,7 @@ if [ "$ret" = "1" ]; then
   fi
 elif [ "$ret" = "252" ]; then
  UserSetup
+ exit 0
 fi
 
 TargetUserRealName="$(echo "$UserStuff" | awk -F '|' '{print $1}')"
@@ -320,9 +321,9 @@ else
  SwapFile
  exit 0
 fi
+
+
 }
-
-
 
 
 ## Choose the drive to partition
@@ -401,6 +402,7 @@ ret=$?
 
 if [ "$ret" = "252" ]; then
  AutoPartitioning 
+ exit 0
 elif [ "$ret" = "5" ]; then
  AutoPart="Auto"
  SwapFile
@@ -417,9 +419,13 @@ fi
 
 
 ## Tell the user that there are instructions in the user manual 
-Instruction (){ $Info --text="Complete installation instructions are included\nin the user manual if needed." '--button=gtk-ok:1'
+Instruction (){ 
+
+$Info --text="Complete installation instructions are included\nin the user manual if needed." '--button=gtk-ok:1'
 AutoPartitioning
 exit 0
+
+
 }
 
 
@@ -456,11 +462,12 @@ if [ -f /etc/salineos-utils/BACKUP ]; then
  exit 0
 fi
 
+progressbar "Checking for an active internet connection, please wait.\n" &
 
 TestInternet="$(httping -g http://www.google.com -c 1 -t 15)"
 Internet="$(echo "$TestInternet" | grep "0.00% failed")"
 
-progressbar "Checking for an active internet connection, please wait.\n" &
+
 sleep 4
 killall -KILL tail
 
