@@ -1,5 +1,4 @@
 #!/bin/bash
-#!/bin/bash
 # Licensed under the GNU General Public License Version 2
 #
 # This program is free software; you can redistribute it and/or modify
@@ -56,7 +55,7 @@ tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="$@"
 TestRoot="$(whoami)"
 
 if [ "$TestRoot" != "root" ]; then
- $Info --button=gtk-ok --text="Must be run as root - press ok to exit"
+ $Info --button=$"gtk-ok:1" --text="Must be run as root - press ok to exit"
  exit 1
 fi
 
@@ -78,6 +77,8 @@ TimeZone=$(yad --on-top --width=300 --height=450 --center --list --column="Selec
 
 ret="$?"
 
+TimeZone="$(echo $TimeZone | awk -F '|' '{print $1}')"
+
 if [ "$ret" = "252" ]; then
  SetTimeZone
  exit 0 
@@ -87,7 +88,7 @@ elif [ "$TimeZone" = "" ]; then
  exit 0
 fi
 
-TimeZone="$(echo $TimeZone | awk -F '|' '{print $1}')"
+
 
 
 }
@@ -107,7 +108,7 @@ if [ "$ret" = "252" ]; then
  SetHostname
  exit 0
 elif [ "$ret" = "3" ]; then
- $Info --text="The system\'s hostname is used to identify the machine on a network,\nsuch as a local area network or the internet.\n\nFor PCs the hostname is used mostly for easing administration of devices\n on LAN, such as switches, routers, and wireless access points." --button=$"gtk-ok:1"
+ $Info --text="The system\'s hostname is used to identify the machine on a network,\nsuch as a local area network or the internet.\n\nFor PCs the hostname is used mostly for easing administration of devices\non LAN, such as switches, routers, and wireless access points." --button=$"gtk-ok:1"
  SetHostname
  exit 0
 elif [ "$TargetHostname" = "" ]; then
@@ -122,7 +123,12 @@ TargetHostname="$(echo "$TargetHostname" | awk '{print tolower ($0)}')"
 ## Remove spaces just in case
 TargetHostname="$(echo "$TargetHostname" | sed -e 's| ||g')"
 
-SetTimeZone
+if [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
+else
+ SetTimeZone
+fi
+
 
 }
 
@@ -141,11 +147,11 @@ TargetUser=""
 TargetUserPassword1=""
 TargetUserPassword2=""
 RequirePassword=""
-UserStuff=$(yad --center --on-top --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK")
+UserStuff=$(yad --center --on-top --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK" --button=$"Exit:3" --button=$"OK:2")
 
 ret=$?
 
-if [ "$ret" = "1" ]; then
+if [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
   if [ "$?" = "0" ]; then
    exit 1
@@ -189,7 +195,13 @@ elif [ "$TargetUserPassword1" != "$TargetUserPassword2" ]; then
  exit 0
 fi
 
-SetHostname
+if [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
+ exit 0
+else
+ SetHostname
+ exit 0
+fi
 
 
 }
@@ -202,7 +214,7 @@ SwapPartMenu=""
 
 ## Find swap partitions and find out which to use.
 TargetSwap=$(fdisk -l | grep swap | cut -d " " -f1)
-TargetSwap=$(echo $TargetSwap | sed -r "s/\/dev\///g")
+TargetSwap=$(echo "$TargetSwap" | sed -r "s/\/dev\///g")
 
 for i in $TargetSwap; do
  SwapPart="$i"
@@ -211,9 +223,11 @@ for i in $TargetSwap; do
 done
 
 
-Swap=$($Menu --width=300 --height=250 --column=Partition --column="Partition Size" --button=$"Exit:3" --button=$"OK:2" $SwapPartMenu)
+Swap=$($Menu --width=300 --height=250 --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"OK:2" $SwapPartMenu)
 
 ret=$?
+
+Swap=$(echo "$Swap" | awk '|' '{print $1}')
 
 if [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
@@ -228,6 +242,9 @@ elif [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$Swap" = "" ]; then
  SelectSwapPart
+ exit 0
+elif [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
  exit 0
 else
  UserSetup
@@ -249,18 +266,21 @@ if [ "$ret" = "3" ]; then
  SelectSwapPart
  UseSwapFile="False"
  exit 0
+elif [ "$ret" = "252" ]; then
+ SwapFile
+ exit 0 
 elif [ "$SwapFileSize" = "" ]; then
  SwapFile
  exit 0
 else
  UseSwapFile="True"
  SwapFileSize=$(echo "$SwapFileSize" | awk -F '|' '{print $1}') 
- if [ -f /tmp/Finished-Menu ]; then
-  FinishedMenu
-  exit 0
- fi
-UserSetup
-exit 0
+  if [ -f /tmp/Finished-Menu ]; then
+   FinishedMenu
+   exit 0
+  fi
+ UserSetup
+ exit 0
 fi
 
 }
@@ -291,11 +311,11 @@ for i in $InstallPart; do
 done
 
 
-TargetPart=$($Menu --height=300 --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Reopen GParted:5" --button=$"Use Selected:2" --text="Please select a partition to install the SalineOS root (Main) directory to." $PartMenu )
+TargetPart=$($Menu --height=300 --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --text="Please select a partition to install the SalineOS root (Main) directory to." $PartMenu )
 
 ret=$?
 
-
+TargetPart=$(echo "$TargetPart" | awk '|' '{print $1}')
 
 if [ "$ret" = "252" ]; then
  SelectRootPart
@@ -308,9 +328,6 @@ elif [ "$ret" = "3" ]; then
    SelectRootPart
    exit 0
   fi
-elif [ "$ret" = "5" ]; then
- ChooseDrive
- exit 0
 elif [ "$TargetPart" = "" ]; then
  SelectRootPart
  exit 0
@@ -334,6 +351,7 @@ ChooseDrive () {
 
 GrubMenu=""
 PartDriveMenu=""
+PartDrive=""
 
 Drives=$(cat /proc/partitions | grep -v loop | grep -v major | grep -v "^$" | awk '{ print $4}' | grep -v "[0-9]")
 
@@ -345,14 +363,14 @@ for i in $Drives; do
 done
 
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use." --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use."  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
 else
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition." --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition."  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
 fi
-
 
 ret=$?
 
+PartDrive=$(echo "$PartDrive" | awk -F '|' '{print $1}')
 
 if [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
@@ -370,25 +388,20 @@ elif [ "$PartDrive" = "" ]; then
  exit 0
 fi 
 
-PartDrive=$(echo "$PartDrive" | awk -F '|' '{print $1}')
+
 ## Launch GParted
 if [ "$AutoPart" != "Auto" ]; then
-gparted /dev/$PartDrive
+ gparted /dev/$PartDrive
 fi
 
-if [ -f /tmp/Called-By-RootPart ]; then
- FinishedMenu
- exit 0
-elif [ -f /tmp/Called-By-Swap ]; then
- SelectSwapPart
- exit 0
-elif [ "$AutoPart" = "True" ]; then
+if [ "$AutoPart" = "True" ]; then
  SwapFile
  exit 0
 else
  SelectRootPart
  exit 0
 fi
+
 }
 
 
@@ -407,7 +420,7 @@ if [ "$ret" = "252" ]; then
  exit 0
 elif [ "$ret" = "5" ]; then
  AutoPart="Auto"
- SwapFile
+ ChooseDrive
  exit 0
 elif [ "$ret" = "3" ]; then
  AutoPart="Manual"
@@ -437,7 +450,7 @@ exit 0
 
 InternetTest2 () {
 
-$Info --button=$"Continue without an internet connection:3" --button=$"Retry connection:5" --text="No internet connection detected, some features of this installer will be disabled.\n\nYou can configure your network settings by right clicking the on the network adapter\nicon in the upper right hand corner, on the top panel.\n\n"
+$Info  --button=$"Retry connection:5" --button=$"Continue without an internet connection:3" --text="No internet connection detected, some features of this installer will be disabled.\n\nYou can configure your network settings by right clicking the on the network adapter\nicon in the upper right hand corner, on the top panel.\n\n"
 
 ret=$?
 
