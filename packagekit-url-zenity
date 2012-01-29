@@ -1,0 +1,148 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Copyright Anthony Nordquist 2011-2012 salinelinux@gmail.com http://www.salineos.com
+
+## Set a variable of the input :)
+## Not needed but I like it this way.
+Input="$@"
+
+## Got root?
+testroot="$(whoami)"
+
+if [ "$testroot" != "root" ]; then
+ zenity --error --title="Error" --text=" Package Kit URL must be run with root privileges, will now exit "
+ exit 0
+fi
+
+
+## Use a lockfile since more than one running instance is bad mojo. 
+
+if [ -f /tmp/packagekit-url-lock-file ]; then
+ zenity --error --title="Package Kit URL" --text="There can only have one running instance of Package Kit URL.\n\nIf there are not any operations in progress then please remove the lockfile.\n\nRunning the command sudo rm -rf /tmp/packagekit-url-lock-file will remove the lockfile."
+ exit
+else
+ touch /tmp/packagekit-url-lock-file
+fi
+
+if [ -f /tmp/packagekit-url-tmp ]; then
+ rm -rf /tmp/packagekit-url-tmp
+fi
+
+############################################################################################################
+##Install and remove section
+## Parse the needed information from the passed input.
+## Includes support for apturl links. 
+if [ "$(echo $Input | grep "apt:")" = "" ]; then
+ Package=$(echo "$Input" | awk -F "/" '{print $3}')
+ Operation=$(echo "$Input" | awk -F "/" '{print $4}')  
+else
+ if [ "$(echo $Input | grep "apt://")" != "" ]; then
+  PackageStart=$(echo "$Input" | awk -F "/" '{print $3}') 
+  Operation="install"
+   if [ "$(echo $PackageStart | grep "?")" = "" ]; then
+    Package="$PackageStart" 
+   else
+     Package="$(echo "$PackageStart" | awk -F "?" '{print $1}')"
+   fi
+ else 
+ Operation="install"
+ PackageStart=$(echo "$Input" | awk -F "apt:" '{print $2}')
+  if [ "$(echo $PackageStart | grep "?")" = "" ]; then
+   Package="$PackageStart" 
+  else
+   Package="$(echo "$PackageStart" | awk -F "?" '{print $1}')"
+  fi
+ fi
+fi
+
+
+## Do everything else.
+
+if [ "$Operation" = "install" ]; then
+zenity --question --title="Package Kit URL" --text="This will install $Package.\n\nContinue with installation?"
+  if [ $? = 0 ]; then
+   pkcon -p -y install $Package>>/tmp/packagekit-url-tmp &
+(while [ "$(pidof pkcon)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
+echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
+done)| zenity --progress --auto-close --no-cancel --title="Package Kit URL"  --text="Installing $Package"
+   if [ "$(grep -B 0  "Installed" /tmp/packagekit-url-tmp)" = "" ]; then
+    Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage" | grep -v "Package:" | grep -v "Downloaded")"
+   else
+    Result="$(grep "Installed" /tmp/packagekit-url-tmp)"
+   fi
+   zenity --info --title="Package Kit URL" --text="$Result"
+   rm -rf /tmp/packagekit-url-lock-file
+   rm -rf /tmp/packagekit-url-tmp
+   exit
+  else
+   zenity --error --title="Package Kit URL" --text="Installation cancelled, press ok to exit."
+  rm -rf /tmp/packagekit-url-lock-file
+  exit
+  fi
+elif [ "$Operation" = "" ]; then
+zenity --question --title="Package Kit URL" --text="This will install $Package.\n\nContinue with installation?"
+  if [ $? = 0 ]; then
+   pkcon -p -y install $Package>>/tmp/packagekit-url-tmp &
+(while [ "$(pidof pkcon)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
+echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
+done)| zenity --progress --auto-close --no-cancel --title="Package Kit URL"  --text="Installing $Package"
+   if [ "$(grep -B 0  "Installed" /tmp/packagekit-url-tmp)" = "" ]; then
+    Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage" | grep -v "Package:" | grep -v "Downloaded")"
+   else
+    Result="$(grep "Installed" /tmp/packagekit-url-tmp)"
+   fi
+   zenity --info --title="Package Kit URL" --text="$Result"
+   rm -rf /tmp/packagekit-url-lock-file
+   rm -rf /tmp/packagekit-url-tmp
+   exit
+  else
+   zenity --error --title="Package Kit URL" --text="Installation cancelled, press ok to exit."
+  rm -rf /tmp/packagekit-url-lock-file
+  exit
+  fi
+elif [ "$Operation" = "remove" ]; then
+ zenity --question --title="Package Kit URL" --text="This will remove $Package.\n\nContinue with removal?"
+  if [ $? = 0 ]; then
+pkcon -p -y remove $Package>>/tmp/packagekit-url-tmp &
+(while [ "$(pidof pkcon)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
+echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
+done)| zenity --progress --auto-close --no-cancel --title="Package Kit URL"  --text="Removing $Package"
+   Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage")"
+   zenity --info --title="Package Kit URL" --text="$Result"
+   rm -rf /tmp/packagekit-url-lock-file
+   rm -rf /tmp/packagekit-url-tmp
+   exit
+  else
+   zenity --error --title="Package Kit URL" --text="Removal cancelled, press ok to exit."
+   rm -rf /tmp/packagekit-url-lock-file
+   exit
+  fi
+else
+ zenity --error --title="Package Kit URL" --text="Invalid Package Kit URL, press ok to exit."
+  rm -rf /tmp/packagekit-url-lock-file
+  rm -rf /tmp/packagekit-url-tmp
+  exit
+fi
+
+## Clear the lockfile and temp file then exit
+rm -rf /tmp/packagekit-url-lock-file
+rm -rf /tmp/packagekit-url-tmp
+exit

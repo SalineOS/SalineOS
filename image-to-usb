@@ -1,9 +1,26 @@
 #!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Authored and maintained by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 2011
+## LOTS of code borrowed from the Remastersys USB copy tool authored by Tony Brijeski, this code has been heavily modified for the use in this script. 
+## Copyright 2011 Anthony Nordquist and Copyright 2009 by Tony Brijeski under the GPL V2 
 
-#Copy to USB Key Tool Copyright 2009 by Tony Brijeski under the GPL V2
 
-
-DIALOG="`which zenity` --width=500 --height=400"
+DIALOG="$(which zenity) --width=300 --height=200"
 TITLE="--title="
 TEXT="--text="
 ENTRY="--entry "
@@ -12,109 +29,40 @@ FILESELECTION="--file-selection "
 MENU="--list --column=Pick --column=Info"
 YESNO="--question "
 MSGBOX="--info "
-PASSWORD="--entry --hide-text "
-TITLETEXT="Remastersys ISO Image to USB Key Tool"
+TITLETEXT="Image To USB Burner"
 
-testroot="`whoami`"
-
-if [ "$testroot" != "root" ]; then
-$DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"Must be run as root - exiting"
-exit 1
-fi
-
-$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"\n\nThis will completely replace the contents of your usb drive with the Bootable Live Image.\n\nPlease use with caution.\n\nDo you want to continue?"
-
-if [ $? != 0 ]; then
-exit 0
-fi
-
-if [ -f /tmp/remastersys-usb-key-copy ]; then
-rm /tmp/remastersys-usb-key-copy
-fi
-
-mainmenu () {
-CHOICE=`$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"\nPlease select action." Exit "Quit" PICKUSB "Select the USB key to use" PICKSOURCE "Select the source to be copied from" COPY "Copy the image to the USB key"`
-
-if [ "$CHOICE" = "PICKUSB" ]; then
-pickusbmenu
-elif [ "$CHOICE" = "PICKSOURCE" ]; then
-picksourcemenu
-elif [ "$CHOICE" = "COPY" ]; then
-copymenu
-else
-rm /tmp/remastersys-usb-key-copy
-exit 0
-fi
-
+progressbar () {
+tail -f /usr/bin/image-to-usb | $DIALOG $TEXT"$@" --progress --pulsate --auto-close
 }
 
-pickusbmenu () {
+
 DEVS=""
-DEVS=`find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}'`
+DEVS=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
 for i in $DEVS; do
-USBDRIVESIZE=`grep -m 1 "$i" /proc/partitions | awk '{print $3}'`
+USBDRIVESIZE=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
 USBDRIVES="$USBDRIVES $i $USBDRIVESIZE "
 done
 
-USBDRIVE=`$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"\nPlease select the usb key." Exit "Quit to main menu" $USBDRIVES`
+USBDRIVE=$($DIALOG $TITLE"$TITLETEXT" $MENU $TEXT'\nPlease select the USB drive you would like to "burn" to.' $USBDRIVES Exit "Quit")
 
-if [ "$USBDRIVE" = "Exit" ]; then
-mainmenu
-fi
-echo "USBDRIVE=\"$USBDRIVE\"" >> /tmp/remastersys-usb-key-copy
-if [ "$USBDRIVE" != "" ]; then
-echo "USBDRIVE=\"$USBDRIVE\"" >> /tmp/remastersys-usb-key-copy
-fi
-  $DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"\n\nYou Selected $USBDRIVE.  Click ok to return to main menu."
-
-mainmenu
-}
-
-
-picksourcemenu () {
-PICKSOURCE=`$DIALOG $TITLE"Pick a hybrid iso file to use as the source" $FILESELECTION --file-filter=*.iso`
-echo "PICKSOURCE=\"$PICKSOURCE\"" >> /tmp/remastersys-usb-key-copy
-. /tmp/remastersys-usb-key-copy
-  $DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"\n\nYou selected $PICKSOURCE as the source for the copy.  Click ok to return to main menu."
-mainmenu
-}
-
-
-copymenu () {
-. /tmp/remastersys-usb-key-copy
-if [ "$USBDRIVE" = "" ]; then
-  $DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"\n\nYou must first select a usb key to use.  Click ok to return to main menu."
-mainmenu
-fi
-if [ "$PICKSOURCE" = "" ]; then
-  $DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"\n\nYou must first select a source to use.  Click ok to return to main menu."
-mainmenu
-fi
-$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"\n\nThis will completely replace the contents of your usb drive with the Bootable Live System.\n\nYou will not be able to undo this operation once it starts.\n\nDo you want to continue?"
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will completely erase the contents of /dev/$USBDRIVE\nand replace them with the contents of $1.\n\nDo you want to continue?"
 
 if [ $? != 0 ]; then
-mainmenu
+ exit
 fi
 
 umount $(mount | grep $USBDRIVE | awk '{print $1}')
 
-progressbar "Copying to USB Key Now \n\nPlease Wait \n" &
+progressbar "Copying $1 to /dev/$USBDRIVE Now\n\nPlease Wait \n" &
 
-#do the copy
-dd if=$PICKSOURCE of=/dev/$USBDRIVE bs=1M
+
+dd if="$1" of=/dev/$USBDRIVE bs=1M
 sync
 
-## Stop the progress bar
+
 killall -KILL tail
 
-echo "COPYDONE=\"YES\"" >> /tmp/remastersys-usb-key-copy
-  $DIALOG $TITLE"$TITLETEXT" $MSGBOX $TEXT"\n\nCopy to USB key completed.  Click ok to return to main menu."
-mainmenu
-}
+zenity --info --title="$TITLETEXT" --text="Copying of image complete, press ok to exit."
+exit
 
 
-progressbar () {
-tail -f /tmp/remastersys-usb-key-copy | $DIALOG $TEXT"$@" --progress --pulsate --auto-close
-}
-
-mainmenu

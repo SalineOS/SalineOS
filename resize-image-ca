@@ -1,0 +1,45 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
+## Copyright 2011 Anthony Nordquist under the GPL V2 License
+
+ResizeTo=$(zenity --list --column="Select One" --title="Image(s) Resize" --text="Select the percentage to resize to." 10% 15% 20% 25% 30% 35% 40% 45% 50% 55% 60% 65% 70% 75% 80% 85% 90% 95% 100% 105% 110% 115% 120% 125% 130% 135% 140% 145% 150% 155% 160% 165% 170% 175% 180% 185% 190% 195% 200%)
+
+if [ "$?" = "1" ]; then
+ exit
+fi
+
+progressbar () {
+tail -f /usr/bin/resize-image-ca |  zenity --progress --pulsate --auto-close --title="Image(s) Resize" --text="$@"
+}
+
+progressbar "Resizing image(s) to $ResizeTo now, please wait..." &
+
+for i in "$@"; do
+ Extension="$(echo "$i" | awk -F "." '{print $NF}')"
+ Resized="$(echo "$i" | sed -e "s|.$Extension||g")"
+ convert "$i" -resize $ResizeTo "$Resized"-RESIZED."$Extension"
+done
+
+sleep 5
+
+killall -KILL tail
+
+zenity --info --title="Resize Image(s)" --text="Resize operation completed."
+
+exit

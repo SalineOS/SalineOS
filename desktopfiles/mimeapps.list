@@ -1,0 +1,15 @@
+
+[Added Associations]
+x-scheme-handler/mailto=exo-mail-reader.desktop
+x-scheme-handler/http=exo-web-browser.desktop
+x-scheme-handler/https=exo-web-browser.desktop
+x-scheme-handler/file=exo-file-manager.desktop
+x-scheme-handler/trash=exo-file-manager.desktop
+x-scheme-handler/pkgkit=packagekit-url.desktop
+x-scheme-handler/apt=packagekit-url.desktop
+image/png=ristretto.desktop;inkscape.desktop;gimp.desktop;
+audio/mpeg=exaile.desktop;
+
+[Default Applications]
+image/png=gimp.desktop
+audio/mpeg=exaile.desktop

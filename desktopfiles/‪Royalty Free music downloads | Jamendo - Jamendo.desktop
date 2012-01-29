@@ -1,0 +1,10 @@
+
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=‪Royalty Free music downloads | Jamendo - Jamendo
+Exec=midori -a http://www.jamendo.com/en/ -e Statusbar
+TryExec=midori
+Icon=/home/anthony/.cache/midori/icons/a05afcddf3f792f109e85f6525a7e632.ico
+Categories=Network;
+GenericName=

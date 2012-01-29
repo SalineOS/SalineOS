@@ -1,0 +1,46 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
+## Copyright 2011 Anthony Nordquist under the GPL V2 License
+
+ImageList="$@"
+ConvertTo=$(zenity --list --column="Select One" --title="Image(s) Conversion" --text="Select the format to convert to" jpg gif jpeg png tiff dpx xhtml bmp pdf)
+
+if [ "$?" = "1" ]; then
+ exit
+fi
+
+progressbar () {
+tail -f /usr/bin/convert-image-ca |  zenity --progress --pulsate --auto-close --title="Image(s) Conversion" --text="$@"
+}
+
+progressbar "Converting image(s) to $ConvertTo now, please wait..." &
+
+for i in "$@"; do
+ Extension="$(echo "$i" | awk -F "." '{print $NF}')"
+ Converted="$(echo "$i" | sed -e "s|.$Extension||g")"
+ convert "$i" "$Converted.$ConvertTo"
+done
+
+sleep 5
+
+killall -KILL tail
+
+zenity --info --title="Image(s) Conversion" --text="Conversion Complete"
+
+exit
