@@ -1,0 +1,68 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Authored and maintained by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 2011
+## LOTS of code borrowed from the Remastersys USB copy tool authored by Tony Brijeski, this code has been heavily modified for the use in this script. 
+## Copyright 2011 Anthony Nordquist and Copyright 2009 by Tony Brijeski under the GPL V2 
+
+
+DIALOG="$(which zenity) --width=300 --height=200"
+TITLE="--title="
+TEXT="--text="
+ENTRY="--entry "
+ENTRYTEXT="--entry-text "
+FILESELECTION="--file-selection "
+MENU="--list --column=Pick --column=Info"
+YESNO="--question "
+MSGBOX="--info "
+TITLETEXT="Image To USB Burner"
+
+progressbar () {
+tail -f /usr/bin/image-to-usb | $DIALOG $TEXT"$@" --progress --pulsate --auto-close
+}
+
+
+DEVS=""
+DEVS=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
+for i in $DEVS; do
+USBDRIVESIZE=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+USBDRIVES="$USBDRIVES $i $USBDRIVESIZE "
+done
+
+USBDRIVE=$($DIALOG $TITLE"$TITLETEXT" $MENU $TEXT'\nPlease select the USB drive you would like to "burn" to.' $USBDRIVES Exit "Quit")
+
+$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will completely erase the contents of /dev/$USBDRIVE\nand replace them with the contents of $1.\n\nDo you want to continue?"
+
+if [ $? != 0 ]; then
+ exit
+fi
+
+umount $(mount | grep $USBDRIVE | awk '{print $1}')
+
+progressbar "Copying $1 to /dev/$USBDRIVE Now\n\nPlease Wait \n" &
+
+
+dd if="$1" of=/dev/$USBDRIVE bs=1M
+sync
+
+
+killall -KILL tail
+
+zenity --info --title="$TITLETEXT" --text="Copying of image complete, press ok to exit."
+exit
+
+
