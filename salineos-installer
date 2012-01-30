@@ -42,13 +42,10 @@ SingleMenu='yad  --on-top --center --list --column="Please choose one." --title=
 
 Menu='yad --print-column=1 --on-top --center --list --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-Progress='yad --on-top --center --progress --title=SalineOS-Installer --no-buttons --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Progress='yad --on-top --center --progress --auto-close --title=SalineOS-Installer --no-buttons --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
 TextEntry='yad --on-top --center --entry --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-progressbar () {
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="$@" 
-}
 
 ## Check for root and cry like a little girl if we don't have it.
 
@@ -244,11 +241,11 @@ elif [ "$Swap" = "" ]; then
  SelectSwapPart
  exit 0
 elif [ -f /tmp/Finished-Menu ]; then
- Swap=$(echo "$Swap" | awk '|' '{print $1}')
+ Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
  FinishedMenu
  exit 0
 else
- Swap=$(echo "$Swap" | awk '|' '{print $1}')
+ Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
  UserSetup
  exit 0
 fi
@@ -483,7 +480,7 @@ if [ -f /etc/salineos-utils/BACKUP ]; then
  exit 0
 fi
 
-progressbar "Checking for an active internet connection, please wait.\n" &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Checking for an active internet connection, please wait.\n" &
 
 TestInternet="$(httping -g http://www.google.com -c 1 -t 15)"
 Internet="$(echo "$TestInternet" | grep "0.00% failed")"
