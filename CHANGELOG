@@ -1,3 +1,28 @@
+commit 3b9e6743bde2e13fbe34eecbbd42a99dc76f15af
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Feb 7 09:20:50 2012 -0500
+
+    Added home partition dialog, polished dialogs, fixed image icon on question dialogs,
+    fixed auto part code, removed button for use swap partition if auto part is in use,
+
+commit 52bf608bf2a09622b0adcdbc38ae6de8b17b502b
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Jan 31 01:48:54 2012 -0500
+
+    Update Custom Actions
+
+commit d51ad9086d879f901d922de429929f7fecd777c8
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Jan 31 01:47:57 2012 -0500
+
+    update custom actions
+
+commit ca6b70f42cc75e2c6e2479b8c2ac89aab74511c7
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Jan 30 11:32:06 2012 -0500
+
+    generate changelog
+
 commit ce2353313ef0beb8d067ecfad7271b307fca417b
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Mon Jan 30 11:31:33 2012 -0500
