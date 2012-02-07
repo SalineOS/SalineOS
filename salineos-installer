@@ -36,7 +36,7 @@
 
 Info='yad --center --on-top --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-Question='yad --on-top --wrap --center --image "dialog-question" --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Question='yad --on-top --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
 SingleMenu='yad  --on-top --center --list --column="Please choose one." --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
@@ -203,6 +203,69 @@ fi
 
 }
 
+SelectHomePart () {
+
+HomePartMenu=""
+
+ExtraParts="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap" | cut -d " " -f1)"
+
+## Cleanup the fdisk output
+HomeParts=$(echo "$ExtraParts" | sed -r "s/\/dev\///g")
+
+for i in $HomeParts; do
+ HomePart="$i"
+ HomePartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+ HomePartMenu="$HomePartMenu $HomePart $HomePartSize"
+done
+
+HomePart=$($Menu --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" $HomePartMenu)
+
+ret=$?
+
+if [ "$ret" = "252" ]; then
+ SelectHomePart
+ exit 0
+elif [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 1
+  else
+   SelectSwapPart
+   exit 0
+  fi
+elif [ "$ret" = "5" ]; then
+ if [ -f /tmp/Finished-Menu ]; then
+  TargetHomePart="root"
+  FinishedMenu
+  exit 0
+ fi
+ TargetHomePart="root"
+ UserSetup
+ exit 0
+elif [ "$HomePart" = "" ]; then
+ SelectHomePart
+ exit 0
+else
+ TargetHomePart=$(echo "$HomePart" | awk -F '|' '{print $1}')
+ $Question --text="Format (Erase all data) on the target home partition, $TargetHomePart?"
+  if [ "$?" = "0" ]; then
+   FormatHome="True"
+  else
+   FormatHome="False"
+  fi
+fi
+
+if [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
+ exit 0
+else
+UserSetup
+exit 0
+fi
+
+
+}
+
 
 
 SelectSwapPart () {
@@ -220,7 +283,7 @@ for i in $TargetSwap; do
 done
 
 
-Swap=$($Menu --width=300 --height=250 --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"OK:2" $SwapPartMenu)
+Swap=$($Menu --width=300 --height=250 --text="  Please select the partition to use for swap\n" --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"OK:2" $SwapPartMenu)
 
 ret=$?
 
@@ -245,6 +308,11 @@ elif [ -f /tmp/Finished-Menu ]; then
  FinishedMenu
  exit 0
 else
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ if [ "$HomePartTest" != "" ]; then
+  SelectHomePart
+  exit 0
+ fi
  Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
  UserSetup
  exit 0
@@ -256,8 +324,11 @@ SwapFile () {
 
 SwapFileSize=""
 
-SwapFileSize=$($Menu --column="Size" --column=" " --text="Please select the size of the SalineOS swap file to be created." --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2"  128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
-
+if [ "$AutoPart" = "Auto" ]; then
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Continue:2"  128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+else
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2"  128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+fi
 
 ret=$?
 
@@ -277,7 +348,15 @@ else
   if [ -f /tmp/Finished-Menu ]; then
    FinishedMenu
    exit 0
+  elif [ "$AutoPart" = "Auto" ]; then
+   UserSetup
+   exit 0
   fi
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ if [ "$HomePartTest" != "" ]; then
+  SelectHomePart
+  exit 0
+ fi
  UserSetup
  exit 0
 fi
@@ -310,7 +389,7 @@ for i in $InstallPart; do
 done
 
 
-TargetPart=$($Menu --height=300 --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --text="Please select a partition to install the SalineOS root (Main) directory to." $PartMenu )
+TargetPart=$($Menu --height=300 --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --text="Please select a partition to install the\nSalineOS root (Main) directory to.\n" $PartMenu )
 
 ret=$?
 
@@ -334,7 +413,7 @@ fi
 
 TargetPart=$(echo "$TargetPart" | awk -F '|' '{print $1}')
 
-echo $TargetPart
+
 if [ -f /tmp/Finished-Menu ]; then
  FinishedMenu
  exit 0
@@ -365,9 +444,9 @@ for i in $Drives; do
 done
 
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use."  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
 else
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition."  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
 fi
 
 ret=$?
@@ -397,7 +476,7 @@ if [ "$AutoPart" != "Auto" ]; then
  gparted /dev/$PartDrive
 fi
 
-if [ "$AutoPart" = "True" ]; then
+if [ "$AutoPart" = "Auto" ]; then
  SwapFile
  exit 0
 else
