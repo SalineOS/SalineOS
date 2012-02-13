@@ -60,6 +60,50 @@ fi
 ## Get variables from the live system configuration. 
 . /etc/live/config.conf
 
+GrubSelect () {
+
+## Grub location
+
+GrubLocation=""
+GrubLoc=""
+
+GrubLoc=$($Menu --width=300 --height=250 --button=$"Exit:3" --button=$"OK:2"--text="\nPlease select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" $GrubMenu root "Root partition - only choose this if you will be using a secondary boot manager")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ GrubSelect
+ exit 0 
+elif [ "$GrubLoc" = "" ]; then
+ $Info --text="The grub location cannot be blank, please choose where to install grub." --button=$"gtk-ok:1"
+ GrubSelect
+ exit 0
+elif [ "$ret" = "3" ]; then 
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   GrubSelect
+   exit 0
+  fi
+fi
+
+GrubLoc=$(echo "$GrubLoc" | awk -F '|' '{print $1}')
+
+if [ "$GrubLoc" != "root" ]; then
+ GrubLocation="/dev/$GrubLoc"
+fi
+
+touch /tmp/Finished-Menu
+
+FinishedMenu
+
+}
+
+
 SetTimeZone () {
 
 TimeZones=""
@@ -122,8 +166,10 @@ TargetHostname="$(echo "$TargetHostname" | sed -e 's| ||g')"
 
 if [ -f /tmp/Finished-Menu ]; then
  FinishedMenu
+ exit 0
 else
  SetTimeZone
+ exit 0
 fi
 
 
@@ -151,6 +197,9 @@ ret=$?
 if [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
   if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
    exit 1
   else
    UserSetup
@@ -228,6 +277,9 @@ if [ "$ret" = "252" ]; then
 elif [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
   if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
    exit 1
   else
    SelectSwapPart
@@ -271,6 +323,7 @@ fi
 SelectSwapPart () {
 
 SwapPartMenu=""
+Swap=""
 
 ## Find swap partitions and find out which to use.
 TargetSwap=$(fdisk -l | grep swap | cut -d " " -f1)
@@ -292,6 +345,9 @@ ret=$?
 if [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
   if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
    exit 1
   else
    SelectSwapPart
@@ -325,9 +381,9 @@ SwapFile () {
 SwapFileSize=""
 
 if [ "$AutoPart" = "Auto" ]; then
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Continue:2"  128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Continue:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 else
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2"  128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 fi
 
 ret=$?
@@ -401,6 +457,9 @@ if [ "$ret" = "252" ]; then
 elif [ "$ret" = "3" ]; then
    $Question --text="Are you sure you want to cancel the installation?"
   if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
    exit 1
   else
    SelectRootPart
@@ -456,6 +515,9 @@ ret=$?
 if [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
   if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
    exit 1
   else
    ChooseDrive
@@ -513,14 +575,57 @@ fi
 }
 
 
+RestrictedMultimedia () {
 
+InstallCodec=""
+
+yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"gtk-no:5" --button=$"gtk-yes:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are under possible patent protection in some jurisdictions. Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate the rights of large multinational corporations. You must also accept the terms of Adobe's end user license agreement for their flash player.\n\nIf desired, you can purchase a license for the use of these codec's at http://www.fluendo.com. You can install these plug-ins at anytime using the SalineOS system utilities.\n\nWould you like to install plug-ins for the decoding of restricted multimedia?"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ RestrictedMultimedia
+ exit 0
+elif [ "$ret" = "5" ]; then
+ if [ -f /tmp/Finished-Menu ]; then
+  InstallCodec="FALSE"
+  FinishedMenu
+  exit 0
+ else
+  InstallCodec="FALSE"
+  AutoPartitioning
+  exit 0
+ fi
+elif [ "$ret" = "3" ]; then
+ yad --list --column='   ' --on-top --title="Adobe EULA" --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --height="550" --width=700 --wrap --button=$"gtk-ok:5" "$(cat /etc/salineos-utils/adobeEULA)"
+ RestrictedMultimedia
+ exit 0
+elif [ "$ret" = "7" ]; then
+ if [ -f /tmp/Finished-Menu ]; then
+  InstallCodec="TRUE"
+  FinishedMenu
+  exit 0
+ else
+  InstallCodec="TRUE"
+  AutoPartitioning
+  exit 0
+ fi
+fi 
+
+}
 
 ## Tell the user that there are instructions in the user manual 
 Instruction (){ 
 
 $Info --text="Complete installation instructions are included\nin the user manual if needed." '--button=gtk-ok:1'
-AutoPartitioning
-exit 0
+
+if [ -f /etc/salineos-utils/BACKUP ]; then
+ AutoPartitioning
+ exit 0
+else
+ RestrictedMultimedia
+ exit 0
+fi
 
 
 }
