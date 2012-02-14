@@ -60,6 +60,93 @@ fi
 ## Get variables from the live system configuration. 
 . /etc/live/config.conf
 
+
+## This installer only takes one option, ext3 this variable is testing for it.
+Input="$@"
+
+
+FinishedMenu () {
+
+Change=""
+
+if [ "$AutoPart" = "Manual" ]; then
+ if [ "$UseSwapFile" = "True" ]; then
+  SwapFinished='Swap-File'
+  SwapFinished2="A $SwapFileSize Megabytes swap file will be created"
+ else
+  SwapFinished='Swap-Partition'
+  SwapFinished2="$Swap will be used as the swap partition"
+ fi
+
+RootPartition="Root-Partition"
+
+ if [ "$Input" = "ext3" ]; then
+  RootPartition2="$TargetPart will be formatted (erased) ext3 and used for root"
+ else
+  RootPartition2="$TargetPart will be formatted (erased) ext4 and used for root"
+ fi
+
+HomePartFinished="Home"
+
+ if [ "$TargetHomePart" = "root" ]; then
+  HomePartFinished2="The home folder will be placed on the root partition"
+ else
+  if [ "$FormatHome" = "TRUE" ]; then
+   if [ "$Input" = "ext3" ]; then
+    HomePartFinished2="$TargetHomePart will be formated (erased) ext3 and used for /home"
+   else
+    HomePartFinished2="$TargetHomePart will be formated (erased) ext4 and used for /home"
+   fi
+  else
+   HomePartFinished2="$TargetHomePart will be used for /home without erasing data"
+  fi
+ fi
+else
+ SwapFinished='Swap-File'
+ SwapFinished2="A $SwapFileSize Megabytes swap file will be created"
+ RootPartition="Use-Disk"
+ RootPartition2="$PartDrive will be erased and the entire disk used"
+fi
+
+if [ "$Internet" != "Continue" ]; then
+if [ "$InstallCodec" = "FALSE" ]; then
+ CodecsFinished="Install-Plugins"
+ CodecsFinished2="Restricted multimedia plug-ins will not be installed"
+else
+ CodecsFinished="Install-Plugins"
+ CodecsFinished2="Restricted multimedia plug-ins will be installed"
+fi
+fi
+
+UserFinished="User-Account"
+UserFinished2="A user account will be created for "$TargetUserRealName" with the username "$TargetUser""
+
+AutoLoginFinished="Auto-Login"
+AutoLoginFinished2="Require password for login is "$RequirePassword""
+
+HostnameFinished="Hostname"
+HostnameFinished2="The system hostname will be set to "$TargetHostname""
+
+TimeZoneFinished="Time-Zone"
+TimeZoneFinished2="The system time zone will be set to "$TimeZone""
+
+GrubFinished="Boot-Loader"
+GrubFinished2="The GRUB2 boot loader will be installed to "$GrubLoc""
+
+if [ "$AutoPart" = "Auto" ]; then
+Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"Exit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
+else
+Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"Exit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$HomePartFinished" "$HomePartFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
+fi
+
+ret="$?"
+
+rm -rf /tmp/Finished-Menu
+
+
+}
+
+
 GrubSelect () {
 
 ## Grub location
@@ -67,17 +154,13 @@ GrubSelect () {
 GrubLocation=""
 GrubLoc=""
 
-GrubLoc=$($Menu --width=300 --height=250 --button=$"Exit:3" --button=$"OK:2"--text="\nPlease select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" $GrubMenu root "Root partition - only choose this if you will be using a secondary boot manager")
+GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"Exit:3" --button=$"OK:2" --text="Please select where to install the grub boot loader\n" $GrubMenu root "Root partition - (Advanced)")
 
 ret="$?"
 
 if [ "$ret" = "252" ]; then
  GrubSelect
  exit 0 
-elif [ "$GrubLoc" = "" ]; then
- $Info --text="The grub location cannot be blank, please choose where to install grub." --button=$"gtk-ok:1"
- GrubSelect
- exit 0
 elif [ "$ret" = "3" ]; then 
   $Question --text="Are you sure you want to cancel the installation?"
   if [ "$?" = "0" ]; then
@@ -89,6 +172,10 @@ elif [ "$ret" = "3" ]; then
    GrubSelect
    exit 0
   fi
+elif [ "$GrubLoc" = "" ]; then
+ $Info --text="The grub location cannot be blank, please choose where to install grub." --button=$"gtk-ok:1"
+ GrubSelect
+ exit 0
 fi
 
 GrubLoc=$(echo "$GrubLoc" | awk -F '|' '{print $1}')
@@ -131,6 +218,13 @@ fi
 
 TimeZone="$(echo $TimeZone | awk -F '|' '{print $1}')"
 
+if [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
+ exit 0
+else
+ GrubSelect
+ exit 0
+fi
 
 }
 
@@ -389,8 +483,8 @@ fi
 ret=$?
 
 if [ "$ret" = "3" ]; then
- SelectSwapPart
  UseSwapFile="False"
+ SelectSwapPart
  exit 0
 elif [ "$ret" = "252" ]; then
  SwapFile
@@ -445,7 +539,7 @@ for i in $InstallPart; do
 done
 
 
-TargetPart=$($Menu --height=300 --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --text="Please select a partition to install the\nSalineOS root (Main) directory to.\n" $PartMenu )
+TargetPart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --text="Please select a partition to install the SalineOS root (Main) directory to.\n" $PartMenu )
 
 ret=$?
 
@@ -579,7 +673,7 @@ RestrictedMultimedia () {
 
 InstallCodec=""
 
-yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"gtk-no:5" --button=$"gtk-yes:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are under possible patent protection in some jurisdictions. Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate the rights of large multinational corporations. You must also accept the terms of Adobe's end user license agreement for their flash player.\n\nIf desired, you can purchase a license for the use of these codec's at http://www.fluendo.com. You can install these plug-ins at anytime using the SalineOS system utilities.\n\nWould you like to install plug-ins for the decoding of restricted multimedia?"
+yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"gtk-no:5" --button=$"gtk-yes:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate the intellectual property rights of corporations. You must also accept the terms of Adobe's end user license agreement for their flash player.\n\nIf desired, you can purchase a license for the use of these codec's at http://www.fluendo.com. You can install these plug-ins at anytime using the SalineOS system utilities.\n\nWould you like to install plug-ins for the decoding of restricted multimedia?"
 
 ret="$?"
 
