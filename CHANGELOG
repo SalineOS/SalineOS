@@ -1,3 +1,15 @@
+commit 2d5444b9cb8cf5fcee76c8496efbcb83d2b8af14
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Feb 14 17:13:21 2012 -0500
+
+    Write the finished menu, still needs code to make options do something
+
+commit d7df237b07fc5baeea3f149503b4cc1d0280b375
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Feb 13 12:15:12 2012 -0500
+
+    Generate Changelog
+
 commit b5d88dde873071c89424729d19c452c7221685d4
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Mon Feb 13 12:11:20 2012 -0500
