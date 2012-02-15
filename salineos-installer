@@ -141,6 +141,70 @@ fi
 
 ret="$?"
 
+Change=$(echo "$Change" | awk -F '|' '{print $1}')
+ 
+if [ "$ret" = "252" ]; then
+ FinishedMenu
+ exit 0 
+elif [ "$ret" = "3" ]; then 
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   FinishedMenu
+   exit 0
+  fi
+elif [ "$ret" = "7" ]; then
+ rm -rf /tmp/Finished-Menu
+ RunInstallation
+ exit 0
+elif [ "$Change" = "Swap-Partition" ]; then
+ SelectSwapPart
+ exit 0
+elif [ "$Change" = "Root-Partition" ]; then
+ SelectRootPart
+ exit 0
+elif [ "$Change" = "Swap-File" ]; then
+ SwapFile
+ exit 0
+elif [ "$Change" = "Home" ]; then
+ SelectHomePart
+ exit 0
+elif [ "$Change" = "Auto-Login" ]; then
+  $Question --text="Require a password to login as "$TargetUser"?"
+  if [ "$?" = "0" ]; then
+   RequirePassword="TRUE"
+   FinishedMenu 
+   exit 0
+  else
+   RequirePassword="FALSE"
+   FinishedMenu
+   exit 0
+  fi
+elif [ "$Change" = "User-Account" ]; then
+ UserSetup
+ exit 0
+elif [ "$Change" = "Hostname" ]; then
+ SetHostname
+ exit 0
+elif [ "$Change" = "Time-Zone" ]; then
+ SetTimeZone
+ exit 0
+elif [ "$Change" = "Boot-Loader" ]; then
+ GrubSelect
+ exit 0
+elif [ "$Change" = "Use-Disk" ]; then
+ ChooseDrive
+ exit 0
+elif [ "$Change" = "" ]; then
+ $Info --text="No change selected" --button=$"gtk-ok:1"
+ exit 0
+fi
+
+
 rm -rf /tmp/Finished-Menu
 
 
@@ -284,7 +348,7 @@ TargetUser=""
 TargetUserPassword1=""
 TargetUserPassword2=""
 RequirePassword=""
-UserStuff=$(yad --center --on-top --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK" --button=$"Exit:3" --button=$"OK:2")
+UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK" --button=$"Exit:3" --button=$"OK:2")
 
 ret=$?
 
