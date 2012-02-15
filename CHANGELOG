@@ -1,0 +1,147 @@
+commit 8af103f2628a615198135d5e5a02aca41879c5dd
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Feb 15 13:09:44 2012 -0500
+
+    Implement Change selected code into finished menu
+
+commit 1148a984cdbfe5ee44c1ace3d781fc4d452bf7bf
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Feb 14 17:14:26 2012 -0500
+
+    Generate Changelog
+
+commit 2d5444b9cb8cf5fcee76c8496efbcb83d2b8af14
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Feb 14 17:13:21 2012 -0500
+
+    Write the finished menu, still needs code to make options do something
+
+commit d7df237b07fc5baeea3f149503b4cc1d0280b375
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Feb 13 12:15:12 2012 -0500
+
+    Generate Changelog
+
+commit b5d88dde873071c89424729d19c452c7221685d4
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Feb 13 12:11:20 2012 -0500
+
+    Add grub selection dialog, add restricted multimedia dialog, add adobe EULA, remove finished menu file before exiting.
+
+commit 78191b68094faa10f7446368fa852884bc520023
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Feb 7 09:24:14 2012 -0500
+
+    Generate Changelog
+
+commit 3b9e6743bde2e13fbe34eecbbd42a99dc76f15af
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Feb 7 09:20:50 2012 -0500
+
+    Added home partition dialog, polished dialogs, fixed image icon on question dialogs,
+    fixed auto part code, removed button for use swap partition if auto part is in use,
+
+commit 52bf608bf2a09622b0adcdbc38ae6de8b17b502b
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Jan 31 01:48:54 2012 -0500
+
+    Update Custom Actions
+
+commit d51ad9086d879f901d922de429929f7fecd777c8
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Jan 31 01:47:57 2012 -0500
+
+    update custom actions
+
+commit ca6b70f42cc75e2c6e2479b8c2ac89aab74511c7
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Jan 30 11:32:06 2012 -0500
+
+    generate changelog
+
+commit ce2353313ef0beb8d067ecfad7271b307fca417b
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Jan 30 11:31:33 2012 -0500
+
+    fix bugs with awk statements and progress bar
+
+commit a2771e8cc90505aacc5c90d0de45efc70f1f590d
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Jan 30 08:02:43 2012 -0500
+
+    Generate changelog
+
+commit 24ad96674190f0f1f7c2e2e130ec6f10d139b1c3
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Jan 30 08:00:39 2012 -0500
+
+    Fix awk syntax error, remove spaces from ' ' that don't belong.
+
+commit 0a4145397406f22a060b374d849ef81cb62e9c9d
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sun Jan 29 13:52:40 2012 -0500
+
+    Finish moving files, generate changelog
+
+commit a4faddc5523f6006056445c388f143da3e7ca9ed
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sun Jan 29 13:51:08 2012 -0500
+
+    Move some files
+
+commit 4c94c81bcd99593d9541da713f96a256e1ec6885
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sun Jan 29 13:43:10 2012 -0500
+
+    Add everything to git :)
+
+commit 711d4c9e6169222d4d3eebfbf4f64b12d91ae0a2
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sun Jan 29 13:33:25 2012 -0500
+
+    add the original Remastersys copy tool to git with the filename image-to-usb
+    so we can use git to track the changes with the re-write
+
+commit 658825588a8d70f1b122673878518c9334674fcf
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Jan 28 12:19:25 2012 -0500
+
+    update changelog
+
+commit 64e5570b0a38fb3b1ab8ccac90ae828af0e76879
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Jan 28 12:18:06 2012 -0500
+
+    Fixed autopart calling wrong function, cleaned up code, added finished
+    menu entries to those missing them. Removed option to reopen GParted
+
+commit 12b3501556c2dbd9a5275010a640cc614c319c64
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Fri Jan 27 09:42:40 2012 -0500
+
+    Generate changelog
+
+commit 7901cd64c81d20cd1cbf3ded256f0c6230b8c88a
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Fri Jan 27 09:35:08 2012 -0500
+
+    Reformat the Remastersys installer code to follow my perferred formatting.
+    This entry is just to ensure GPL compliance in the changelog.
+
+commit d5495b6155ec49386e591ce98103d6628f00cac1
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Fri Jan 27 09:11:51 2012 -0500
+
+    Completed another proof read
+
+commit 2746dba884d267f817554d922c71a21e3690a566
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Fri Jan 27 09:03:40 2012 -0500
+
+    Fix Usersetup text
+
+commit 8d3d4321a0ff45655c1b01d9ef6fc06ae4860bc0
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Fri Jan 27 08:03:30 2012 -0500
+
+    first commit
