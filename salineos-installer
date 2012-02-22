@@ -64,6 +64,174 @@ fi
 ## This installer only takes one option, ext3 this variable is testing for it.
 Input="$@"
 
+RunInstallation () { 
+
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="$@" 
+
+## Check for safe mode and change the grub line.
+TestSafeMode=$(grep -B 0  "noapic noapm nodma nomce nolapic nomodeset radeon.modeset=0 nouveau.modeset=0" /proc/cmdline)
+
+if [ "$TestSafeMode" != "" ]; then
+ OldGrubLine="$(grep -B 0  "GRUB_CMDLINE_LINUX=" /etc/default/grub)"
+ sed -i -e "s/"$OldGrubLine"""/GRUB_CMDLINE_LINUX=\"noapic noapm nodma nomce nolapic nomodeset radeon.modeset=0 nouveau.modeset=0 nosmp\"/g" /etc/default/grub
+fi
+
+if [ "$Input" = "ext3" ]; then
+ FilesystemType="ext3"
+else
+ FilesystemType="ext4"
+fi
+
+if [ "$AutoPart" = "Auto" ]; then 
+ parted --script --align optimal /dev/$PartDrive mklabel msdos
+ parted --script --align optimal /dev/$PartDrive mkpart primary 1 -- -1
+ parted --script --align optimal /dev/$PartDrive set 1 boot on
+ TargetHomePart="root"
+ TargetPart="$PartDrive"1
+fi
+
+if [ "$(mount | grep $TargetPart)" != "" ]; then
+ echo "Unmounting the partition we are going to use and format now"
+ umount /dev/$TargetPart
+ sleep 2
+fi
+
+mke2fs -t $FilesystemType /dev/$TargetPart
+
+mkdir -p /Target
+
+sleep 2
+
+echo "Mounting $TargetPart"
+
+mount /dev/$TargetPart /Target -o rw
+
+sleep 2
+
+echo "Configure the filesystem to be checked every 50 mounts"
+
+tune2fs -c 50 -i 0 /dev/$TargetPart
+
+sleep 2
+
+rm -rf /Target/lost+found
+
+if [ "$TargetHomePart" != "root" ]; then
+ if [ "$FormatHome" = "TRUE" ]; then
+  echo "Formatting the $TargetHomePart partition now"
+  mke2fs -t $FilesystemType /dev/$TargetHomePart
+ fi
+
+ echo "Mounting the TARGET home partition now"
+
+ mkdir -p /Target/home
+
+ mount /dev/$TargetHomePart /Target/home -o rw
+
+ tune2fs -c 50 -i 0 /dev/$TargetHomePart
+
+ rm -rf /Target/home/lost+found
+
+ TargetHomeUUID=$(blkid /dev/$TargetHomePart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+
+ ## Get fs type for the home partition in case the user chose not to format it
+ HomeFilesystemType=$(mount | grep "/dev/$TargetHomePart" | awk '{print $5}')
+
+fi
+
+echo "Generating UUID values for fstab"
+
+TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+TargetCDRom="/dev/cdrom"
+
+killall -KILL tail
+
+## Copy the live system to $Target
+tail -f /usr/bin/salineos-installer | $Progress --text="$@" --pulsate
+
+rsync -a / /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
+
+## Make needed aditional folders on the system.
+mkdir -p /Target/{proc,mnt,sys,media/cdrom}
+
+## Prepare a chroot envoirnment for post install changes
+
+mount -o bind /proc /Target/proc
+mount -o bind /dev /Target/dev
+mount -o bind /sys /Target/sys
+rm -rf /Target/etc/fstab
+
+## Create a new fstab file for the system
+
+if [ "$UseSwapFile" = "True" ]; then
+ SwapFstab="/swap/salineos-swapfile"
+else
+ TargetSwapUUID=$(blkid /dev/$Swap | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+ SwapFstab="UUID=$TargetSwapUUID"
+fi
+
+if [ "$TargetHomePart" = "root" ]; then
+cat > /Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+# Swap space created during install
+$SwapFstab none swap sw 0 0
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+FOO
+
+else
+
+cat > /Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+# /dev/$HOMEPART home
+UUID=$TargetHomeUUID /home $HomeFilesystemType relatime 0 0
+# Swap space created during install
+$SwapFstab none swap sw 0 0
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+FOO
+
+fi
+
+## Remove diverted update-initramfs as live-initramfs makes it a dummy file when booting the livecd
+if [ -f /Target/usr/sbin/update-initramfs.debian ]; then
+ rm -f /Target/usr/sbin/update-initramfs
+fi
+
+## Remove diverted update-notifier as it is disabled by live-config
+if [ -f /Target/usr/lib/update-notifier/apt-check.debian ]; then
+ rm -f /Target/usr/lib/update-notifier/apt-check
+fi
+
+## Remove diverted anacron as it is disabled by live-config
+if [ -f /Target/usr/sbin/anacron.debian ]; then
+ rm -f /Target/usr/sbin/anacron
+fi
+
+## Restore original inittab as live-initramfs changes it
+cp /Target/usr/share/sysvinit/inittab /Target/etc/inittab
+
+echo "$TargetHostname" > /Target/etc/hostname
+echo "127.0.0.1 localhost" > /Target/etc/hosts
+echo "127.0.0.1 $TargetHostname" >> /Target/etc/hosts
+touch /Target/etc/resolv.conf
+
+}
+
 
 FinishedMenu () {
 
@@ -159,7 +327,7 @@ elif [ "$ret" = "3" ]; then
   fi
 elif [ "$ret" = "7" ]; then
  rm -rf /tmp/Finished-Menu
- RunInstallation
+ RunInstallation-DISABLED-FOR-TESTING
  exit 0
 elif [ "$Change" = "Swap-Partition" ]; then
  SelectSwapPart
