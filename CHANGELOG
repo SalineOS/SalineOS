@@ -1,3 +1,21 @@
+commit cbe7807943c741bd283a6a976380acd36c1a6312
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Feb 22 12:16:54 2012 -0500
+
+    Creat most of RunInstallation, port packagekit URL to yad, break 1000 lines of code in installer :)
+
+commit f78b48d61994116f08b6b0e75be9defeebf63fd9
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Feb 15 13:41:25 2012 -0500
+
+    Generate Changelog
+
+commit 772c286846b8830d345db50cf42c19c6aef16045
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Feb 15 13:10:27 2012 -0500
+
+    Generate Changelog
+
 commit 8af103f2628a615198135d5e5a02aca41879c5dd
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Wed Feb 15 13:09:44 2012 -0500
