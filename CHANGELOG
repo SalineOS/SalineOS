@@ -1,3 +1,15 @@
+commit 6e25f11340ecf133ba81c98159a823826977f137
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Fri Feb 24 16:53:26 2012 -0500
+
+    Redo progress bars, add swap creation code, various cleanups
+
+commit b2d986099ed2a9b98e2b1f2a5b01d768d5fa45fb
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Feb 22 12:18:23 2012 -0500
+
+    Generate Changelog
+
 commit cbe7807943c741bd283a6a976380acd36c1a6312
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Wed Feb 22 12:16:54 2012 -0500
