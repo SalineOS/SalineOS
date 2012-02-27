@@ -1007,7 +1007,7 @@ RestrictedMultimedia () {
 
 InstallCodec=""
 
-yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"gtk-no:5" --button=$"gtk-yes:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate the intellectual property rights of corporations. You must also accept the terms of Adobe's end user license agreement for their flash player.\n\nIf desired, you can purchase a license for the use of these codec's at http://www.fluendo.com. You can install these plug-ins at anytime using the SalineOS system utilities.\n\nWould you like to install plug-ins for the decoding of restricted multimedia?"
+yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights. In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's EULA.\n\n"
 
 ret="$?"
 
