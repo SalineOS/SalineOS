@@ -1,3 +1,21 @@
+commit ef81ff29bfd058a4995c6e4458d43061bf765661
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Feb 27 05:35:06 2012 -0500
+
+    Rewrite restricted multimedia dialog
+
+commit facfab45f6b9007a74756d886c3b45f76a9a4c6b
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Feb 27 02:54:58 2012 -0500
+
+    Various errors corrected, finish the base install code
+
+commit 25f01eec958d91cbffcf4c13b8f23c6350986788
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Fri Feb 24 16:54:08 2012 -0500
+
+    Generate Changelog
+
 commit 6e25f11340ecf133ba81c98159a823826977f137
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Fri Feb 24 16:53:26 2012 -0500
