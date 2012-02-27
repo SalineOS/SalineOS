@@ -66,7 +66,7 @@ Input="$@"
 
 RunInstallation () { 
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Preparing disk and partitions" &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Preparing disk and partitions           " &
 
 ## Check for safe mode and change the grub line.
 TestSafeMode=$(grep -B 0  "noapic noapm nodma nomce nolapic nomodeset radeon.modeset=0 nouveau.modeset=0" /proc/cmdline)
@@ -103,7 +103,7 @@ sleep 3
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Mounting $TargetPart     " &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Mounting $TargetPart             " &
 
 mount /dev/$TargetPart /Target -o rw
 
@@ -123,13 +123,13 @@ killall -KILL tail
 
 if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "TRUE" ]; then
-  tail -f /usr/bin/salineos-installer | yad --progress --pulsate --text="Formatting $TargetHomePart for /home" &
+  tail -f /usr/bin/salineos-installer | yad --progress --pulsate --text="Formatting $TargetHomePart for /home        " &
   mke2fs -t $FilesystemType /dev/$TargetHomePart
   sleep 3
   killall -KILL tail
  fi
 
- tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Mounting $TargetHomePart      " &
+ tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Mounting $TargetHomePart              " &
 
  mkdir -p /Target/home
 
@@ -147,7 +147,7 @@ if [ "$TargetHomePart" != "root" ]; then
  killall -KILL tail
 fi
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Generating UUID values for fstab" &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Generating UUID values for fstab      " &
 
 TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
 TargetCDRom="/dev/cdrom"
@@ -157,7 +157,7 @@ sleep 3
 killall -KILL tail
 
 ## Copy the live system to $Target
-tail -f /usr/bin/salineos-installer | $Progress --text="Copying files to $TargetPart" --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="Copying files to $TargetPart          " --pulsate &
 
 rsync -a / /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
 
@@ -168,10 +168,11 @@ sleep 3
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --text="Setting up swap space" --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="Setting up swap space         " --pulsate &
 
 
 if [ "$UseSwapFile" = "True" ]; then
+ mkdir -p /Target/swap
  fallocate --length "$SwapFileSize"m /Target/swap/salineos-swap
  sleep 2
  mkswap /Target/swap/salineos-swap
@@ -213,6 +214,15 @@ $SwapFstab none swap sw 0 0
 # cdrom
 $TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
 
+for i in $(ls /home); do
+
+if [ -f /home/$i/.config/Thunar/volmanrc ]; then
+  sed -i -e 's/FALSE/TRUE/g' /home/$i/.config/Thunar/volmanrc
+  cp -f /home/$i/.config/volmanrc /root/.config/Thunar/volmanrc
+fi
+
+done
+
 FOO
 
 else
@@ -231,6 +241,16 @@ UUID=$TargetHomeUUID /home $HomeFilesystemType relatime 0 0
 $SwapFstab none swap sw 0 0
 # cdrom
 $TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+
+for i in $(ls /home); do
+
+if [ -f /home/$i/.config/Thunar/volmanrc ]; then
+  sed -i -e 's/FALSE/TRUE/g' /home/$i/.config/Thunar/volmanrc
+  cp -f /home/$i/.config/volmanrc /root/.config/Thunar/volmanrc
+fi
+
+done
 
 FOO
 
@@ -263,6 +283,39 @@ sleep 2
 
 killall -KILL tail
 
+## Install GRUB2
+tail -f /usr/bin/salineos-installer | $Progress --text="Installing and setting up GRUB2            " --pulsate &
+chroot /Target chmod -x /etc/grub.d/20_memtest86+
+chroot /Target grub-install --force --no-floppy $GrubLocation
+chroot /Target update-grub
+sleep 2
+
+killall -KILL tail
+
+## Unmount the target partition
+tail -f /usr/bin/salineos-installer | $Progress --text="Unmounting $TargetPart           " --pulsate &
+
+sleep 2
+umount /Target/home
+sleep 2
+umount /Target/proc
+sleep 2
+umount /Target/dev
+sleep 2
+umount /Target/sys
+sleep 2
+umount /Target
+sleep 2
+
+killall -KILL tail
+
+$Question --text="\nInstallation is complete.\n\nIf everything went well you should have your\nnew system installed and ready.\n\nDo you want to reboot now to try it out?" 
+
+if [ $? = 0 ]; then
+ reboot
+else
+ exit 0
+fi
 
 }
 
@@ -359,9 +412,9 @@ elif [ "$ret" = "3" ]; then
    FinishedMenu
    exit 0
   fi
-elif [ "$ret" = "7" ]; then
+elif [ "$ret" = "5" ]; then
  rm -rf /tmp/Finished-Menu
- RunInstallation-DISABLED-FOR-TESTING
+ RunInstallation
  exit 0
 elif [ "$Change" = "Swap-Partition" ]; then
  SelectSwapPart
@@ -403,6 +456,7 @@ elif [ "$Change" = "Use-Disk" ]; then
  exit 0
 elif [ "$Change" = "" ]; then
  $Info --text="No change selected" --button=$"gtk-ok:1"
+ FinishedMenu
  exit 0
 fi
 
@@ -448,6 +502,8 @@ GrubLoc=$(echo "$GrubLoc" | awk -F '|' '{print $1}')
 
 if [ "$GrubLoc" != "root" ]; then
  GrubLocation="/dev/$GrubLoc"
+else
+ GrubLocation="/dev/$TargetPart"
 fi
 
 touch /tmp/Finished-Menu
@@ -519,10 +575,18 @@ elif [ "$TargetHostname" = "" ]; then
 fi
 
 
-## Make the hostname lower case, to avoid random issues with bad software.
-TargetHostname="$(echo "$TargetHostname" | awk '{print tolower ($0)}')"
-## Remove spaces just in case
+## Check if the user is an idiot :)
+TestHostname=$(echo "$TargetHostname" | grep '[!@#$%&*()_+=~,.?:;*-+]')
+
+if [ "$TestHostname" != "" ]; then
+ $Info --text="The hostname cannot contain special characters." --width=200 --button=$"gtk-ok:1"
+ SetHostname
+ exit 0
+fi
+
+## Remove spaces just in case the user doesn't read >.>
 TargetHostname="$(echo "$TargetHostname" | sed -e 's| ||g')"
+
 
 if [ -f /tmp/Finished-Menu ]; then
  FinishedMenu
@@ -696,7 +760,7 @@ for i in $TargetSwap; do
 done
 
 
-Swap=$($Menu --width=300 --height=250 --text="  Please select the partition to use for swap\n" --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"OK:2" $SwapPartMenu)
+Swap=$($Menu --width=300 --height=250 --text="  Please select the partition to use for swap\n" --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" $SwapPartMenu)
 
 ret=$?
 
@@ -716,6 +780,9 @@ if [ "$ret" = "3" ]; then
 elif [ "$ret" = "252" ]; then
  SelectSwapPart
  exit 0 
+elif [ "$ret" = "5" ]; then
+ SwapFile
+ exit 0
 elif [ "$Swap" = "" ]; then
  SelectSwapPart
  exit 0
@@ -726,6 +793,7 @@ elif [ -f /tmp/Finished-Menu ]; then
 else
  HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
  if [ "$HomePartTest" != "" ]; then
+  Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
   SelectHomePart
   exit 0
  fi
