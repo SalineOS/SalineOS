@@ -66,7 +66,7 @@ Input="$@"
 
 RunInstallation () { 
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Preparing disk and partitions           " &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Preparing disk and partitions               " &
 
 ## Check for safe mode and change the grub line.
 TestSafeMode=$(grep -B 0  "noapic noapm nodma nomce nolapic nomodeset radeon.modeset=0 nouveau.modeset=0" /proc/cmdline)
@@ -103,7 +103,7 @@ sleep 3
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Mounting $TargetPart             " &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="                   Mounting $TargetPart                   " &
 
 mount /dev/$TargetPart /Target -o rw
 
@@ -123,13 +123,13 @@ killall -KILL tail
 
 if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "TRUE" ]; then
-  tail -f /usr/bin/salineos-installer | yad --progress --pulsate --text="Formatting $TargetHomePart for /home        " &
+  tail -f /usr/bin/salineos-installer | yad --progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
   mke2fs -t $FilesystemType /dev/$TargetHomePart
   sleep 3
   killall -KILL tail
  fi
 
- tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Mounting $TargetHomePart              " &
+ tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="              Mounting $TargetHomePart              " &
 
  mkdir -p /Target/home
 
@@ -147,7 +147,7 @@ if [ "$TargetHomePart" != "root" ]; then
  killall -KILL tail
 fi
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Generating UUID values for fstab      " &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="               Generating UUID values for fstab               " &
 
 TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
 TargetCDRom="/dev/cdrom"
@@ -157,7 +157,7 @@ sleep 3
 killall -KILL tail
 
 ## Copy the live system to $Target
-tail -f /usr/bin/salineos-installer | $Progress --text="Copying files to $TargetPart          " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="Copying files to $TargetPart                   " --pulsate &
 
 rsync -a / /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
 
@@ -168,15 +168,15 @@ sleep 3
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --text="Setting up swap space         " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="                    Setting up swap space                    " --pulsate &
 
 
 if [ "$UseSwapFile" = "True" ]; then
  mkdir -p /Target/swap
- fallocate --length "$SwapFileSize"m /Target/swap/salineos-swap
+ fallocate --l "$SwapFileSize"m /Target/swap/salineos-swap
  sleep 2
  mkswap /Target/swap/salineos-swap
- SwapFstab="/swap/salineos-swapfile"
+ SwapFstab="/swap/salineos-swap"
 else
  mkswap $Swap
  sleep 2
@@ -214,14 +214,6 @@ $SwapFstab none swap sw 0 0
 # cdrom
 $TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
 
-for i in $(ls /home); do
-
-if [ -f /home/$i/.config/Thunar/volmanrc ]; then
-  sed -i -e 's/FALSE/TRUE/g' /home/$i/.config/Thunar/volmanrc
-  cp -f /home/$i/.config/volmanrc /root/.config/Thunar/volmanrc
-fi
-
-done
 
 FOO
 
@@ -242,15 +234,6 @@ $SwapFstab none swap sw 0 0
 # cdrom
 $TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
 
-
-for i in $(ls /home); do
-
-if [ -f /home/$i/.config/Thunar/volmanrc ]; then
-  sed -i -e 's/FALSE/TRUE/g' /home/$i/.config/Thunar/volmanrc
-  cp -f /home/$i/.config/volmanrc /root/.config/Thunar/volmanrc
-fi
-
-done
 
 FOO
 
@@ -283,8 +266,42 @@ sleep 2
 
 killall -KILL tail
 
+tail -f /usr/bin/salineos-installer | $Progress --text="             Setting up user account             " --pulsate &
+
+DefaultGroups="audio,cdrom,dialout,floppy,video,plugdev,netdev,powerdev,lp,scanner,disk,fuse,games,voice,sudo"
+
+cat > /Target/bin/TempScript <<FOO
+#!/bin/bash
+
+userdel -f -r $LIVE_USERNAME
+sed -i '/$LIVE_USERNAME/d' /etc/sudoers
+groupadd -g 1000 $TargetUser
+useradd -u 1000 -g 1000 -c "$TargetUserRealName,,," -G $DefaultGroups -s /bin/bash -m $TargetUser
+echo -e "TargetUserPassword1\nTargetUserPassword1\n" | passwd $TargetUser
+dpkg-divert --remove --rename --quiet /usr/lib/update-notifier/apt-check
+dpkg-divert --remove --rename --quiet /usr/sbin/update-initramfs
+dpkg-divert --remove --rename --quiet /usr/sbin/anacron
+update-initramfs -t -c -k $(/bin/uname -r)
+shadowconfig on
+
+FOO
+
+chmod +x /Target/usr/bin/TempScript
+
+sleep 1
+
+chroot /Target TempScript
+
+sleep 2
+
+rm /Target/usr/bin/TempScript
+sleep 3
+
+killall -KILL tail
+
+
 ## Install GRUB2
-tail -f /usr/bin/salineos-installer | $Progress --text="Installing and setting up GRUB2            " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="Installing and setting up GRUB2                " --pulsate &
 chroot /Target chmod -x /etc/grub.d/20_memtest86+
 chroot /Target grub-install --force --no-floppy $GrubLocation
 chroot /Target update-grub
@@ -292,8 +309,8 @@ sleep 2
 
 killall -KILL tail
 
-## Unmount the target partition
-tail -f /usr/bin/salineos-installer | $Progress --text="Unmounting $TargetPart           " --pulsate &
+## Unmount the target partition  
+tail -f /usr/bin/salineos-installer | $Progress --text="                  Unmounting $TargetPart                  " --pulsate &
 
 sleep 2
 umount /Target/home
