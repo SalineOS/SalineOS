@@ -157,7 +157,7 @@ sleep 3
 killall -KILL tail
 
 ## Copy the live system to $Target
-tail -f /usr/bin/salineos-installer | $Progress --text="Copying files to $TargetPart                   " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="                   Copying files to $TargetPart                   " --pulsate &
 
 rsync -a / /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
 
@@ -697,7 +697,7 @@ SelectHomePart () {
 
 HomePartMenu=""
 
-ExtraParts="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap" | cut -d " " -f1)"
+ExtraParts="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap" | grep -v 'p1'  | cut -d " " -f1)"
 
 ## Cleanup the fdisk output
 HomeParts=$(echo "$ExtraParts" | sed -r "s/\/dev\///g")
@@ -767,7 +767,7 @@ SwapPartMenu=""
 Swap=""
 
 ## Find swap partitions and find out which to use.
-TargetSwap=$(fdisk -l | grep swap | cut -d " " -f1)
+TargetSwap=$(fdisk -l | grep "swap" | cut -d " " -f1)
 TargetSwap=$(echo "$TargetSwap" | sed -r "s/\/dev\///g")
 
 for i in $TargetSwap; do
@@ -808,7 +808,7 @@ elif [ -f /tmp/Finished-Menu ]; then
  FinishedMenu
  exit 0
 else
- HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
  if [ "$HomePartTest" != "" ]; then
   Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
   SelectHomePart
@@ -853,7 +853,7 @@ else
    UserSetup
    exit 0
   fi
- HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
  if [ "$HomePartTest" != "" ]; then
   SelectHomePart
   exit 0
@@ -873,7 +873,7 @@ SelectRootPart () {
 
 PartMenu=""
 
-Partitions=$(cat /proc/partitions | grep "$PartDrive" | awk '{print $4}' | grep "[0-9]")
+Partitions=$(cat /proc/partitions | grep "$PartDrive" | awk '{print $4}' | grep "[0-9]" | grep -v 'p1')
 InstallPart="$(echo $Partitions)"
 for i in $Partitions; do
 TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
