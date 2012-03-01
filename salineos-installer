@@ -1024,7 +1024,7 @@ RestrictedMultimedia () {
 
 InstallCodec=""
 
-yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights. In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's EULA.\n\n"
+yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights. In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
 
 ret="$?"
 
