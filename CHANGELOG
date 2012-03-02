@@ -1,3 +1,39 @@
+commit 0073c459e582e7ef5e6226cb8d429b2090079b5a
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 1 21:23:14 2012 -0500
+
+    Apply needed changes to Simple icon theme
+
+commit 5d1d200ca88c5c48d5476e19abc06fd94939a687
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 1 18:56:34 2012 -0500
+
+    Add Simple Icon theme
+
+commit 304a3b533ab3ed1420fb727c508a706b85f7a5ec
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 1 04:12:25 2012 -0500
+
+    Random Cleanups
+
+commit a892bbbef29632675ada6447c1ea81e4f6b0df86
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 1 04:03:14 2012 -0500
+
+    Apply more fixes than I can remember
+
+commit 289d1e54d8cb21af84dc4398daf0d6dc1e3c183f
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Feb 28 03:29:24 2012 -0500
+
+    New Clean's first release
+
+commit 914fa49d2eda686c3cd5bffb06d633ff6125a018
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Feb 27 05:35:49 2012 -0500
+
+    Generate Changelog
+
 commit ef81ff29bfd058a4995c6e4458d43061bf765661
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Mon Feb 27 05:35:06 2012 -0500
