@@ -34,17 +34,17 @@
 
 ## Set options for yet another dialog, this makes creating dialogs much easier.
 
-Info='yad --center --on-top --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Info='yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-Question='yad --on-top --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-SingleMenu='yad  --on-top --center --list --column="Please choose one." --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+SingleMenu='yad  --center --list --column="Please choose one." --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-Menu='yad --print-column=1 --on-top --center --list --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Menu='yad --print-column=1 --center --list --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-Progress='yad --on-top --center --progress --auto-close --title=SalineOS-Installer --no-buttons --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Progress='yad --center --progress --auto-close --title=SalineOS-Installer --no-buttons --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
-TextEntry='yad --on-top --center --entry --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+TextEntry='yad --center --entry --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
 
 
 ## Check for root and cry like a little girl if we don't have it.
@@ -122,7 +122,7 @@ rm -rf /Target/lost+found
 killall -KILL tail
 
 if [ "$TargetHomePart" != "root" ]; then
- if [ "$FormatHome" = "TRUE" ]; then
+ if [ "$FormatHome" = "True" ]; then
   tail -f /usr/bin/salineos-installer | yad --progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
   mke2fs -t $FilesystemType /dev/$TargetHomePart
   sleep 3
@@ -227,7 +227,7 @@ cat > /Target/etc/fstab <<FOO
 proc /proc proc defaults 0 0
 # Root was on /dev/$TargetPart during install
 UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
-# /dev/$HOMEPART home
+# /dev/$TargetHomePart home
 UUID=$TargetHomeUUID /home $HomeFilesystemType relatime 0 0
 # Swap space created during install
 $SwapFstab none swap sw 0 0
@@ -270,7 +270,7 @@ tail -f /usr/bin/salineos-installer | $Progress --text="             Setting up 
 
 DefaultGroups="audio,cdrom,dialout,floppy,video,plugdev,netdev,powerdev,lp,scanner,disk,fuse,games,voice,sudo"
 
-cat > /Target/bin/TempScript <<FOO
+cat > /Target/usr/bin/TempScript <<FOO
 #!/bin/bash
 
 userdel -f -r $LIVE_USERNAME
@@ -306,6 +306,9 @@ chroot /Target chmod -x /etc/grub.d/20_memtest86+
 chroot /Target grub-install --force --no-floppy $GrubLocation
 chroot /Target update-grub
 sleep 2
+
+## Remove Installer icon
+chroot /Target rm "/home/$TargetUser./SalineOS Installer.desktop"
 
 killall -KILL tail
 
@@ -363,7 +366,7 @@ HomePartFinished="Home"
  if [ "$TargetHomePart" = "root" ]; then
   HomePartFinished2="The home folder will be placed on the root partition"
  else
-  if [ "$FormatHome" = "TRUE" ]; then
+  if [ "$FormatHome" = "True" ]; then
    if [ "$Input" = "ext3" ]; then
     HomePartFinished2="$TargetHomePart will be formated (erased) ext3 and used for /home"
    else
@@ -697,7 +700,7 @@ SelectHomePart () {
 
 HomePartMenu=""
 
-ExtraParts="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap" | grep -v 'p1'  | cut -d " " -f1)"
+ExtraParts="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "swap" | grep -v 'p1' | grep -v "extended" | grep -v "Hidden" | cut -d " " -f1)"
 
 ## Cleanup the fdisk output
 HomeParts=$(echo "$ExtraParts" | sed -r "s/\/dev\///g")
@@ -1064,14 +1067,13 @@ Instruction (){
 
 $Info --text="Complete installation instructions are included\nin the user manual if needed." '--button=gtk-ok:1'
 
-if [ -f /etc/salineos-utils/BACKUP ]; then
- AutoPartitioning
- exit 0
-else
+if [ "$Internet" != "Continue" ]; then
  RestrictedMultimedia
  exit 0
+else
+ AutoPartitioning
+ exit 0
 fi
-
 
 }
 
@@ -1104,10 +1106,6 @@ fi
 InternetTest () {
 
 
-if [ -f /etc/salineos-utils/BACKUP ]; then
- Instruction
- exit 0
-fi
 
 tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Checking for an active internet connection, please wait.\n" &
 

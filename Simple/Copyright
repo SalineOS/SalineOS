@@ -1,3 +1,5 @@
+Icon theme downloaded from http://www.gnome-look.org
+
 Most icons in this theme are distributed under the terms of the GPL or LGPL licenses.  See the Authors file for all Authors of this theme. 
 
 This theme was modified for use on the SalineOS system on 03/01/2012 by Anthony Nordquist
@@ -11,3 +13,4 @@ Removed Terminal icons that were included
 Removed OpenOffice.org icons
 
 All changes are tracked in git at http://www.github.com/SalineOS/SalineOS
+
