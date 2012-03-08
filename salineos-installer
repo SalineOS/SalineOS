@@ -308,7 +308,7 @@ killall -KILL tail
 ## Install GRUB2
 tail -f /usr/bin/salineos-installer | $Progress --text="Installing and configuring GRUB2                  " --pulsate &
 chroot /Target chmod -x /etc/grub.d/20_memtest86+
-chroot /Target grub-install --force --no-floppy $GrubLocation
+chroot /Target grub-install --force --no-floppy "$GrubLocation"
 sleep 2
 chroot /Target update-grub
 sleep 2
