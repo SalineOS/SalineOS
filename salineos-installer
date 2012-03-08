@@ -34,17 +34,17 @@
 
 ## Set options for yet another dialog, this makes creating dialogs much easier.
 
-Info='yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Info='yad --center --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
-Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
-SingleMenu='yad  --center --list --column="Please choose one." --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+SingleMenu='yad  --center --list --column="Please choose one." --title=SalineOS-Installer --window-icon=/usr/share/icons/pixmaps/salineos-installer.png'
 
-Menu='yad --print-column=1 --center --list --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Menu='yad --print-column=1 --center --list --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
-Progress='yad --center --progress --auto-close --title=SalineOS-Installer --no-buttons --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+Progress='yad --center --progress --auto-close --title=SalineOS-Installer --no-buttons --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
-TextEntry='yad --center --entry --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png'
+TextEntry='yad --center --entry --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
 
 ## Check for root and cry like a little girl if we don't have it.
@@ -306,7 +306,7 @@ killall -KILL tail
 
 
 ## Install GRUB2
-tail -f /usr/bin/salineos-installer | $Progress --text="Installing and configuring GRUB2                  " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="         Installing and configuring GRUB2         " --pulsate &
 chroot /Target chmod -x /etc/grub.d/20_memtest86+
 chroot /Target grub-install --force --no-floppy "$GrubLocation"
 sleep 2
@@ -1009,7 +1009,7 @@ fi
 ## Ask the user if they wish to use automatic partitioning.
 
 AutoPartitioning () {
-$Info --width=500 --text="You will need at least one partition in order to install SalineOS.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
+$Info --width=400 --wrap --text="You will need at least one partition in order to install SalineOS.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
 
 ret=$?
 
@@ -1090,7 +1090,7 @@ fi
 
 InternetTest2 () {
 
-$Info  --button=$"Retry connection:5" --button=$"Continue without an internet connection:3" --text="No internet connection detected, some features of this installer will be disabled.\n\nYou can configure your network settings by right clicking the on the network adapter\nicon in the upper right hand corner, on the top panel.\n\n"
+$Info --width=200 --wrap --button=$"Retry connection:5" --button=$"Continue:3" --text="No internet connection detected, some features of this installer will be disabled.\n\nYou can configure your network settings by right clicking on the network icon in the upper right hand corner, on the top panel and selecting Edit Connections...\n\n"
 
 ret=$?
 

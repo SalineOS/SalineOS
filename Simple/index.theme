@@ -65,3 +65,13 @@ Type=scalable
 Size=128
 Context=Stock
 Type=scalable
+
+[/stock/io]
+Size=128
+Context=Stock
+Type=scalable
+
+[scalable/stock/io]
+Size=128
+Context=Stock
+Type=scalable

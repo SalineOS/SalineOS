@@ -1,0 +1,183 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Copyright 2009-2011 Anthony Nordquist and Tony Brijeski
+## Some of this code was borrowed from Tony Brijeski's Remastersys installer and Remastersys grub restore utility, and he deserves lots of credit for having code worth jacking. This code has been modified to suit the purpose of this program :) 
+
+Progress='yad --center --pulsate --progress --auto-close --title=Grub-Doctor --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png'
+ 
+Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=Grub-Doctor --window-icon=/usr/share/pixmaps/grub-doctor.png'
+
+Info='yad --center --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/grub-doctor.png'
+
+Menu="yad --list --title=Grub-Doctor --column=Pick --column=Info --print-column=1"
+
+## Cry like a little girl if we don't have root
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ yad --title="Grub-Doctor" --text="Must be run with root privileges, will now exit" --button=$"gtk-ok:1"
+ exit 0
+fi
+
+
+
+## Just in case people don't know what this is, inform them.
+
+$Question --width=200 --text="This is a boot-loader restoration utility (Grub2. Would you like to restore the system boot-loader?"
+
+if [ $? != 0 ]; then
+ exit 0
+fi
+
+## Need to get the root partition from the user.
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}')
+
+for i in $Drives; do
+  PartDrive="$i"
+  PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
+   PartDriveMenu="$PartDriveMenu $PartDrive $PartDriveSize"
+  fi
+  if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
+   GrubMenu="$PartDrive Master-Boot-Record $GrubMenu"
+  fi
+done
+
+GetRootPart () {
+
+RootPart=""
+
+RootPart=$($Menu --height="300" --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS, or another Grub2 based Linux distribution.\nThis partition will be the first entry in the installed GRUB's boot menu" $PartDriveMenu)
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GetRootPart
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ GetRootPart
+ exit 0 
+elif [ "$RootPart" = "" ]; then
+ $Info --text="No partition selected, please retry." --button=$"gtk-ok:1"
+ GetRootPart
+ exit 0
+fi
+
+RootPart=$( echo "$RootPart" | awk -F '|' '{print $1}')
+
+
+
+}
+
+GetRootPart
+
+## Find out where grub is going
+
+GetGrubLocation (){
+GrubLocation=""
+
+
+GrubLocation=$($Menu --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" $GrubMenu root "Root partition (Advanced)")
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GetGrubLocation
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ GetGrubLocation
+ exit 0 
+elif [ "$GrubLocation" = "" ]; then
+ $Info --text="No location selected, please retry." --button=$"gtk-ok:1"
+ GetGrubLocation
+ exit 0
+fi
+
+GrubLocation=$(echo "$GrubLocation" | awk -F '|' '{print $1}')
+
+if [ "$GrubLocation" = "root" ]; then
+ GrubLocation="/dev/$RootPart"
+else
+ GrubLocation="/dev/$GrubLocation"
+fi
+
+}
+
+GetGrubLocation
+
+## Ask for confirmation before we do anything drastic
+$Question --text="Grub will be installed on "$GrubLocation"\n\nContinue with operation?"
+
+if [ "$?" = "1" ]; then
+ $Info --text="Operation cancelled, will now exit" --button=$"gtk-ok:1"
+ exit
+fi
+
+## Start Progress bar
+tail -f /usr/bin/grub-doctor | $Progress --text="Installing and setting up grub...Please Wait" &
+
+GrubDir="$(mount | grep $RootPart | awk '{print$3}')"
+
+if [ "$GrubDir" != "/" ]; then
+ GrubDir="/tmp/remmnt/Target"
+ 
+ ## Mount the root directory
+ umount /dev/$RootPart
+ sleep 2
+ if [ ! -d $GrubDir ]; then
+  mkdir -p $GrubDir
+ fi
+ mount /dev/$RootPart $GrubDir -o rw
+ 
+ ## Prepare chroot
+ mount -o bind /proc $GrubDir/proc
+ mount -o bind /dev  $GrubDir/dev
+ mount -o bind /sys  $GrubDir/sys
+ 
+ ## The meat and potatoes of this script
+ chroot $GrubDir grub-install --force --no-floppy "$GrubLocation"
+ chroot $GrubDir update-grub
+
+ ## Dismount
+ umount $GrubDir/proc
+ umount $GrubDir/dev
+ umount $GrubDir/sys
+else
+ grub-install --no-floppy --force "$GrubLocation"
+ update-grub
+fi
+
+
+## Stop the progress bar
+killall -KILL tail
+
+## Tell the user we are done now
+$Info --text="             Grub installation complete.             \n" --button=$"gtk-ok:1"
+
+## We came we did and now its time to leave, wam bam thank you mam style.
+#
+exit 0
