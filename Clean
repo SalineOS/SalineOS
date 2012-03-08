@@ -17,6 +17,9 @@
 ####################################################################################################
 # Copyright 2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
 
+Progress='yad --center --progress --auto-close --title=Clean --no-buttons'
+
+tail -f /usr/bin/Clean | $Progress --pulsate --text="     Calculating size of files     " &
 
 FlashCookieSize=$(du -chs --apparent-size $HOME/.adobe $HOME/.macromedia/Flash_Player | grep 'total' | awk -F ' ' '{print $1}')
 
@@ -26,7 +29,43 @@ LogsSize=$(du -chs --apparent-size $HOME/.xsession-errors | grep 'total' | awk -
 
 ThumbnailsSize=$(du -chs --apparent-size $HOME/.thumbnails | grep 'total' | awk -F ' ' '{print $1}')
 
-Operation=$(yad --button=$"Exit:3" --button=$"gtk-ok:2" --list --text="Please select the actions you wish to perform" --height="250" --checklist --multiple --on-top --column=' ' --column="Action" --column="Size" --title="Clean" --print-column="2" X Flash-Cookies "$FlashCookieSize" X Logs "$LogsSize" X Package-Cache "$PackageCacheSize" X Un-Needed-Packages 'N/A' X Thumbnails "$ThumbnailsSize")
+## Calculate the size saved by removing un-needed packages
+
+PackageList=$(apt-get -s autoremove | grep '  ' | grep -v "This is only a simulation" | grep -v "root privileges for real" | grep -v "Keep also in mind that locking" | grep -v "depend on the relevance to the real")
+
+if [ "$PackageList" = "" ]; then
+ FinalSize="0"
+else
+ for i in $PackageList; do
+  SizeStart=$(aptitude show "$i" | grep "Uncompressed Size" | awk -F ':' '{print $2}')
+  if [ "$(echo "$SizeStart" | grep "M")" != "" ]; then 
+   if [ "$(echo $SizeTemp | grep ',')" != "" ]; then
+     SizeTemp=$(echo $SizeTemp | sed -e "s|,||g")
+    fi
+    SizeTemp=$(echo "$SizeStart" | awk -F ' ' '{print $1}')
+    if [ "$(echo $SizeTemp | grep '.')" != "" ]; then
+     SizeTemp=$(echo $SizeTemp | awk -F '.' '{print $1}')
+    fi 
+   FinalSize=$(($FinalSize + $SizeTemp))
+  else 
+   SizeTemp=$(echo "$SizeStart" | awk -F ' ' '{print $1}')
+    if [ "$(echo $SizeTemp | grep ',')" != "" ]; then
+     SizeTemp=$(echo $SizeTemp | sed -e "s|,||g")
+    fi
+    if [ "$(echo $SizeTemp | grep '.')" != "" ]; then
+     SizeTemp=$(echo $SizeTemp | awk -F '.' '{print $1}')
+    fi
+   SizeInM=$(($SizeTemp/1024))
+   FinalSize=$(($FinalSize + $SizeInM))
+  fi
+ done
+fi
+
+sleep 3
+
+killall -KILL tail
+
+Operation=$(yad --button=$"Exit:3" --button=$"gtk-ok:2" --list --text="Please select the actions you wish to perform" --height="250" --checklist --multiple --on-top --column=' ' --column="Action" --column="Size" --title="Clean" --print-column="2" X Flash-Cookies "$FlashCookieSize" X Logs "$LogsSize" X Package-Cache "$PackageCacheSize" X Un-Needed-Packages "$FinalSize"M X Thumbnails "$ThumbnailsSize")
 
 ret=$?
 
@@ -40,20 +79,20 @@ elif [ "$ret" = "3" ]; then
 fi
 
 
-if [ "$(echo "$Operation" | grep "Flash-Cookies")" != "" ]; then
+if [ "$(echo $Operation | grep Flash-Cookies)" != "" ]; then
  rm -rf $HOME/.adobe
  rm -rf $HOME/.macromedia/Flash_Player
  mkdir -p $HOME/.adobe
  mkdir -p $HOME/.macromedia/Flash_Player
-elif [ "$(echo "$Operation" | grep "Package-Cache")" != "" ]; then
+elif [ "$(echo $Operation | grep Package-Cache)" != "" ]; then
  apt-get clean
-elif [ "$(echo "$Operation" | grep "Logs")" != "" ]; then
+elif [ "$(echo $Operation | grep Logs)" != "" ]; then
  rm $HOME/.xsession-errors
  touch $HOME/.xsession-errors
-elif [ "$(echo "$Operation" | grep "Thumbnails")" != "" ]; then
+elif [ "$(echo $Operation | grep Thumbnails)" != "" ]; then
  rm -rf $HOME/.thumbnails
  mkdir -p $HOME/.thumbnails
-elif [ "$(echo "$Operation" | grep "Packages")" != "" ]; then
+elif [ "$(echo $Operation | grep Packages)" != "" ]; then
  DialogText="$(apt-get -s autoremove | grep '  ')"
  yad --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:0"
  if [ "$?" = "0" ]; then
