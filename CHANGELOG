@@ -1,3 +1,45 @@
+commit 48a08cfa85982c9c267db3e7dc38ec1ea01e0233
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 8 00:50:26 2012 -0500
+
+    Fix GTK errors in simple theme, polish dialogs in installer, add grub-doctor and ported it to yad, add grub-doctor icon to simple theme
+
+commit ff90429d47033bb973b4df74a8b936c3af981572
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 7 22:08:48 2012 -0500
+
+    Fix more bugs
+
+commit a3efd14b79ac066c44716340f969d4976a38a4f9
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 7 21:35:44 2012 -0500
+
+    Change package manager icon
+
+commit aca5d2f8a8ff6dc28aaaf9737d01f89b84a4ad1e
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 7 20:09:27 2012 -0500
+
+    Minor fixes to icon them, fix stupidity in installer
+
+commit dea9d74d878ad80760553d0331bff58d02b821cf
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 7 02:57:02 2012 -0500
+
+    Modify the colors of many icons
+
+commit dfe115c7ff001065ceafff5430f7d3755dd82d88
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Mar 6 03:05:56 2012 -0500
+
+    Fix various bugs in installer, fix authors and copyright file for Simple icon theme
+
+commit a2152255b715069efde2c5d018b94eab442b9f79
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 1 21:23:59 2012 -0500
+
+    Generate Changelog
+
 commit 0073c459e582e7ef5e6226cb8d429b2090079b5a
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Thu Mar 1 21:23:14 2012 -0500
