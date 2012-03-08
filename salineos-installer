@@ -123,7 +123,9 @@ killall -KILL tail
 
 if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "True" ]; then
-  tail -f /usr/bin/salineos-installer | yad --progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
+  tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
+  umount /dev/$TargetHomePart
+  sleep 2
   mke2fs -t $FilesystemType /dev/$TargetHomePart
   sleep 3
   killall -KILL tail
@@ -142,7 +144,7 @@ if [ "$TargetHomePart" != "root" ]; then
  TargetHomeUUID=$(blkid /dev/$TargetHomePart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
 
  ## Get fs type for the home partition in case the user chose not to format it
- HomeFilesystemType=$(mount | grep "/dev/$TargetHomePart" | awk '{print $5}')
+ HomeFilesystemType=$(mount | grep "/dev/$TargetHomePart" | awk '{print $5}' | awk -F ' ' '{print $1}')
 
  killall -KILL tail
 fi
@@ -257,6 +259,9 @@ fi
 ## Restore original inittab as live-initramfs changes it
 cp /Target/usr/share/sysvinit/inittab /Target/etc/inittab
 
+rm /Target/etc/hostname
+rm /Target/etc/hosts
+
 echo "$TargetHostname" > /Target/etc/hostname
 echo "127.0.0.1 localhost" > /Target/etc/hosts
 echo "127.0.0.1 $TargetHostname" >> /Target/etc/hosts
@@ -277,7 +282,7 @@ userdel -f -r $LIVE_USERNAME
 sed -i '/$LIVE_USERNAME/d' /etc/sudoers
 groupadd -g 1000 $TargetUser
 useradd -u 1000 -g 1000 -c "$TargetUserRealName,,," -G $DefaultGroups -s /bin/bash -m $TargetUser
-echo -e "TargetUserPassword1\nTargetUserPassword1\n" | passwd $TargetUser
+echo -e "$TargetUserPassword2\n$TargetUserPassword2\n" | passwd $TargetUser
 dpkg-divert --remove --rename --quiet /usr/lib/update-notifier/apt-check
 dpkg-divert --remove --rename --quiet /usr/sbin/update-initramfs
 dpkg-divert --remove --rename --quiet /usr/sbin/anacron
@@ -286,11 +291,11 @@ shadowconfig on
 
 FOO
 
-chmod +x /Target/usr/bin/TempScript
+chmod 755 /Target/usr/bin/TempScript
 
 sleep 1
 
-chroot /Target TempScript
+chroot /Target /usr/bin/TempScript
 
 sleep 2
 
@@ -301,9 +306,10 @@ killall -KILL tail
 
 
 ## Install GRUB2
-tail -f /usr/bin/salineos-installer | $Progress --text="Installing and setting up GRUB2                " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="Installing and configuring GRUB2                  " --pulsate &
 chroot /Target chmod -x /etc/grub.d/20_memtest86+
 chroot /Target grub-install --force --no-floppy $GrubLocation
+sleep 2
 chroot /Target update-grub
 sleep 2
 
@@ -1027,7 +1033,7 @@ RestrictedMultimedia () {
 
 InstallCodec=""
 
-yad --on-top --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights. In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
+yad --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights. In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
 
 ret="$?"
 
