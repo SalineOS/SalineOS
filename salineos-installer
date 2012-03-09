@@ -500,7 +500,7 @@ GrubSelect () {
 GrubLocation=""
 GrubLoc=""
 
-GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"gtk-quit:3" --button=$"OK:2" --text="Please select where to install the grub boot loader\n" $GrubMenu root "Root partition - (Advanced)")
+GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="Please select where to install the grub boot loader\n" $GrubMenu root "Root partition - (Advanced)")
 
 ret="$?"
 
@@ -582,7 +582,7 @@ SetHostname () {
 
 TargetHostname=""
 
-TargetHostname=$($TextEntry --text="Enter a hostname for the installed system. You can enter anything\nyou like here, except spaces and special characters" --button=$"About Hostname:3" --button=$"OK:2")
+TargetHostname=$($TextEntry --text="Enter a hostname for the installed system. You can enter anything\nyou like here, except spaces and special characters" --button=$"About Hostname:3" --button=$"gtk-ok:2")
 
 
 ret="$?"
@@ -640,7 +640,7 @@ TargetUser=""
 TargetUserPassword1=""
 TargetUserPassword2=""
 RequirePassword=""
-UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK" --button=$"gtk-quit:3" --button=$"OK:2")
+UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 ret=$?
 
@@ -957,9 +957,9 @@ for i in $Drives; do
 done
 
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
 else
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
 fi
 
 ret=$?
