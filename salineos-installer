@@ -415,9 +415,9 @@ GrubFinished="Boot-Loader"
 GrubFinished2="The GRUB2 boot loader will be installed to "$GrubLoc""
 
 if [ "$AutoPart" = "Auto" ]; then
-Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"Exit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
+Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"gtk-quit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
 else
-Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"Exit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$HomePartFinished" "$HomePartFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
+Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"gtk-quit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$HomePartFinished" "$HomePartFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
 fi
 
 ret="$?"
@@ -500,7 +500,7 @@ GrubSelect () {
 GrubLocation=""
 GrubLoc=""
 
-GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"Exit:3" --button=$"OK:2" --text="Please select where to install the grub boot loader\n" $GrubMenu root "Root partition - (Advanced)")
+GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"gtk-quit:3" --button=$"OK:2" --text="Please select where to install the grub boot loader\n" $GrubMenu root "Root partition - (Advanced)")
 
 ret="$?"
 
@@ -640,7 +640,7 @@ TargetUser=""
 TargetUserPassword1=""
 TargetUserPassword2=""
 RequirePassword=""
-UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK" --button=$"Exit:3" --button=$"OK:2")
+UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require The user's password to logon?:CHK" --button=$"gtk-quit:3" --button=$"OK:2")
 
 ret=$?
 
@@ -717,7 +717,7 @@ for i in $HomeParts; do
  HomePartMenu="$HomePartMenu $HomePart $HomePartSize"
 done
 
-HomePart=$($Menu --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" $HomePartMenu)
+HomePart=$($Menu --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column=Partition --column="Size in Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" $HomePartMenu)
 
 ret=$?
 
@@ -786,7 +786,7 @@ for i in $TargetSwap; do
 done
 
 
-Swap=$($Menu --width=300 --height=250 --text="  Please select the partition to use for swap\n" --column=Partition --column="Size in Megabytes" --button=$"Exit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" $SwapPartMenu)
+Swap=$($Menu --width=300 --height=250 --text="  Please select the partition to use for swap\n" --column=Partition --column="Size in Megabytes" --button=$"gtk-quit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" $SwapPartMenu)
 
 ret=$?
 
@@ -899,7 +899,7 @@ for i in $InstallPart; do
 done
 
 
-TargetPart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"Exit:3" --button=$"Use Selected:2" --text="Please select a partition to install the SalineOS root (Main) directory to.\n" $PartMenu )
+TargetPart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select a partition to install the SalineOS root (Main) directory to.\n" $PartMenu )
 
 ret=$?
 
@@ -957,9 +957,9 @@ for i in $Drives; do
 done
 
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"OK:2" $PartDriveMenu )
 else
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"Exit:3" --button=$"OK:2" $PartDriveMenu )
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"OK:2" $PartDriveMenu )
 fi
 
 ret=$?

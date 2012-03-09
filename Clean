@@ -85,7 +85,7 @@ if [ "$(echo $Operation | grep Flash-Cookies)" != "" ]; then
  mkdir -p $HOME/.adobe
  mkdir -p $HOME/.macromedia/Flash_Player
 elif [ "$(echo $Operation | grep Package-Cache)" != "" ]; then
- apt-get clean
+ gksudo apt-get clean
 elif [ "$(echo $Operation | grep Logs)" != "" ]; then
  rm $HOME/.xsession-errors
  touch $HOME/.xsession-errors
@@ -96,7 +96,7 @@ elif [ "$(echo $Operation | grep Packages)" != "" ]; then
  DialogText="$(apt-get -s autoremove | grep '  ')"
  yad --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:0"
  if [ "$?" = "0" ]; then
-  apt-get -y autoremove
+  gksudo apt-get -y autoremove
  fi
 fi
 exit 
