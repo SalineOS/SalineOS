@@ -29,7 +29,7 @@ SingleMenu='yad  --center --list --column=Choices --title=SalineOS-Backup --wind
 
 Menu='yad --print-column=1 --center --list --title=SalineOS-Backup--window-icon=/usr/share/pixmaps/salineos-installer.png'
 
-Progress='yad --pulsate --center --progress --auto-close --title=SalineOS-Backup --no-buttons --window-icon=/usr/share/pixmaps/salineos-installer.png'
+Progress='yad --center --progress --auto-close --title=SalineOS-Backup --no-buttons --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
 TextEntry='yad --center --entry --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
@@ -51,7 +51,7 @@ elif [ "$SaveFolder" = "" ]; then
  exit 0
 fi
 
-ImageName=$($TextEntry --wrap --width=250 --text="Enter a name for the backup file, or select time to use the current/date and time." --button=$"gtk-quit:3" --button=$"Time:5" --button=$"gtk-ok:2")
+ImageName=$($TextEntry --wrap --width=250 --text="Enter a name for the backup file, or select time to use the current time and date." --button=$"gtk-quit:3" --button=$"Time:5" --button=$"gtk-ok:2")
 
 ret="$?"
 
@@ -69,6 +69,8 @@ if [ "$BackupPart" = "root" ]; then
  $Info --text="Please close all other running applications before continuing" --button=$"gtk-ok:1"
  UseRoot='/'
 else
+ umount "$BackupPart"
+ sleep 2 
  mkdir -p /mnt/Super-Happy-Mount-Point
  mount "$BackupPart" /mnt/Super-Happy-Mount-Point -o rw
  if [ "$HomePart" != "" ]; then
@@ -77,7 +79,6 @@ else
  UseRoot="/mnt/Super-Happy-Mount-Point"
 fi
 
-tail -f /usr/bin/salineos-backup | $Progress --text="Creating backup $SaveFolder/$ImageName.backup, Please wait..." &
 
 mksquashfs $UseRoot $SaveFolder/$ImageName.backup -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
 .bash_history \
@@ -93,12 +94,19 @@ $SaveFolder/$ImageName.backup \
 swap \
 sys \
 tmp \
+var/log \>> /tmp/salineos-backup-temp-file &
 
-killall -KILL tail
+(while [ "$(pidof mksquashfs)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
+echo "$CurrentOutput" | awk -F ' ' '{print $NF+0}' 
+done)| $Progress --text="Creating backup $SaveFolder/$ImageName.backup, Please wait..."
 
+## Cleanup some
 if [ -d /mnt/Super-Happy-Mount-Point ]; then
  rm -rf /mnt/Super-Happy-Mount-Point
 fi
+
+# rm /tmp/salineos-backup-temp-file
 
 $Info --text="Creation of backup image $SaveFolder/$ImageName complete" --button=$"gtk-quit:1"
 
