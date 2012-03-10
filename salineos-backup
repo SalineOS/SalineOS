@@ -1,0 +1,244 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+#  Copyright 2008,2009,2010,2012 Under the GNU GPL2 License
+# Authors Tony Brijeski, Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
+
+
+## Set options for yet another dialog, this makes creating dialogs much easier.
+
+Info='yad --center --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-installer.png'
+
+Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-installer.png'
+
+SingleMenu='yad  --center --list --column=Choices --title=SalineOS-Backup --window-icon=/usr/share/icons/pixmaps/salineos-installer.png'
+
+Menu='yad --print-column=1 --center --list --title=SalineOS-Backup--window-icon=/usr/share/pixmaps/salineos-installer.png'
+
+Progress='yad --pulsate --center --progress --auto-close --title=SalineOS-Backup --no-buttons --window-icon=/usr/share/pixmaps/salineos-installer.png'
+
+TextEntry='yad --center --entry --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-installer.png'
+
+
+StartBackup () {
+
+
+SaveFolder=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --directory --text="\n                     Select the folder to save the backup image to\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ StartBackup
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$SaveFolder" = "" ]; then
+ StartBackup
+ exit 0
+fi
+
+ImageName=$($TextEntry --wrap --width=250 --text="Enter a name for the backup file, or select time to use the current/date and time." --button=$"gtk-quit:3" --button=$"Time:5" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "5" ]; then
+ ImageName=$(date +%H%M%h%d%Y)
+elif [ "$ImageName" = "" ]; then
+ ImageName=$(date +%H%M%h%d%Y)
+fi
+
+if [ "$BackupPart" = "root" ]; then
+ $Info --text="Please close all other running applications before continuing" --button=$"gtk-ok:1"
+ UseRoot='/'
+else
+ mkdir -p /mnt/Super-Happy-Mount-Point
+ mount "$BackupPart" /mnt/Super-Happy-Mount-Point -o rw
+ if [ "$HomePart" != "" ]; then
+  mount "$HomePart" /mnt/Super-Happy-Mount-Point/home -o rw
+ fi
+ UseRoot="/mnt/Super-Happy-Mount-Point"
+fi
+
+tail -f /usr/bin/salineos-backup | $Progress --text="Creating backup $SaveFolder/$ImageName.backup, Please wait..." &
+
+mksquashfs $UseRoot $SaveFolder/$ImageName.backup -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
+.bash_history \
+.cache \
+.thumbnails \
+boot/grub \
+Cache \
+dev \
+media \
+mnt \
+proc \
+$SaveFolder/$ImageName.backup \
+swap \
+sys \
+tmp \
+
+killall -KILL tail
+
+if [ -d /mnt/Super-Happy-Mount-Point ]; then
+ rm -rf /mnt/Super-Happy-Mount-Point
+fi
+
+$Info --text="Creation of backup image $SaveFolder/$ImageName complete" --button=$"gtk-quit:1"
+
+exit 0
+
+}
+
+SelectHomePart () {
+
+
+PartMenu=""
+
+Partitions=$(cat /proc/partitions | awk '{print $4}' | grep "[0-9]" | grep -v 'p1' | grep -v "$BackupPart")
+
+TempParts="$(echo $Partitions)"
+
+for i in $Partitions; do
+TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+if [ "$TempSize" = "1" ]; then
+ TempParts=$(echo $TempParts | sed -r "s/$i//")
+fi
+done
+
+
+for i in $TempParts; do
+  Part="$i"
+  PartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  PartMenu="$PartMenu $Part $PartSize"
+done
+
+
+HomePart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select the root partition you want to backup." $PartMenu )
+
+ret=$?
+
+
+if [ "$ret" = "252" ]; then
+ SelectHomePart
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$HomePart" = "" ]; then
+ SelectHomePart
+ exit 0
+fi
+
+HomePart=$(echo "$HomePart" | awk -F '|' '{print $1}')
+
+StartBackup
+
+
+}
+
+SelectBackupPart () { 
+
+PartMenu=""
+
+Partitions=$(cat /proc/partitions | awk '{print $4}' | grep "[0-9]" | grep -v 'p1')
+
+TempParts="$(echo $Partitions)"
+
+for i in $Partitions; do
+TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+if [ "$TempSize" = "1" ]; then
+ TempParts=$(echo $TempParts | sed -r "s/$i//")
+fi
+done
+
+
+for i in $TempParts; do
+  Part="$i"
+  PartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  PartMenu="$PartMenu $Part $PartSize"
+done
+
+
+BackupPart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select the root partition you want to backup." $PartMenu )
+
+ret=$?
+
+
+if [ "$ret" = "252" ]; then
+ SelectBackupPart
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$BackupPart" = "" ]; then
+ SelectBackupPart
+ exit 0
+fi
+
+BackupPart=$(echo "$BackupPart" | awk -F '|' '{print $1}')
+
+$Question --text="Is /home for this instance on a seperate partition?" 
+
+if [ "$?" = "0" ]; then
+ SelectHomePart
+else
+ StartBackup
+fi
+
+}
+
+MainMenu () {
+
+Operation=$($SingleMenu --wrap --height=300 --width=400 --text="Please select the operation you wish to perform" "Create a backup image of this SalineOS instance" "Create a backup image of another Linux instance" "Restore a backup image" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+Operation=$(echo "$Operation" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$Operation" = "" ]; then
+ $Info --text="You must select an operation in order to continue" --button=$"gtk-ok:1"
+ MainMenu
+ exit 0
+elif [ "$Operation" = "Create a backup image of this SalineOS instance" ]; then
+ BackupPart="root"
+ StartBackup
+ exit 0
+elif [ "$Operation" = "Create a backup image of another Linux instance" ]; then
+ SelectBackupPart
+ exit 0
+elif [ "$Operation" = "Restore a backup image" ]; then
+ SelectBackupImage
+ exit 0
+fi
+
+}
+
+
+if [ "$1" = "Restore" ]; then
+ BackupImage="$2"
+ StartRestore
+else
+ MainMenu
+fi
+
+

@@ -17,7 +17,7 @@
 ####################################################################################################
 # Copyright 2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
 # Some code borrowed from the Remastersys Installer by Tony Brijeski 
-#
+# All borrowed code has been heavily modified for use in this script.
 #
 ################### Remastersys-installer original copyright notice ##########################
 #  remastersys-installer is an alternative installer for remastered livecd/dvd's
@@ -627,10 +627,6 @@ fi
 
 UserSetup () {
 
-if [ -f /etc/salineos-utils/BACKUP ]; then
- GrubSelect
- exit 0
-fi
 
 ## Reset all variables just in case
 

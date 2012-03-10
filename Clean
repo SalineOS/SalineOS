@@ -69,8 +69,7 @@ Operation=$(yad --button=$"Exit:3" --button=$"gtk-ok:2" --list --text="Please se
 
 ret=$?
 
-echo "$Operation"
-
+Operation=$(echo "$Operation" | sed -e "s/|//g")
 
 if [ "$ret" = "252" ]; then
  exit 0
@@ -79,20 +78,24 @@ elif [ "$ret" = "3" ]; then
 fi
 
 
-if [ "$(echo $Operation | grep Flash-Cookies)" != "" ]; then
+if [ "$(echo "$Operation" | grep Flash-Cookies)" != "" ]; then
  rm -rf $HOME/.adobe
  rm -rf $HOME/.macromedia/Flash_Player
  mkdir -p $HOME/.adobe
  mkdir -p $HOME/.macromedia/Flash_Player
-elif [ "$(echo $Operation | grep Package-Cache)" != "" ]; then
+fi
+if [ "$(echo "$Operation" | grep Package-Cache)" != "" ]; then
  gksudo apt-get clean
-elif [ "$(echo $Operation | grep Logs)" != "" ]; then
+fi
+if [ "$(echo "$Operation" | grep Logs)" != "" ]; then
  rm $HOME/.xsession-errors
  touch $HOME/.xsession-errors
-elif [ "$(echo $Operation | grep Thumbnails)" != "" ]; then
+fi
+if [ "$(echo "$Operation" | grep Thumbnails)" != "" ]; then
  rm -rf $HOME/.thumbnails
  mkdir -p $HOME/.thumbnails
-elif [ "$(echo $Operation | grep Packages)" != "" ]; then
+fi
+if [ "$(echo "$Operation" | grep Packages)" != "" ]; then
  DialogText="$(apt-get -s autoremove | grep '  ')"
  yad --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:0"
  if [ "$?" = "0" ]; then
