@@ -27,7 +27,7 @@ Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --b
 
 SingleMenu='yad  --center --list --column=Choices --title=SalineOS-Backup --window-icon=/usr/share/icons/pixmaps/salineos-installer.png'
 
-Menu='yad --print-column=1 --center --list --title=SalineOS-Backup--window-icon=/usr/share/pixmaps/salineos-installer.png'
+Menu='yad --print-column=1 --center --list --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
 Progress='yad --center --progress --auto-close --title=SalineOS-Backup --no-buttons --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
@@ -94,19 +94,30 @@ $SaveFolder/$ImageName.backup \
 swap \
 sys \
 tmp \
-var/log \>> /tmp/salineos-backup-temp-file &
+var/log \
+var/run \ >> /tmp/salineos-backup-temp-file &
 
 (while [ "$(pidof mksquashfs)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
 echo "$CurrentOutput" | awk -F ' ' '{print $NF+0}' 
-done)| $Progress --text="Creating backup $SaveFolder/$ImageName.backup, Please wait..."
+done)| $Progress --text="Creating backup $ImageName.backup, Please wait..."
+
+## Unmount partitions if needed
+if [ "$HomePart" != "" ]; then
+ umount "$HomePart" 
+fi
+
+if [ "$BackupPart" != "root" ]; then 
+ umount "$BackupPart"
+fi
 
 ## Cleanup some
 if [ -d /mnt/Super-Happy-Mount-Point ]; then
  rm -rf /mnt/Super-Happy-Mount-Point
 fi
 
-# rm /tmp/salineos-backup-temp-file
+
+rm /tmp/salineos-backup-temp-file
 
 $Info --text="Creation of backup image $SaveFolder/$ImageName complete" --button=$"gtk-quit:1"
 
@@ -114,7 +125,7 @@ exit 0
 
 }
 
-SelectHomePart () {
+SelectBackupHomePart () {
 
 
 PartMenu=""
@@ -144,16 +155,17 @@ ret=$?
 
 
 if [ "$ret" = "252" ]; then
- SelectHomePart
+ SelectBackupHomePart
  exit 0
 elif [ "$ret" = "3" ]; then
  exit 0
 elif [ "$HomePart" = "" ]; then
- SelectHomePart
+ SelectBackupHomePart
  exit 0
 fi
 
 HomePart=$(echo "$HomePart" | awk -F '|' '{print $1}')
+HomePart="/dev/$HomePart"
 
 StartBackup
 
@@ -199,14 +211,49 @@ elif [ "$BackupPart" = "" ]; then
 fi
 
 BackupPart=$(echo "$BackupPart" | awk -F '|' '{print $1}')
+BackupPart="/dev/$BackupPart"
 
 $Question --text="Is /home for this instance on a seperate partition?" 
 
 if [ "$?" = "0" ]; then
- SelectHomePart
+ SelectBackupHomePart
 else
  StartBackup
 fi
+
+}
+
+
+SelectBackupImage () {
+
+BackupImage=""
+
+BackupImage=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to restore\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+BackupImage=$(echo $BackupImage | awk -F '|' '{print $1}')
+
+if [ "$ret" = "252" ]; then
+ SelectBackupImage
+ exit 0
+elif [ "$ret" = "3" ]; then
+ $Question --text="Are you sure you want to cancel the resoration?"
+ if [ "$?" = "0" ]; then
+  if [ -f /tmp/Finished-Menu ]; then
+   rm /tmp/Finished-Menu
+  fi
+  exit 1
+elif [ "$BackupImage" = "" ]; then
+ SelectBackupImage
+ exit 0
+elif [ "$(echo "$BackupImage" | grep ".backup")"  = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="$BackupImage is not a valid backup image"
+ SelectBackupImage
+ exit 0
+fi
+
+AutoPartitioning
 
 }
 
@@ -242,9 +289,120 @@ fi
 }
 
 
+## Choose the drive to partition
+
+ChooseDrive () { 
+
+GrubMenu=""
+PartDriveMenu=""
+PartDrive=""
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v major | grep -v "^$" | awk '{print $4}' | grep -v "[0-9]")
+
+for i in $Drives; do
+  PartDrive="$i"
+  PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  PartDriveMenu="$PartDriveMenu $PartDrive $PartDriveSize"
+  GrubMenu="$PartDrive Master-Boot-Record $GrubMenu"
+done
+
+
+if [ "$AutoPart" = "Auto" ]; then
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
+else
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
+fi
+
+ret=$?
+
+
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the resoration?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   ChooseDrive
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ ChooseDrive
+ exit 0
+elif [ "$PartDrive" = "" ]; then
+ ChooseDrive
+ exit 0
+fi 
+
+
+PartDrive=$(echo "$PartDrive" | awk -F '|' '{print $1}')
+
+## Since unlike the salineos-installer this utility can be run from a non live envoirnment
+## We need to make sure that the user doesn't try to autopartition the currently used disk.
+RootDir="$(mount | grep -B 0 ' / ')"
+
+if [ "$AutoPart" = "Auto" ]; then
+ if [ "$(echo "$RootDir" | grep "$PartDrive")" != "" ]; then
+  $Info --wrap --width=300 --text="You cannot erase the partition this utility is running from, please select another disk or use manual partitioning to select another partition on this disk.\n"
+  AutoPartitioning
+ fi
+fi
+  
+
+## Launch GParted
+if [ "$AutoPart" != "Auto" ]; then
+ gparted /dev/$PartDrive
+fi
+
+if [ "$AutoPart" = "Auto" ]; then
+ SwapFile
+ exit 0
+else
+ SelectRootPart
+ exit 0
+fi
+
+}
+
+
+
+
+## Ask the user if they wish to use automatic partitioning.
+
+AutoPartitioning () {
+$Info --width=400 --wrap --text="You will need at least one partition in order to restore your backup image.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
+
+ret=$?
+
+if [ "$ret" = "252" ]; then
+ AutoPartitioning 
+ exit 0
+elif [ "$ret" = "5" ]; then
+ AutoPart="Auto"
+ ChooseDrive
+ exit 0
+elif [ "$ret" = "3" ]; then
+ AutoPart="Manual"
+ ChooseDrive
+ exit 0
+fi 
+
+}
+
+## Check for root and cry like a little girl if we don't have it.
+
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ $Info --button=$"gtk-quit:1" --text="SalineOS Backup must be run as root."
+ exit 1
+fi
+
 if [ "$1" = "Restore" ]; then
  BackupImage="$2"
- StartRestore
+ AutoPartitioning
 else
  MainMenu
 fi

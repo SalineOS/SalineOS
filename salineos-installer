@@ -52,7 +52,7 @@ TextEntry='yad --center --entry --title=SalineOS-Installer --window-icon=/usr/sh
 TestRoot="$(whoami)"
 
 if [ "$TestRoot" != "root" ]; then
- $Info --button=$"gtk-ok:1" --text="Must be run as root - press ok to exit"
+ $Info --button=$"gtk-quit:1" --text="SalineOS Installer must be run as root."
  exit 1
 fi
 
