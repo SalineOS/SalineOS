@@ -66,7 +66,7 @@ Input="$@"
 
 RunInstallation () { 
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Preparing disk and partitions               " &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="           Preparing disk and partitions           " &
 
 ## Check for safe mode and change the grub line.
 TestSafeMode=$(grep -B 0  "noapic noapm nodma nomce nolapic nomodeset radeon.modeset=0 nouveau.modeset=0" /proc/cmdline)
