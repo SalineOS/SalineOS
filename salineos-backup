@@ -86,7 +86,6 @@ mksquashfs $UseRoot $SaveFolder/$ImageName.backup -always-use-fragments -b 1M -n
 .thumbnails \
 boot/grub \
 Cache \
-dev \
 media \
 mnt \
 proc \
@@ -94,8 +93,7 @@ $SaveFolder/$ImageName.backup \
 swap \
 sys \
 tmp \
-var/log \
-var/run \>>/tmp/salineos-backup-temp-file &
+var/run\>>/tmp/salineos-backup-temp-file &
 
 (while [ "$(pidof mksquashfs)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
@@ -112,7 +110,13 @@ if [ "$BackupPart" != "root" ]; then
 fi
 
 ## Let all users move the file around
-chmod 0777 $SaveFolder/$ImageName.backup
+chmod o+rwx $SaveFolder/$ImageName.backup
+
+ls /home>>/tmp/salineos-backup-home-list
+UserNameTemp=$(tail --lines=1 /tmp/salineos-backup-home-list)
+
+chown $UserNameTemp $SaveFolder/$ImageName.backup 
+
 
 
 ## Cleanup some
@@ -337,7 +341,8 @@ sleep 1
 rm -rf /mnt/Super-Happy-Mount-Point
 
 ## Make needed aditional folders on the system.
-mkdir -p /Target/{proc,mnt,sys,media/cdrom}
+mkdir -p /Target/{proc,dev,mnt,sys,tmp,media/cdrom}
+mkdir -p /Target/var/run
 
 sleep 3
 
@@ -413,6 +418,14 @@ $TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
 FOO
 
 fi
+
+## Make the users on the system own their home folders
+for $i in $(ls /Target/home); do
+ chown -R "$i" /Target/home/"$i"
+done
+
+## Fix permissions on /tmp
+chmod og+rw /Target/tmp
 
 sleep 3
 
@@ -967,6 +980,7 @@ BackupImage=$(yad --file-selection --title="SalineOS-Backup" --height=450 --widt
 ret="$?"
 
 BackupImage=$(echo $BackupImage | awk -F '|' '{print $1}')
+
 
 if [ "$ret" = "252" ]; then
  SelectBackupImage
