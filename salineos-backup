@@ -89,7 +89,6 @@ Cache \
 media \
 mnt \
 proc \
-"$SaveFolder/$ImageName.backup" \
 swap \
 sys \
 tmp \
@@ -127,7 +126,7 @@ fi
 
 rm /tmp/salineos-backup-temp-file
 
-$Info --text="Creation of backup image $SaveFolder/$ImageName complete" --button=$"gtk-quit:1"
+$Info --text="Creation of backup image "$SaveFolder/$ImageName" complete" --button=$"gtk-quit:1"
 
 exit 0
 
