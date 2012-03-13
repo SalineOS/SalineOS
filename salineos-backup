@@ -94,6 +94,8 @@ sys \
 tmp \
 var/run\>>/tmp/salineos-backup-temp-file &
 
+sleep 1
+
 (while [ "$(pidof mksquashfs)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
 echo "$CurrentOutput" | awk -F ' ' '{print $NF}' | awk -F '%' '{print $1}' 
