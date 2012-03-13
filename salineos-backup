@@ -80,7 +80,7 @@ else
 fi
 
 
-mksquashfs $UseRoot $SaveFolder/$ImageName.backup -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
+mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
 .bash_history \
 .cache \
 .thumbnails \
@@ -89,7 +89,7 @@ Cache \
 media \
 mnt \
 proc \
-$SaveFolder/$ImageName.backup \
+"$SaveFolder/$ImageName.backup" \
 swap \
 sys \
 tmp \
@@ -110,12 +110,12 @@ if [ "$BackupPart" != "root" ]; then
 fi
 
 ## Let all users move the file around
-chmod o+rwx $SaveFolder/$ImageName.backup
+chmod o+rwx "$SaveFolder/$ImageName.backup"
 
 ls /home>>/tmp/salineos-backup-home-list
 UserNameTemp=$(tail --lines=1 /tmp/salineos-backup-home-list)
 
-chown $UserNameTemp $SaveFolder/$ImageName.backup 
+chown "$UserNameTemp" "$SaveFolder/$ImageName.backup" 
 
 
 
