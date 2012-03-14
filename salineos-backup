@@ -99,7 +99,7 @@ sleep 1
 (while [ "$(pidof mksquashfs)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
 echo "$CurrentOutput" | awk -F ' ' '{print $NF}' | awk -F '%' '{print $1}' 
-done)| $Progress --text="Creating backup $ImageName.backup, Please wait..."
+done)| $Progress --text="Creating backup image $ImageName.backup, Please wait..."
 
 ## Unmount partitions if needed
 if [ "$HomePart" != "" ]; then
