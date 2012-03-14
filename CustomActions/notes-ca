@@ -9,7 +9,7 @@ if [ -f "$HOME/.notes-ca/$Input" ]; then
  Text="$(cat "$HOME/.notes-ca/$Input")"
 fi
 
-Note="$(echo "$Text" | yad --text-info --editable --title="$Input Notes" --height=550 --width=450 --button=$"gtk-quit:3" --button=$"gtk-save:2" )"
+Note="$(echo -n "$Text" | yad --text-info --editable --title="$Input Notes" --height=550 --width=450 --button=$"gtk-quit:3" --button=$"gtk-save:2" )"
 
 ret="$?"
 
@@ -25,6 +25,6 @@ if [ ! -f "$HOME/.notes-ca/$Input" ]; then
  touch "$HOME/.notes-ca/$Input"
 fi
 
-echo "$Note">>"$HOME/.notes-ca/$Input"
+echo -n "$Note">>"$HOME/.notes-ca/$Input"
 
 exit
