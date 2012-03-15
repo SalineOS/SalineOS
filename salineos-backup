@@ -60,25 +60,34 @@ if [ "$ret" = "252" ]; then
 elif [ "$ret" = "3" ]; then
  exit 0
 elif [ "$ret" = "5" ]; then
- ImageName=$(date +%H%M%h%d%Y)
+ ImageName=$(date +%Y%h%d-%H%M)
 elif [ "$ImageName" = "" ]; then
- ImageName=$(date +%H%M%h%d%Y)
+ ImageName=$(date +%Y%h%d-%H%M)
 fi
 
 if [ "$BackupPart" = "root" ]; then
- $Info --text="Please close all other running applications before continuing" --button=$"gtk-ok:1"
+ $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-ok:1"
  UseRoot='/'
+elif [ "$(mount | grep "$BackupPart" | awk '{print $3}')" != "" ]; then
+ $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-ok:1"
+ UseRoot="$(mount | grep "$BackupPart" | awk '{print $3}')"
+ if [ "$HomePart" != "" ]; then
+  umount -l "$HomePart"
+  mount "$HomePart" "$UseRoot/home" -o rw
+ fi
 else
- umount "$BackupPart"
+ umount -l "$BackupPart"
  sleep 2 
  mkdir -p /mnt/Super-Happy-Mount-Point
  mount "$BackupPart" /mnt/Super-Happy-Mount-Point -o rw
  if [ "$HomePart" != "" ]; then
+  umount -l "$HomePart"
   mount "$HomePart" /mnt/Super-Happy-Mount-Point/home -o rw
  fi
  UseRoot="/mnt/Super-Happy-Mount-Point"
 fi
 
+TimeStart=$(date +%H%M)
 
 mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
 .bash_history \
@@ -87,6 +96,7 @@ mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1
 boot/grub \
 Cache \
 media \
+"$SaveFolder/$ImageName.backup" \
 mnt \
 proc \
 swap \
@@ -101,14 +111,6 @@ CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
 echo "$CurrentOutput" | awk -F ' ' '{print $NF}' | awk -F '%' '{print $1}' 
 done)| $Progress --text="Creating backup image $ImageName.backup, Please wait..."
 
-## Unmount partitions if needed
-if [ "$HomePart" != "" ]; then
- umount "$HomePart" 
-fi
-
-if [ "$BackupPart" != "root" ]; then 
- umount "$BackupPart"
-fi
 
 ## Let all users move the file around
 chmod o+rwx "$SaveFolder/$ImageName.backup"
@@ -118,17 +120,28 @@ UserNameTemp=$(tail --lines=1 /tmp/salineos-backup-home-list)
 
 chown "$UserNameTemp" "$SaveFolder/$ImageName.backup" 
 
+## Unmount partitions if needed
+if [ "$HomePart" != "" ]; then
+ umount "$HomePart" 
+fi
 
+if [ "$BackupPart" != "root" ]; then 
+ umount "$BackupPart"
+fi
 
 ## Cleanup some
 if [ -d /mnt/Super-Happy-Mount-Point ]; then
  rm -rf /mnt/Super-Happy-Mount-Point
 fi
 
+TimeEnd=$(date +%H%M)
+
+TimeTaken=$(($TimeStart - $TimeEnd))
+TimeTaken=$(echo "$TimeTaken" | sed -u "s|-||g")
 
 rm /tmp/salineos-backup-temp-file
 
-$Info --text="Creation of backup image "$SaveFolder/$ImageName" complete" --button=$"gtk-quit:1"
+$Info --text="Creation of backup image "$ImageName.backup" complete.\nImage saved to directory $SaveFolder\nThis operation took "$TimeTaken"minutes." --button=$"gtk-quit:1"
 
 exit 0
 
