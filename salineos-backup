@@ -72,19 +72,31 @@ elif [ "$(mount | grep "$BackupPart" | awk '{print $3}')" != "" ]; then
  $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-ok:1"
  UseRoot="$(mount | grep "$BackupPart" | awk '{print $3}')"
  if [ "$HomePart" != "" ]; then
-  umount -l "$HomePart"
+  HomeMountPoint="$(mount | grep "$HomePart" | awk '{print $3}')"
+  if [ "$HomeMountPoint" != "" ]; then
+   umount "$HomePart"
+   umount -l "$HomePart"
+   if [ "$(echo "$SaveFolder" | grep "$HomeMountPoint")" != "" ]; then
+    SaveFolder=$(echo "$SaveFolder" | sed -u "s|"$HomeMountPoint"|"$UseRoot"/home|g")
+   fi
+  fi
   mount "$HomePart" "$UseRoot/home" -o rw
  fi
 else
- umount -l "$BackupPart"
- sleep 2 
  mkdir -p /mnt/Super-Happy-Mount-Point
  mount "$BackupPart" /mnt/Super-Happy-Mount-Point -o rw
+  UseRoot="/mnt/Super-Happy-Mount-Point"
  if [ "$HomePart" != "" ]; then
-  umount -l "$HomePart"
+  HomeMountPoint="$(mount | grep "$HomePart" | awk '{print $3}')"
+  if [ "$HomeMountPoint" != "" ]; then
+   umount "$HomePart"
+   umount -l "$HomePart"
+   if [ "$(echo "$SaveFolder" | grep "$HomeMountPoint")" != "" ]; then
+    SaveFolder=$(echo "$SaveFolder" | sed -u "s|"$HomeMountPoint"|"$UseRoot"/home|g")
+   fi
+  fi
   mount "$HomePart" /mnt/Super-Happy-Mount-Point/home -o rw
  fi
- UseRoot="/mnt/Super-Happy-Mount-Point"
 fi
 
 TimeStart=$(date +%H%M)
@@ -171,7 +183,7 @@ for i in $TempParts; do
 done
 
 
-HomePart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select the root partition you want to backup." $PartMenu )
+HomePart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select the home partition for "$BackupPart"." $PartMenu )
 
 ret=$?
 
@@ -238,7 +250,13 @@ BackupPart="/dev/$BackupPart"
 $Question --text="Is /home for this instance on a seperate partition?" 
 
 if [ "$?" = "0" ]; then
- SelectBackupHomePart
+ $Info --wrap --width=250 --button=$"gtk-quit:3" --button=$"gtk-ok:1" --text="If the /home folder for "$BackupPart" is shared with SalineOS, then you will have to run SalineOS backup from a live environment."
+ ret=$?
+ if [ "$ret" = "3" ]; then
+  exit 0
+ else
+  SelectBackupHomePart
+ fi
 else
  StartBackup
 fi
