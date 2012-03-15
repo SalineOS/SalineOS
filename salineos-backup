@@ -99,9 +99,9 @@ else
  fi
 fi
 
-TimeStart=$(date +%H%M)
 
-mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
+
+/usr/bin/time --output=/tmp/TimeTaken -p mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
 .bash_history \
 .cache \
 .thumbnails \
@@ -146,14 +146,13 @@ if [ -d /mnt/Super-Happy-Mount-Point ]; then
  rm -rf /mnt/Super-Happy-Mount-Point
 fi
 
-TimeEnd=$(date +%H%M)
 
-TimeTaken=$(($TimeStart - $TimeEnd))
-TimeTaken=$(echo "$TimeTaken" | sed -u "s|-||g")
+TimeTaken=$(($(grep "real" /tmp/TimeTaken | awk '{print $2}' | awk -F '.' '{print $1}') / 60))
 
+rm /tmp/TimeTaken
 rm /tmp/salineos-backup-temp-file
 
-$Info --text="Creation of backup image "$ImageName.backup" complete.\nImage saved to directory $SaveFolder\nThis operation took "$TimeTaken"minutes." --button=$"gtk-quit:1"
+$Info --text="Creation of backup image "$ImageName.backup" complete.\nImage saved to directory $SaveFolder\nThis operation took "$TimeTaken" minutes." --button=$"gtk-quit:1"
 
 exit 0
 
