@@ -451,7 +451,7 @@ FOO
 fi
 
 ## Make the users on the system own their home folders
-for $i in $(ls /Target/home); do
+for i in $(ls /Target/home); do
  chown -R "$i" /Target/home/"$i"
 done
 
