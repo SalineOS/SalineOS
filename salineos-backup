@@ -60,9 +60,9 @@ if [ "$ret" = "252" ]; then
 elif [ "$ret" = "3" ]; then
  exit 0
 elif [ "$ret" = "5" ]; then
- ImageName=$(date +%Y%h%d-%H%M)
+ ImageName=$(date +%Y%m%d-%H%M)
 elif [ "$ImageName" = "" ]; then
- ImageName=$(date +%Y%h%d-%H%M)
+ ImageName=$(date +%Y%m%d-%H%M)
 fi
 
 if [ "$BackupPart" = "root" ]; then
