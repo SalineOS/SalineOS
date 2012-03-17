@@ -335,7 +335,7 @@ sleep 2
 
 killall -KILL tail
 
-$Question --text="\nInstallation is complete.\n\nIf everything went well you should have your\nnew system installed and ready.\n\nDo you want to reboot now to try it out?" 
+$Question --wrap --width=250 --text="Installation is complete.  If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?" 
 
 if [ $? = 0 ]; then
  reboot
