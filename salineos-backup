@@ -227,7 +227,7 @@ rsync -a /mnt/Super-Happy-Mount-Point/ /Target --ignore-existing --exclude=/{Tar
 
 if [ "$TargetHomePart" != "root" ]; then
 if [ "$FormatHome" != "True" ]; then
- for i in $(ls /Target/home); do
+ for i in $(ls /mnt/Super-Happy-Mount-Point/home); do
   cp -rf /mnt/Super-Happy-Mount-Point/home/"$i" /Target/home/
  done
 fi
