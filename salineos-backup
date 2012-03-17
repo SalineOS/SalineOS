@@ -51,57 +51,39 @@ elif [ "$SaveFolder" = "" ]; then
  exit 0
 fi
 
-ImageName=$($TextEntry --wrap --width=250 --text="Enter a name for the backup file, or select time to use the current time and date." --button=$"gtk-quit:3" --button=$"Time:5" --button=$"gtk-ok:2")
+ContinueBackup
+
+}
+
+ContinueBackup () { 
+
+ImageName=""
+
+ImageName=$($TextEntry --wrap --width=250 --entry-text="$(date +%Y%m%d-%H%M)" --text="Enter a name for the backup file." --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 ret="$?"
 
 if [ "$ret" = "252" ]; then
+ ContinueBackup
  exit 0
 elif [ "$ret" = "3" ]; then
  exit 0
-elif [ "$ret" = "5" ]; then
- ImageName=$(date +%Y%m%d-%H%M)
 elif [ "$ImageName" = "" ]; then
  ImageName=$(date +%Y%m%d-%H%M)
+elif [ -f "$SaveFolder/$ImageName" ]; then
+ $Question --text="Warning "$ImageName" already exists in folder "$SaveFolder", would you like to overwrite?"
+ if [ "$?" != "0" ]; then
+  ContinueBackup
+  exit 0
+ fi
 fi
 
 if [ "$BackupPart" = "root" ]; then
  $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-ok:1"
  UseRoot='/'
-elif [ "$(mount | grep "$BackupPart" | awk '{print $3}')" != "" ]; then
- $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-ok:1"
- UseRoot="$(mount | grep "$BackupPart" | awk '{print $3}')"
- if [ "$HomePart" != "" ]; then
-  HomeMountPoint="$(mount | grep "$HomePart" | awk '{print $3}')"
-  if [ "$HomeMountPoint" != "" ]; then
-   umount "$HomePart"
-   umount -l "$HomePart"
-   if [ "$(echo "$SaveFolder" | grep "$HomeMountPoint")" != "" ]; then
-    SaveFolder=$(echo "$SaveFolder" | sed -u "s|"$HomeMountPoint"|"$UseRoot"/home|g")
-   fi
-  fi
-  mount "$HomePart" "$UseRoot/home" -o rw
- fi
-else
- mkdir -p /mnt/Super-Happy-Mount-Point
- mount "$BackupPart" /mnt/Super-Happy-Mount-Point -o rw
-  UseRoot="/mnt/Super-Happy-Mount-Point"
- if [ "$HomePart" != "" ]; then
-  HomeMountPoint="$(mount | grep "$HomePart" | awk '{print $3}')"
-  if [ "$HomeMountPoint" != "" ]; then
-   umount "$HomePart"
-   umount -l "$HomePart"
-   if [ "$(echo "$SaveFolder" | grep "$HomeMountPoint")" != "" ]; then
-    SaveFolder=$(echo "$SaveFolder" | sed -u "s|"$HomeMountPoint"|"$UseRoot"/home|g")
-   fi
-  fi
-  mount "$HomePart" /mnt/Super-Happy-Mount-Point/home -o rw
- fi
 fi
 
-
-
-/usr/bin/time --output=/tmp/TimeTaken -p mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
+mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
 .bash_history \
 .cache \
 .thumbnails \
@@ -114,7 +96,7 @@ proc \
 swap \
 sys \
 tmp \
-var/run\>>/tmp/salineos-backup-temp-file &
+var/run >>/tmp/salineos-backup-temp-file &
 
 sleep 1
 
@@ -132,133 +114,12 @@ UserNameTemp=$(tail --lines=1 /tmp/salineos-backup-home-list)
 
 chown "$UserNameTemp" "$SaveFolder/$ImageName.backup" 
 
-## Unmount partitions if needed
-if [ "$HomePart" != "" ]; then
- umount "$HomePart" 
-fi
-
-if [ "$BackupPart" != "root" ]; then 
- umount "$BackupPart"
-fi
-
-## Cleanup some
-if [ -d /mnt/Super-Happy-Mount-Point ]; then
- rm -rf /mnt/Super-Happy-Mount-Point
-fi
-
-
-TimeTaken=$(($(grep "real" /tmp/TimeTaken | awk '{print $2}' | awk -F '.' '{print $1}') / 60))
-
-rm /tmp/TimeTaken
 rm /tmp/salineos-backup-temp-file
 
-$Info --text="Creation of backup image "$ImageName.backup" complete.\nImage saved to directory $SaveFolder\nThis operation took "$TimeTaken" minutes." --button=$"gtk-quit:1"
+$Info --text="Creation of backup image "$ImageName.backup" complete.\nImage saved to directory $SaveFolder" --button=$"gtk-ok:1"
+
 
 exit 0
-
-}
-
-SelectBackupHomePart () {
-
-
-PartMenu=""
-
-Partitions=$(cat /proc/partitions | awk '{print $4}' | grep "[0-9]" | grep -v 'p1' | grep -v "$BackupPart")
-
-TempParts="$(echo $Partitions)"
-
-for i in $Partitions; do
-TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-if [ "$TempSize" = "1" ]; then
- TempParts=$(echo $TempParts | sed -r "s/$i//")
-fi
-done
-
-
-for i in $TempParts; do
-  Part="$i"
-  PartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-  PartMenu="$PartMenu $Part $PartSize"
-done
-
-
-HomePart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select the home partition for "$BackupPart"." $PartMenu )
-
-ret=$?
-
-
-if [ "$ret" = "252" ]; then
- SelectBackupHomePart
- exit 0
-elif [ "$ret" = "3" ]; then
- exit 0
-elif [ "$HomePart" = "" ]; then
- SelectBackupHomePart
- exit 0
-fi
-
-HomePart=$(echo "$HomePart" | awk -F '|' '{print $1}')
-HomePart="/dev/$HomePart"
-
-StartBackup
-
-
-}
-
-SelectBackupPart () { 
-
-PartMenu=""
-
-Partitions=$(cat /proc/partitions | awk '{print $4}' | grep "[0-9]" | grep -v 'p1')
-
-TempParts="$(echo $Partitions)"
-
-for i in $Partitions; do
-TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-if [ "$TempSize" = "1" ]; then
- TempParts=$(echo $TempParts | sed -r "s/$i//")
-fi
-done
-
-
-for i in $TempParts; do
-  Part="$i"
-  PartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-  PartMenu="$PartMenu $Part $PartSize"
-done
-
-
-BackupPart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select the root partition you want to backup." $PartMenu )
-
-ret=$?
-
-
-if [ "$ret" = "252" ]; then
- SelectBackupPart
- exit 0
-elif [ "$ret" = "3" ]; then
- exit 0
-elif [ "$BackupPart" = "" ]; then
- SelectBackupPart
- exit 0
-fi
-
-BackupPart=$(echo "$BackupPart" | awk -F '|' '{print $1}')
-BackupPart="/dev/$BackupPart"
-
-$Question --text="Is /home for this instance on a seperate partition?" 
-
-if [ "$?" = "0" ]; then
- $Info --wrap --width=250 --button=$"gtk-quit:3" --button=$"gtk-ok:1" --text="If the /home folder for "$BackupPart" is shared with SalineOS, then you will have to run SalineOS backup from a live environment."
- ret=$?
- if [ "$ret" = "3" ]; then
-  exit 0
- else
-  SelectBackupHomePart
- fi
-else
- StartBackup
-fi
 
 }
 
@@ -389,7 +250,7 @@ if [ "$UseSwapFile" = "True" ]; then
  mkswap /Target/swap/salineos-swap
  SwapFstab="/swap/salineos-swap"
 else
- mkswap $Swap
+ mkswap "$Swap"
  sleep 2
  blkid
  sleep 2
@@ -488,14 +349,12 @@ sleep 2
 umount /Target/sys
 sleep 2
 umount /Target
+umount -l /Target
 sleep 2
-
-## Remove Target
-rm -rf /Target
 
 killall -KILL tail
 
-$Question --text="\nRestoration is complete.\n\nIf everything went well you should have your\nnew system installed and ready.\n\nDo you want to reboot now to try it out?" 
+$Question --wrap --width=250 --text="Restoration is complete. If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?" 
 
 if [ $? = 0 ]; then
  reboot
@@ -1043,29 +902,18 @@ exit 0
 
 MainMenu () {
 
-Operation=$($SingleMenu --wrap --height=300 --width=400 --text="Please select the operation you wish to perform" "Create a backup image of this SalineOS instance" "Create a backup image of another Linux instance" "Restore a backup image" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+$Info --wrap  --width=300 --text="Welcome to the SalineOS backup utility. For complete usage information please refer to the SalineOS backup section in the user manual." --button=$"Restore Backup:5" --button=$"Create Backup:7"
 
 ret="$?"
 
-Operation=$(echo "$Operation" | awk -F '|' '{print $1}')
 
-if [ "$ret" = "3" ]; then
+if [ "$ret" = "252" ]; then
  exit 0
-elif [ "$ret" = "252" ]; then
- MainMenu
- exit 0
-elif [ "$Operation" = "" ]; then
- $Info --text="You must select an operation in order to continue" --button=$"gtk-ok:1"
- MainMenu
- exit 0
-elif [ "$Operation" = "Create a backup image of this SalineOS instance" ]; then
+elif [ "$ret" = "7" ]; then
  BackupPart="root"
  StartBackup
  exit 0
-elif [ "$Operation" = "Create a backup image of another Linux instance" ]; then
- SelectBackupPart
- exit 0
-elif [ "$Operation" = "Restore a backup image" ]; then
+elif [ "$ret" = "5" ]; then
  SelectBackupImage
  exit 0
 fi
