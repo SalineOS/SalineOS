@@ -211,7 +211,7 @@ sleep 3
 
 killall -KILL tail
 
-## Copy the live system to $Target
+## Copy the backup image contents to $Target
 tail -f /usr/bin/salineos-backup | $Progress --text="                   Copying files to $TargetPart                   " --pulsate &
 
 ## Mount the backup image
@@ -220,7 +220,18 @@ mkdir -p /mnt/Super-Happy-Mount-Point
 
 mount "$BackupImage" -o loop /mnt/Super-Happy-Mount-Point
 
+## Rsync
 rsync -a /mnt/Super-Happy-Mount-Point/ /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
+
+## Update the home folders of users if need be
+
+if [ "$TargetHomePart" != "root" ]; then
+if [ "$FormatHome" != "True" ]; then
+ for i in $(ls /Target/home); do
+  cp -rf /mnt/Super-Happy-Mount-Point/home/"$i" /Target/home/
+ done
+fi
+fi
 
 sleep 3
 
