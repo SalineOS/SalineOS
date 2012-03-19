@@ -34,6 +34,56 @@ Progress='yad --center --progress --auto-close --title=SalineOS-Backup --no-butt
 TextEntry='yad --center --entry --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-installer.png'
 
 
+SetExcludes () {
+
+Selection=""
+Excludes=""
+NewExclude=""
+CurrentExcludes=""
+
+mkdir -p /etc/salineos-backup
+if [ -f /etc/salineos-backup/excludes ]; then
+ Excludes=$(cat /etc/salineos-backup/excludes)
+fi
+
+CurrentExcludes=$(echo -n "$Excludes" | yad --always-print-result --text-info --height=350 --editable --title="SalineOS-Backup" --wrap --width=400 --text="If desired you can exclude select files or folders from being included in the generated .backup file. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog." --button=$"gtk-quit:3" --button=$"Add New:5" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ SetExcludes
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "5" ]; then
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+ NewExclude=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --directory --text="\n                     Select the file or folder you wish to exclude\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ ret="$?"
+
+ if [ "$ret" = "252" ]; then
+  SetExcludes
+  exit 0
+ elif [ "$ret" = "3" ]; then
+  exit 0
+ else
+  echo "$NewExclude">>/etc/salineos-backup/excludes
+  SetExcludes
+  exit 0
+ fi
+else
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+ StartBackup
+ exit 0
+fi
+
+} 
+
 StartBackup () {
 
 
@@ -83,12 +133,115 @@ if [ "$BackupPart" = "root" ]; then
  UseRoot='/'
 fi
 
+E=$(head --lines=1 /etc/salineos-backup/excludes)
+E1=$(head -n 2 /etc/salineos-backup/excludes | tail -n 1)
+E2=$(head -n 3 /etc/salineos-backup/excludes | tail -n 1)
+E3=$(head -n 4 /etc/salineos-backup/excludes | tail -n 1)
+E4=$(head -n 5 /etc/salineos-backup/excludes | tail -n 1)
+E5=$(head -n 6 /etc/salineos-backup/excludes | tail -n 1)
+E6=$(head -n 7 /etc/salineos-backup/excludes | tail -n 1)
+E7=$(head -n 8 /etc/salineos-backup/excludes | tail -n 1)
+E8=$(head -n 9 /etc/salineos-backup/excludes | tail -n 1)
+E9=$(head -n 10 /etc/salineos-backup/excludes | tail -n 1)
+E10=$(head -n 11 /etc/salineos-backup/excludes | tail -n 1)
+E11=$(head -n 12 /etc/salineos-backup/excludes | tail -n 1)
+E12=$(head -n 13 /etc/salineos-backup/excludes | tail -n 1)
+E13=$(head -n 14 /etc/salineos-backup/excludes | tail -n 1)
+E14=$(head -n 15 /etc/salineos-backup/excludes | tail -n 1)
+E15=$(head -n 16 /etc/salineos-backup/excludes | tail -n 1)
+E16=$(head -n 17 /etc/salineos-backup/excludes | tail -n 1)
+E17=$(head -n 18 /etc/salineos-backup/excludes | tail -n 1)
+E18=$(head -n 19 /etc/salineos-backup/excludes | tail -n 1)
+E19=$(head -n 20 /etc/salineos-backup/excludes | tail -n 1)
+E20=$(head -n 21 /etc/salineos-backup/excludes | tail -n 1)
+E21=$(head -n 22 /etc/salineos-backup/excludes | tail -n 1)
+E22=$(head -n 23 /etc/salineos-backup/excludes | tail -n 1)
+E23=$(head -n 24 /etc/salineos-backup/excludes | tail -n 1)
+E24=$(head -n 25 /etc/salineos-backup/excludes | tail -n 1)
+E25=$(head -n 26 /etc/salineos-backup/excludes | tail -n 1)
+E26=$(head -n 27 /etc/salineos-backup/excludes | tail -n 1)
+E27=$(head -n 28 /etc/salineos-backup/excludes | tail -n 1)
+E28=$(head -n 29 /etc/salineos-backup/excludes | tail -n 1)
+E29=$(head -n 30 /etc/salineos-backup/excludes | tail -n 1)
+E30=$(head -n 31 /etc/salineos-backup/excludes | tail -n 1)
+E31=$(head -n 32 /etc/salineos-backup/excludes | tail -n 1)
+E32=$(head -n 33 /etc/salineos-backup/excludes | tail -n 1)
+E33=$(head -n 34 /etc/salineos-backup/excludes | tail -n 1)
+E34=$(head -n 35 /etc/salineos-backup/excludes | tail -n 1)
+E35=$(head -n 36 /etc/salineos-backup/excludes | tail -n 1)
+E36=$(head -n 37 /etc/salineos-backup/excludes | tail -n 1)
+E37=$(head -n 38 /etc/salineos-backup/excludes | tail -n 1)
+E38=$(head -n 39 /etc/salineos-backup/excludes | tail -n 1)
+E39=$(head -n 40 /etc/salineos-backup/excludes | tail -n 1)
+E40=$(head -n 41 /etc/salineos-backup/excludes | tail -n 1)
+E41=$(head -n 42 /etc/salineos-backup/excludes | tail -n 1)
+E42=$(head -n 43 /etc/salineos-backup/excludes | tail -n 1)
+E43=$(head -n 44 /etc/salineos-backup/excludes | tail -n 1)
+E44=$(head -n 45 /etc/salineos-backup/excludes | tail -n 1)
+E45=$(head -n 46 /etc/salineos-backup/excludes | tail -n 1)
+E46=$(head -n 47 /etc/salineos-backup/excludes | tail -n 1)
+E47=$(head -n 48 /etc/salineos-backup/excludes | tail -n 1)
+E48=$(head -n 49 /etc/salineos-backup/excludes | tail -n 1)
+E49=$(head -n 50 /etc/salineos-backup/excludes | tail -n 1)
+E50=$(head -n 51 /etc/salineos-backup/excludes | tail -n 1)
+
 mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
 .bash_history \
 .cache \
 .thumbnails \
 boot/grub \
 Cache \
+"$E" \
+"$E1" \
+"$E2" \
+"$E3" \
+"$E4" \
+"$E5" \
+"$E6" \
+"$E7" \
+"$E8" \
+"$E9" \
+"$E10" \
+"$E11" \
+"$E12" \
+"$E13" \
+"$E14" \
+"$E15" \
+"$E16" \
+"$E17" \
+"$E18" \
+"$E19" \
+"$E20" \
+"$E21" \
+"$E22" \
+"$E23" \
+"$E24" \
+"$E25" \
+"$E26" \
+"$E27" \
+"$E28" \
+"$E29" \
+"$E30" \
+"$E31" \
+"$E32" \
+"$E33" \
+"$E34" \
+"$E35" \
+"$E36" \
+"$E37" \
+"$E38" \
+"$E39" \
+"$E40" \
+"$E41" \
+"$E42" \
+"$E43" \
+"$E44" \
+"$E45" \
+"$E46" \
+"$E47" \
+"$E48" \
+"$E49" \
+"$E50" \
 media \
 "$SaveFolder/$ImageName.backup" \
 mnt \
@@ -922,7 +1075,7 @@ if [ "$ret" = "252" ]; then
  exit 0
 elif [ "$ret" = "7" ]; then
  BackupPart="root"
- StartBackup
+ SetExcludes
  exit 0
 elif [ "$ret" = "5" ]; then
  SelectBackupImage
