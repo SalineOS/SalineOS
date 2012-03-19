@@ -129,8 +129,16 @@ elif [ -f "$SaveFolder/$ImageName" ]; then
 fi
 
 if [ "$BackupPart" = "root" ]; then
- $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-ok:1"
+ $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-quit:3" --button=$"gtk-ok:1"
  UseRoot='/'
+fi
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" ="3" ]; then
+ exit 0
 fi
 
 E=$(head --lines=1 /etc/salineos-backup/excludes)
