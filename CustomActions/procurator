@@ -146,7 +146,7 @@ Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
 if [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$ret" = "3" ]; then
- $Info --wrap --width=250 --title="Procurator Help" --text="This program will allow you to create and manage virtual disks for use with KVM (Kernel Virtual Machine), which is included with SalineOS. Virtual machines allow you to run one operating system within another. In order to use KVM you must have a CPU or APU with virtualization support. You may have to enable virtualization support in your computer's bios before using this utility." --button=$"gtk-ok:1"
+ $Info --wrap --width=250 --title="Procurator Help" --text="This program will allow you to create and manage virtual disks for use with KVM (Kernel Virtual Machine), which is included with SalineOS. Virtual machines allow you to run one operating system like a program within another. Virtual disks are specialized files, which can be mounted (Accessed), formated to various filesystems and installed to within a virtual machine. Procurator is a very simple program, with few features, solely meant to be used for creating, deleting and allowing you to use virtual disks easily with KVM.\n\nIn order to use KVM you must have a CPU or APU with virtualization support. You may also have to enable virtualization support in your computer's bios before using this utility. To boot an ISO file with access to any of the virtual disks, simply right click on the .iso from within Thunar and select Boot with KVM from the menu.\n\nProcurator will always launch KVM with access to a cdrom device if possible.  If you select an ISO and launch Procurator through the custom action, then the .iso file will be mounted as a loop device and appear inside the virtual machine as /dev/cdrom. If no .iso file is used, then procurator will allow your virtual machine access to the host systems cd/dvd drive if available. Within the running KVM window, your virtual disk will appear as /dev/sda under Linux, and as the C: drive in Windows." --button=$"gtk-ok:1"
  MainMenu
  exit 0
 elif [ "$ret" = "5" ]; then
@@ -172,7 +172,7 @@ elif [ "$ret" = "9" ]; then
  if [ "$Selection" != "" ]; then
   HardDisk=$(echo "-hda $HOME/.procurator/disks/$Selection")
  fi
- kvm -boot order=dc -m $RamSize -smp maxcpus=maxcpus -soundhw ac97 -cdrom $Input $HardDisk 
+ kvm  -boot order=dc -m $RamSize -smp maxcpus=maxcpus -soundhw ac97 -sdl -cdrom $Input $HardDisk 
  exit 0
 fi
 
@@ -188,7 +188,7 @@ Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
 if [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$ret" = "3" ]; then
- $Info --wrap --width=250 --title="Procurator Help" --text="This program will allow you to create and manage virtual disks for use with KVM (Kernel Virtual Machine), which is included with SalineOS. Virtual machines allow you to run one operating system within another. In order to use KVM you must have a CPU or APU with virtualization support. You may have to enable virtualization support in your computer's bios before using this utility. To boot an ISO file with access to any of the virtual disks, simply right click on it from within Thunar and select Boot with KVM from the menu." --button=$"gtk-ok:1"
+ $Info --wrap --width=250 --title="Procurator Help" --text="This program will allow you to create and manage virtual disks for use with KVM (Kernel Virtual Machine), which is included with SalineOS. Virtual machines allow you to run one operating system like a program within another. Virtual disks are specialized files, which can be mounted (Accessed), formated to various filesystems and installed to within a virtual machine. Procurator is a very simple program, with few features, solely meant to be used for creating, deleting and allowing you to use virtual disks easily with KVM.\n\nIn order to use KVM you must have a CPU or APU with virtualization support. You may also have to enable virtualization support in your computer's bios before using this utility. To boot an ISO file with access to any of the virtual disks, simply right click on the .iso from within Thunar and select Boot with KVM from the menu.\n\nProcurator will always launch KVM with access to a cdrom device if possible.  If you select an ISO and launch Procurator through the custom action, then the .iso file will be mounted as a loop device and appear inside the virtual machine as /dev/cdrom. If no .iso file is used, then procurator will allow your virtual machine access to the host systems cd/dvd drive if available. Within the running KVM window, your virtual disk will appear as /dev/sda under Linux, and as the C: drive in Windows." --button=$"gtk-ok:1"
  MainMenu
  exit 0
 elif [ "$ret" = "5" ]; then
@@ -216,8 +216,14 @@ elif [ "$ret" = "9" ]; then
   MainMenu
   exit 0
  fi
- kvm -boot order=dc -m $RamSize -smp maxcpus=maxcpus -soundhw ac97 -cdrom /dev/cdrom -hda "$HOME/.procurator/disks/$Selection"
- exit 0
+if [ -a /dev/cdrom ]; then
+kvm  -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97  "$HOME/.procurator/disks/$Selection" -cdrom /dev/cdrom
+else
+kvm -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97 "$HOME/.procurator/disks/$Selection"
+fi
+ 
+
+exit 0
 fi
 
 fi
