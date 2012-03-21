@@ -71,13 +71,13 @@ if [ "$NewDiskNotes" != "" ]; then
  echo "$NewDiskNotes">>"$HOME/.procurator/notes/$NewDiskName"
 fi
 
-Output=$(fallocate --l "$NewDiskSize"m "$HOME/.procurator/disks/$NewDiskName")
 
-if [ "$Output" = "" ]; then
- $Info --text="Creation of $NewDiskName complete." --button=$"gtk-ok:1"
-else
- $Info --text="$Output" --button=$"gtk-ok:1"
-fi
+
+kvm-img create -f qcow2 -o size="$NewDiskSize"M,preallocation=metadata,cluster_size=2M $HOME/.procurator/disks/"$NewDiskName"
+
+
+$Info --text="Creation of $NewDiskName complete." --button=$"gtk-ok:1"
+
 
 MainMenu
 
@@ -108,9 +108,10 @@ elif [ "$NewDiskSize" = "Custom" ]; then
  elif [ "$NewDiskSize" = "" ]; then
   exit 0
  fi
+ NewDiskSize=$(($NewDiskSize * 1024))
 fi
 
-NewDiskSize=$(("$NewDiskSize" * 1024))
+
 
 NameDisk
 
@@ -123,7 +124,9 @@ Menu=""
 
 for i in $(ls $HOME/.procurator/disks); do
  Disk="$i"
- DiskSize=$(du -chs --apparent-size "$HOME/.procurator/disks/$i" | grep "total" | awk '{print $1}')
+ DiskSize=$(du -c --apparent-size "$HOME/.procurator/disks/$i" | grep "total" | awk '{print $1}')
+ DiskSize=$(($DiskSize / 1024))
+ DiskSize="$DiskSize"M
 if [ -f $HOME/.procurator/notes/$i ]; then
  Note=$(cat "$HOME/.procurator/notes/$i")
 else
