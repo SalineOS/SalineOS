@@ -173,7 +173,7 @@ elif [ "$ret" = "7" ]; then
  exit 0
 elif [ "$ret" = "9" ]; then
  if [ "$Selection" != "" ]; then
-  HardDisk=$(echo "-hda $HOME/.procurator/disks/$Selection")
+  HardDisk=$(echo "-drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk")
  fi
  kvm  -boot order=dc -m $RamSize -smp maxcpus=maxcpus -soundhw ac97 -sdl -cdrom $Input $HardDisk 
  exit 0
@@ -220,9 +220,9 @@ elif [ "$ret" = "9" ]; then
   exit 0
  fi
 if [ -a /dev/cdrom ]; then
-kvm  -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97  "$HOME/.procurator/disks/$Selection" -cdrom /dev/cdrom
+kvm  -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97  -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -cdrom /dev/cdrom
 else
-kvm -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97 "$HOME/.procurator/disks/$Selection"
+kvm -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97 -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk
 fi
  
 
