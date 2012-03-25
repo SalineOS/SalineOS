@@ -1,3 +1,195 @@
+commit 644cd63c46ae57a2567231d6f2e31401fde686ad
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sun Mar 25 12:41:22 2012 -0400
+
+    Make tooltips white, replace yellow star with a blue one.
+
+commit f893b51a1cde3ef25541b04410d9f0a72e9d64f1
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 21 13:59:58 2012 -0400
+
+    Add icon for kvm and qemu
+
+commit ac0f29a5f988299b452dbc7dc01015cdd57a432d
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 21 11:17:20 2012 -0400
+
+    Disabled caching on virtual disk to increase raw performance
+
+commit 89f442d4e951b8023a3d4a923d71e301c6a5abad
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 21 11:01:45 2012 -0400
+
+    Fix Nestling of if statement, Use kvm-img to create disk and use all performance tweaks, Use megabytes of displaying size of disk since they are acurate
+
+commit ce62d66385f092b6a4c5a04ecd96c461cf6d9412
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 21 09:23:46 2012 -0400
+
+    Don't try to access the cdrom if the host system doesn't have one, enable sdl, add some more information to the help
+
+commit cf73b096320edb2e01858a419e48389bd322b13a
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Mar 20 21:40:24 2012 -0400
+
+    First release procurator
+
+commit 1a9264f16defde659b6f06d9435e9a30829c4bd8
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Mar 20 07:15:53 2012 -0400
+
+    Add a copy of salineos_utils
+
+commit 5d25e0ec7270b3c1286db309adb2400c549f3b42
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Mar 19 16:54:44 2012 -0400
+
+    Add one last option to exit before running the backup
+
+commit 2cb42c8d99bce49b923c69bd4c5c23e7a4a2522d
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Mar 19 04:10:10 2012 -0400
+
+    Add support for excluding files and folders from backup
+
+commit 6e2131a8bd3a214a2e6c3852e24ad559b0fc127e
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Mar 17 07:27:53 2012 -0400
+
+    One more quick fix
+
+commit 81bf2248b402208b1b278fcfe9cccda168e6905e
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Mar 17 07:25:45 2012 -0400
+
+    Force updating of /home/user-name folders if the user didn't format seperate home partition
+
+commit 5def398dfd95e175a6a33800e0533a93f6a40821
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Mar 17 00:39:16 2012 -0400
+
+    Polish up final dialog
+
+commit 5e186336ace880f8b6d172cdc7bf6b867c3fe311
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Mar 17 00:36:37 2012 -0400
+
+    Remove other instance code, remove time taken code, fix exclude of /var/run, re-write and polish dialogs
+
+commit 026cb68f174d14e406f2cb1f99492d95c11bed55
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 15 21:14:11 2012 -0400
+
+    Replace letters with numbers in date
+
+commit a24bb7ab66e174ae2fd1ab6187347117ba9c26f9
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 15 20:41:04 2012 -0400
+
+    Fix loop error in permissions code
+
+commit 6172517ccea3d99a135896558ae69ecc0c7a1fcc
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 15 08:06:44 2012 -0400
+
+    Use the time command instead of date to calculate time taken
+
+commit 413e4df9eac059142ed5332ff17faba12244d0d9
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 15 06:49:22 2012 -0400
+
+    Allow saving backup file to seperate home partitions of other instances
+
+commit c9c287622bbf17352547d6ea6d6c92da66bf14c1
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 14 23:40:46 2012 -0400
+
+    Reformat time stamp, use current mount point of other instances, add time taken to final dialog
+
+commit 185ffe4639de049e22c49592bb18400dcd0d0ab5
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Wed Mar 14 00:41:38 2012 -0400
+
+    Remove trailing new line from notes
+
+commit 919773cb37f82b34bd9debb31677f02fdf3e6374
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Mar 13 20:51:32 2012 -0400
+
+    Polish progress bar, add custom action for file notes
+
+commit 17a438f7a95c0fc77dd488f80dc0f874907cf93f
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Mar 13 15:28:47 2012 -0400
+
+    add sleep one before progress bar loop
+
+commit 6f80ac515aa0ce8061bd2bb5e5bfa7f0e5a30f9c
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Mar 13 15:27:58 2012 -0400
+
+    Remove un-needed entry from excludes
+
+commit 48fb2aa5a73d72381d79339bbf12fa522be0f329
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Tue Mar 13 15:22:48 2012 -0400
+
+    SCOTTY WE NEED MORE QUOTES!
+
+commit 02222f4bbe5767fc64ee1fc261aca8084461b1d1
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Mon Mar 12 13:48:19 2012 -0400
+
+    Fix permissions on restored system
+
+commit 96b8ded043d5d9d1fa119e22835b56a001d51b55
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sun Mar 11 05:30:00 2012 -0400
+
+    Finish restore code for backup, polish a dialog up in installer
+
+commit d4a2437937aa569c5a87129d85bd00f576cbd5e9
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Mar 10 22:29:09 2012 -0500
+
+    Bug fixes and typos in salineos-backup fixed, start the code for restoring backup, change gtk-ok to gtk-quit on require root dialog in installer
+
+commit 0cd5285a4da89921e4d53f2fae50e3d9ffa8de0b
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Mar 10 06:23:04 2012 -0500
+
+    Make a real progress bar, exclude var/log
+
+commit d7983e6606eddfdc6469dcd21921f6a2e11fa7d6
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Sat Mar 10 02:50:40 2012 -0500
+
+    Add Terminal icon, fix Clean, add unfinished salineos-backup
+
+commit 28a8ccf469b732d6a8191d18482e5ee6573f5481
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 8 23:37:00 2012 -0500
+
+    Replace OK buttons with gtk-ok buttons
+
+commit 816d3d80c6412398bd9a51125a884cecc798eca4
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 8 23:34:02 2012 -0500
+
+    Add sudo command to Clean, replace Exit with gtk-quit buttons in installer
+
+commit 93047248b6c171854b6051cf9c02cd617aa3d4ad
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 8 18:58:59 2012 -0500
+
+    Add code for calculating size of un-needed dependencies
+
+commit ed1c5c000ed5cfa5f2f57bb3d2fc617b651fdb04
+Author: Anthony Nordquist <salinelinux@gmail.com>
+Date:   Thu Mar 8 00:51:38 2012 -0500
+
+    Generate Changelog
+
 commit 48a08cfa85982c9c267db3e7dc38ec1ea01e0233
 Author: Anthony Nordquist <salinelinux@gmail.com>
 Date:   Thu Mar 8 00:50:26 2012 -0500
