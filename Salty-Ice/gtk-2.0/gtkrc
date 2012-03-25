@@ -314,8 +314,8 @@ style "handlebox" = "default"
 
 style "tooltips" = "default"
 {
-    bg[NORMAL] = "#cce2ff"
-    bg[ACTIVE] = "#cce2ff"
+    bg[NORMAL] = "#ffffff"
+    bg[ACTIVE] = "#ffffff"
     fg[NORMAL] = "#000000"
 
     engine "xfce"
