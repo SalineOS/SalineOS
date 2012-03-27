@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=/usr/bin/midori-web-apps
+Name=Add or Remove Entry
+Icon=preferences-system-windows
+TryExec=midori-web-apps
+Categories=WebAppsMain;
+
