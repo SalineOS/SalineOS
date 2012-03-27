@@ -237,7 +237,7 @@ ExtensionsArray=(\
  "FALSE" "Icons Only" "Show only icons on tabs" "libtabs-minimized.so=true"\
  "FALSE" "Toolbar Editor" "Easily edit the toolbar (Navigationbar) layout" "libtoolbar-editor.so=true")
 
-Extensions=$(yad --title='     ' --window-icon="midori" --width=625 --height=450 --list --checklist --multiple --column=' ' --column=' ' --column='Name' --column='Description'  --print-column=4 --hide-column=4 --text="Select the extensions you want to enable." --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${ExtensionsArray[@]}")
+Extensions=$(yad --title='     ' --window-icon="midori" --width=625 --height=450 --list --checklist --multiple --column=' '  --column='Name' --column='Description' --column=' ' --print-column=4 --hide-column=4 --text="Select the extensions you want to enable." --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${ExtensionsArray[@]}")
 
  ret="$?"
 
