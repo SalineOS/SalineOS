@@ -158,7 +158,7 @@ fi
 if [ "$ClearPrivateData" = "TRUE" ]; then
  PrivateData="clear-private-data=32"
  DataArray=("FALSE" "page-icons" "Page Icons" "FALSE" "formhistory" "Form History" "FALSE" "web-cookies" "Web Cookies" "FALSE" "flash-cookies" "Flash Cookies" "FALSE" "html5-databases" "HTML5 Databases" "FALSE" "web-cache" "Website Cache" "FALSE" "offline-appcache" "Offline Application Cache")
- ToClear=$(yad --title='     ' --window-icon="midori" --width=300 --height=275 --list --checklist --multiple --no-headers  --column=' ' --column=' ' --column=' '  --print-column=2 --hide-column=2 --text="Select the private date you want cleared on exit." --button=$"gtk-cancel:3" --button=$"gtk-ok:2" "${DataArray[@]}")
+ ToClear=$(yad --title='     ' --window-icon="midori" --width=300 --height=275 --list --checklist --multiple --no-headers  --column=' ' --column=' ' --column=' '  --print-column=2 --hide-column=2 --text="Select the private data you want cleared on exit." --button=$"gtk-cancel:3" --button=$"gtk-ok:2" "${DataArray[@]}")
 
 ret="$?"
 
