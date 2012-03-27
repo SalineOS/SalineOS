@@ -1,8 +1,0 @@
-[Desktop Entry]
-Version=1.0
-Type=Application
-Name=‪midori:faq
-Exec=midori -a file:///usr/share/doc/midori/faq.html
-TryExec=midori
-Icon=web-browser
-Categories=Network;
