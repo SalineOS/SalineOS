@@ -1,0 +1,23 @@
+Format: 1.8
+Date: Fri, 30 Mar 2012 19:24:02 -0400
+Source: midori
+Binary: midori
+Architecture: i386
+Version: 0.4.4
+Distribution: UNRELEASED
+Urgency: low
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Changed-By: AnthonyNordquist <salinelinux@gmail.com>
+Description: 
+ midori     - Web browser based  on webkit, that uses the Xfce libraries.
+Closes: 0
+Changes: 
+ midori (0.4.4) UNRELEASED; urgency=low
+ .
+   * Initial release. (Closes: #0)
+Checksums-Sha1: 
+ 473f2607b11fc9b9d25a86f3aa7ca1cfaf605127 1108204 midori_0.4.4_i386.deb
+Checksums-Sha256: 
+ 272d92e643fe3a0dbc0b67ead4ab3133777cd01939a128753b4db5d0c0232c05 1108204 midori_0.4.4_i386.deb
+Files: 
+ e895cad6961db6e773facef2582b5d03 1108204 misc optional midori_0.4.4_i386.deb
