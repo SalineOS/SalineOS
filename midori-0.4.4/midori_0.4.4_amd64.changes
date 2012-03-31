@@ -16,14 +16,17 @@ Changes:
  .
    * Initial release. (Closes: #0)
 Checksums-Sha1: 
- 25d6810697c1c778d5142b8a268fea031e4489f5 519 midori_0.4.4.dsc
- 1c64809702da4b53c81203a733aeb93338f01036 1780810 midori_0.4.4.tar.gz
- 66adb273d5506fb1bc1e502fd1557f44df453c6d 1155542 midori_0.4.4_amd64.deb
+ 0079324a045cec62365c87239678e0d35480535b 786 midori_0.4.4.dsc
+ 5777bf7ee9591451282b2198bd8d6df6af22eca3 1429675 midori_0.4.4.orig.tar.gz
+ aa415a1205794bbbe8692453d1cd0708445763ea 332296 midori_0.4.4.debian.tar.gz
+ c1b6be02fc7f5f5d4432f713c8fcfc1f7bc912bc 1140566 midori_0.4.4_amd64.deb
 Checksums-Sha256: 
- 167b77895870f6391572a7d1aee8cdb9d8345e32d6e5890af218e5ecf01100a6 519 midori_0.4.4.dsc
- bbaf92edb6a1cd6e3a1f65297c4c20fb0d7fdfc528b8181e73b74090b8b48024 1780810 midori_0.4.4.tar.gz
- 50aff92e797aba029a2a5516de1a2cbed47c30643b12260080bfe061a2101124 1155542 midori_0.4.4_amd64.deb
+ a416faabbfd0a787c84e98f2ca9bf76a92de6d94ece247b3b10d3851153dddb9 786 midori_0.4.4.dsc
+ f154007f2894da7acbc10748124c06419603f57e5239d39ed368fa38d451fd20 1429675 midori_0.4.4.orig.tar.gz
+ 7857cc5dc75caf85ce6c93165a9f454b1ff83065aeafb3b0fb5a11a09055e4a0 332296 midori_0.4.4.debian.tar.gz
+ 36d84cde87e8a1dc24d5ce60203d72256cc3677dedeb0bb478f99292b8ba2e3b 1140566 midori_0.4.4_amd64.deb
 Files: 
- 19ba43e7b6055d646c6fb3798766b570 519 misc optional midori_0.4.4.dsc
- 8dafa0f7f4b7c2cfc671427ddaf31033 1780810 misc optional midori_0.4.4.tar.gz
- 218fc6271ff7220ac1b99ef48012e40e 1155542 misc optional midori_0.4.4_amd64.deb
+ 478e3c56a98fb5b0a449f423602e1602 786 misc optional midori_0.4.4.dsc
+ ea7e39cf69ca366e83680a4afe14b89b 1429675 misc optional midori_0.4.4.orig.tar.gz
+ 42aa582e8db70b9ab597d4f15cd05159 332296 misc optional midori_0.4.4.debian.tar.gz
+ df6dda9efcb9dd3b499e9be8a8490209 1140566 misc optional midori_0.4.4_amd64.deb
