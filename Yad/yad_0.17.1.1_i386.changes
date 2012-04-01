@@ -1,0 +1,31 @@
+Format: 1.8
+Date: Sat, 31 Mar 2012 18:20:54 -0400
+Source: yad
+Binary: yad
+Architecture: source i386
+Version: 0.17.1.1
+Distribution: UNRELEASED
+Urgency: low
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Changed-By: Anthony Nordquist <salinelinux@gmail.com>
+Description: 
+ yad        - Yet another dialog
+Changes: 
+ yad (0.17.1.1) UNRELEASED; urgency=low
+ .
+   * Initial release.
+Checksums-Sha1: 
+ 626e34e623e8f198df5603b2aa416fc80f74682d 748 yad_0.17.1.1.dsc
+ 33f83404f5c6429a5665c78118872babf28dc06a 292275 yad_0.17.1.1.orig.tar.gz
+ 30e3c4046467fbe39d5c6ac2afeede16b3268938 6233 yad_0.17.1.1.debian.tar.gz
+ e86f4845f6985718ca8bbdb462b5cd1d6e500cf7 137642 yad_0.17.1.1_i386.deb
+Checksums-Sha256: 
+ f593159d498986cc0a1036b16af799c928f200f5e4ab944f970e61a7d83552e4 748 yad_0.17.1.1.dsc
+ f8fb6b33c352fb93630216e41c6d721f0eacc046fe3df26d1e9dff3eb5cd7504 292275 yad_0.17.1.1.orig.tar.gz
+ 5684766b7f0ddc18735d9acd0a71a927eeaed578e664899eb4b3136b39b08f2d 6233 yad_0.17.1.1.debian.tar.gz
+ 081fd6728352a2e3df486ffe7d2fec9f0806e50d5c01902dfde3859f59adece9 137642 yad_0.17.1.1_i386.deb
+Files: 
+ f33ce4fadb85c2dcdf32f9bcb13af4aa 748 misc optional yad_0.17.1.1.dsc
+ c9cb471978bece450770579c74f46e5e 292275 misc optional yad_0.17.1.1.orig.tar.gz
+ 8da129c734a44137f909a5a95abcef4e 6233 misc optional yad_0.17.1.1.debian.tar.gz
+ 932c37ca1ecde3f55facdd6f56154181 137642 misc optional yad_0.17.1.1_i386.deb

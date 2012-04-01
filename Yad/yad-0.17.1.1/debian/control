@@ -3,7 +3,7 @@ Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.1
-Build-Depends: debhelper (>= 8)
+Build-Depends: intltool, pkg-config, libgtk2.0-dev, debhelper (>= 8)
 
 Package: yad
 Architecture: any

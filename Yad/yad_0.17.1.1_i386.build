@@ -1,0 +1,444 @@
+ dpkg-buildpackage -rfakeroot -D -us -uc
+dpkg-buildpackage: export CFLAGS from dpkg-buildflags (origin: vendor): -g -O2
+dpkg-buildpackage: export CPPFLAGS from dpkg-buildflags (origin: vendor): 
+dpkg-buildpackage: export CXXFLAGS from dpkg-buildflags (origin: vendor): -g -O2
+dpkg-buildpackage: export FFLAGS from dpkg-buildflags (origin: vendor): -g -O2
+dpkg-buildpackage: export LDFLAGS from dpkg-buildflags (origin: vendor): 
+dpkg-buildpackage: source package yad
+dpkg-buildpackage: source version 0.17.1.1
+dpkg-buildpackage: source changed by Anthony Nordquist <salinelinux@gmail.com>
+ dpkg-source --before-build yad-0.17.1.1
+dpkg-buildpackage: host architecture i386
+ fakeroot debian/rules clean
+dh clean
+   dh_testdir
+   dh_auto_clean
+   dh_clean
+ dpkg-source -b yad-0.17.1.1
+dpkg-source: info: using source format `3.0 (quilt)'
+dpkg-source: info: building yad using existing ./yad_0.17.1.1.orig.tar.gz
+dpkg-source: info: local changes stored in yad-0.17.1.1/debian/patches/debian-changes-0.17.1.1, the modified files are:
+ yad-0.17.1.1/config.log
+dpkg-source: info: building yad in yad_0.17.1.1.debian.tar.gz
+dpkg-source: info: building yad in yad_0.17.1.1.dsc
+ debian/rules build
+dh build
+   dh_testdir
+   dh_auto_configure
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether build environment is sane... yes
+checking for a thread-safe mkdir -p... /bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking whether to enable maintainer-specific portions of Makefiles... no
+checking whether NLS is requested... yes
+checking for style of include used by make... GNU
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables... 
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether we are using the GNU C compiler... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to accept ISO C89... none needed
+checking dependency style of gcc... none
+checking for intltool >= 0.40.0... 0.41.1 found
+checking for intltool-update... /usr/bin/intltool-update
+checking for intltool-merge... /usr/bin/intltool-merge
+checking for intltool-extract... /usr/bin/intltool-extract
+checking for xgettext... /usr/bin/xgettext
+checking for msgmerge... /usr/bin/msgmerge
+checking for msgfmt... /usr/bin/msgfmt
+checking for gmsgfmt... /usr/bin/msgfmt
+checking for perl... /usr/bin/perl
+checking for perl >= 5.8.1... 5.10.1
+checking for XML::Parser... ok
+checking for gcc... (cached) gcc
+checking whether we are using the GNU C compiler... (cached) yes
+checking whether gcc accepts -g... (cached) yes
+checking for gcc option to accept ISO C89... (cached) none needed
+checking dependency style of gcc... (cached) none
+gtk2
+checking for pkg-config... /usr/bin/pkg-config
+checking pkg-config is at least version 0.9.0... yes
+checking for YAD... yes
+checking how to run the C preprocessor... gcc -E
+checking for grep that handles long lines and -e... /bin/grep
+checking for egrep... /bin/grep -E
+checking for ANSI C header files... yes
+checking for sys/types.h... yes
+checking for sys/stat.h... yes
+checking for stdlib.h... yes
+checking for string.h... yes
+checking for memory.h... yes
+checking for strings.h... yes
+checking for inttypes.h... yes
+checking for stdint.h... yes
+checking for unistd.h... yes
+checking locale.h usability... yes
+checking locale.h presence... yes
+checking for locale.h... yes
+checking for LC_MESSAGES... yes
+checking libintl.h usability... yes
+checking libintl.h presence... yes
+checking for libintl.h... yes
+checking for ngettext in libc... yes
+checking for dgettext in libc... yes
+checking for bind_textdomain_codeset... yes
+checking for msgfmt... (cached) /usr/bin/msgfmt
+checking for dcgettext... yes
+checking if msgfmt accepts -c... yes
+checking for gmsgfmt... (cached) /usr/bin/msgfmt
+checking for xgettext... (cached) /usr/bin/xgettext
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating po/Makefile.in
+config.status: creating src/Makefile
+config.status: creating data/Makefile
+config.status: creating data/icons/Makefile
+config.status: creating data/icons/16x16/Makefile
+config.status: creating data/icons/24x24/Makefile
+config.status: creating data/icons/32x32/Makefile
+config.status: creating data/icons/48x48/Makefile
+config.status: creating data/icons/96x96/Makefile
+config.status: creating data/icons/128x128/Makefile
+config.status: creating data/yad.m4
+config.status: creating data/yad.spec
+config.status: creating config.h
+config.status: executing depfiles commands
+config.status: executing default-1 commands
+config.status: executing po/stamp-it commands
+
+Build icon browser - no
+
+   dh_auto_build
+make[1]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make  all-recursive
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+Making all in src
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+  CC     yad-about.o
+  CC     yad-calendar.o
+  CC     yad-color.o
+  CC     yad-dnd.o
+  CC     yad-entry.o
+  CC     yad-file.o
+  CC     yad-font.o
+  CC     yad-form.o
+  CC     yad-icons.o
+  CC     yad-list.o
+  CC     yad-multi-progress.o
+  CC     yad-notification.o
+  CC     yad-option.o
+  CC     yad-print.o
+  CC     yad-progress.o
+  CC     yad-scale.o
+  CC     yad-text.o
+  CC     yad-util.o
+  CC     yad-main.o
+  CCLD   yad
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+Making all in po
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/po'
+file=`echo de | sed 's,.*/,,'`.gmo \
+	  && rm -f $file && /usr/bin/msgfmt -o $file de.po
+file=`echo fr | sed 's,.*/,,'`.gmo \
+	  && rm -f $file && /usr/bin/msgfmt -o $file fr.po
+file=`echo ru | sed 's,.*/,,'`.gmo \
+	  && rm -f $file && /usr/bin/msgfmt -o $file ru.po
+file=`echo sk | sed 's,.*/,,'`.gmo \
+	  && rm -f $file && /usr/bin/msgfmt -o $file sk.po
+file=`echo uk | sed 's,.*/,,'`.gmo \
+	  && rm -f $file && /usr/bin/msgfmt -o $file uk.po
+file=`echo zh_TW | sed 's,.*/,,'`.gmo \
+	  && rm -f $file && /usr/bin/msgfmt -o $file zh_TW.po
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/po'
+Making all in data
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+Making all in icons
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+Making all in 16x16
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+Making all in 24x24
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+Making all in 32x32
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+Making all in 48x48
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+Making all in 96x96
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+Making all in 128x128
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[5]: Nothing to be done for `all'.
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[5]: Nothing to be done for `all-am'.
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[4]: Nothing to be done for `all-am'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[1]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+   dh_auto_test
+make[1]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+Making check in src
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+make[2]: Nothing to be done for `check'.
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+Making check in po
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/po'
+INTLTOOL_EXTRACT=/usr/bin/intltool-extract srcdir=. /usr/bin/intltool-update --gettext-package yad --pot
+rm -f missing notexist
+srcdir=. /usr/bin/intltool-update -m
+if [ -r missing -o -r notexist ]; then \
+	  exit 1; \
+	fi
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/po'
+Making check in data
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+Making check in icons
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+Making check in 16x16
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+make[4]: Nothing to be done for `check'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+Making check in 24x24
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+make[4]: Nothing to be done for `check'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+Making check in 32x32
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+make[4]: Nothing to be done for `check'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+Making check in 48x48
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+make[4]: Nothing to be done for `check'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+Making check in 96x96
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+make[4]: Nothing to be done for `check'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+Making check in 128x128
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[4]: Nothing to be done for `check'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[4]: Nothing to be done for `check-am'.
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[3]: Nothing to be done for `check-am'.
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[1]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+ fakeroot debian/rules binary
+dh binary
+   dh_testroot
+   dh_prep
+   dh_installdirs
+   dh_auto_install
+make[1]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+Making install in src
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+test -z "/usr/bin" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/bin"
+  /usr/bin/install -c yad '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/bin'
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/src'
+Making install in po
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/po'
+linguas="de fr ru sk uk zh_TW "; \
+	for lang in $linguas; do \
+	  dir=/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/locale/$lang/LC_MESSAGES; \
+	  /bin/bash /home/user/SalineOS/Yad/yad-0.17.1.1/install-sh -d $dir; \
+	  if test -r $lang.gmo; then \
+	    /usr/bin/install -c -m 644 $lang.gmo $dir/yad.mo; \
+	    echo "installing $lang.gmo as $dir/yad.mo"; \
+	  else \
+	    /usr/bin/install -c -m 644 ./$lang.gmo $dir/yad.mo; \
+	    echo "installing ./$lang.gmo as" \
+		 "$dir/yad.mo"; \
+	  fi; \
+	  if test -r $lang.gmo.m; then \
+	    /usr/bin/install -c -m 644 $lang.gmo.m $dir/yad.mo.m; \
+	    echo "installing $lang.gmo.m as $dir/yad.mo.m"; \
+	  else \
+	    if test -r ./$lang.gmo.m ; then \
+	      /usr/bin/install -c -m 644 ./$lang.gmo.m \
+		$dir/yad.mo.m; \
+	      echo "installing ./$lang.gmo.m as" \
+		   "$dir/yad.mo.m"; \
+	    else \
+	      true; \
+	    fi; \
+	  fi; \
+	done
+installing de.gmo as /home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/locale/de/LC_MESSAGES/yad.mo
+installing fr.gmo as /home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/locale/fr/LC_MESSAGES/yad.mo
+installing ru.gmo as /home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/locale/ru/LC_MESSAGES/yad.mo
+installing sk.gmo as /home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/locale/sk/LC_MESSAGES/yad.mo
+installing uk.gmo as /home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/locale/uk/LC_MESSAGES/yad.mo
+installing zh_TW.gmo as /home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/locale/zh_TW/LC_MESSAGES/yad.mo
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/po'
+Making install in data
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+Making install in icons
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+Making install in 16x16
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+make[5]: Nothing to be done for `install-exec-am'.
+test -z "/usr/share/icons/hicolor/16x16/apps" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/16x16/apps"
+ /usr/bin/install -c -m 644 yad.png '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/16x16/apps'
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/16x16'
+Making install in 24x24
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+make[5]: Nothing to be done for `install-exec-am'.
+test -z "/usr/share/icons/hicolor/24x24/apps" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/24x24/apps"
+ /usr/bin/install -c -m 644 yad.png '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/24x24/apps'
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/24x24'
+Making install in 32x32
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+make[5]: Nothing to be done for `install-exec-am'.
+test -z "/usr/share/icons/hicolor/32x32/apps" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/32x32/apps"
+ /usr/bin/install -c -m 644 yad.png '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/32x32/apps'
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/32x32'
+Making install in 48x48
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+make[5]: Nothing to be done for `install-exec-am'.
+test -z "/usr/share/icons/hicolor/48x48/apps" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/48x48/apps"
+ /usr/bin/install -c -m 644 yad.png '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/48x48/apps'
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/48x48'
+Making install in 96x96
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+make[5]: Nothing to be done for `install-exec-am'.
+test -z "/usr/share/icons/hicolor/96x96/apps" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/96x96/apps"
+ /usr/bin/install -c -m 644 yad.png '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/96x96/apps'
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/96x96'
+Making install in 128x128
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[5]: Nothing to be done for `install-exec-am'.
+test -z "/usr/share/icons/hicolor/128x128/apps" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/128x128/apps"
+ /usr/bin/install -c -m 644 yad.png '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/icons/hicolor/128x128/apps'
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons/128x128'
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[5]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[5]: Nothing to be done for `install-exec-am'.
+make  install-data-hook
+make[6]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+*** Icon cache not updated. Remember to run:
+***
+***   gtk-update-icon-cache -f -t /usr/share/icons/hicolor
+***
+make[6]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[5]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data/icons'
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[4]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[4]: Nothing to be done for `install-exec-am'.
+test -z "" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad"
+test -z "/usr/share/aclocal" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/aclocal"
+ /usr/bin/install -c -m 644 yad.m4 '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/aclocal'
+test -z "/usr/share/man/man1" || /bin/mkdir -p "/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/man/man1"
+ /usr/bin/install -c -m 644 yad.1 '/home/user/SalineOS/Yad/yad-0.17.1.1/debian/yad/usr/share/man/man1'
+make[4]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1/data'
+make[2]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[3]: Entering directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[3]: Nothing to be done for `install-exec-am'.
+make[3]: Nothing to be done for `install-data-am'.
+make[3]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[2]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+make[1]: Leaving directory `/home/user/SalineOS/Yad/yad-0.17.1.1'
+   dh_install
+   dh_installdocs
+   dh_installchangelogs
+   dh_installexamples
+   dh_installman
+   dh_installcatalogs
+   dh_installcron
+   dh_installdebconf
+   dh_installemacsen
+   dh_installifupdown
+   dh_installinfo
+   dh_pysupport
+   dh_installinit
+   dh_installmenu
+   dh_installmime
+   dh_installmodules
+   dh_installlogcheck
+   dh_installlogrotate
+   dh_installpam
+   dh_installppp
+   dh_installudev
+   dh_installwm
+   dh_installxfonts
+   dh_bugfiles
+   dh_lintian
+   dh_gconf
+   dh_icons
+   dh_perl
+   dh_usrlocal
+   dh_link
+   dh_compress
+   dh_fixperms
+   dh_strip
+   dh_makeshlibs
+   dh_shlibdeps
+dpkg-shlibdeps: warning: dependency on libfontconfig.so.1 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on libatk-1.0.so.0 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on libm.so.6 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on librt.so.1 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on libgio-2.0.so.0 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on libgmodule-2.0.so.0 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on libgthread-2.0.so.0 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on libfreetype.so.6 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+dpkg-shlibdeps: warning: dependency on libpangoft2-1.0.so.0 could be avoided if "debian/yad/usr/bin/yad" were not uselessly linked against it (they use none of its symbols).
+   dh_installdeb
+   dh_gencontrol
+   dh_md5sums
+   dh_builddeb
+dpkg-deb: building package `yad' in `../yad_0.17.1.1_i386.deb'.
+ dpkg-genchanges  >../yad_0.17.1.1_i386.changes
+dpkg-genchanges: including full source code in upload
+ dpkg-source --after-build yad-0.17.1.1
+dpkg-buildpackage: full upload (original source is included)
+Now running lintian...
+W: yad source: non-native-package-with-native-version
+W: yad source: configure-generated-file-in-source config.log
+W: yad: copyright-without-copyright-notice
+W: yad: manpage-has-errors-from-man usr/share/man/man1/yad.1.gz  around line 633: table wider than line width
+Finished running lintian.
