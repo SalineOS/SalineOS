@@ -1,7 +1,0 @@
-MODULE    = snmpapi.dll
-IMPORTLIB = snmpapi
-
-C_SRCS = \
-	main.c
-
-@MAKE_DLL_RULES@

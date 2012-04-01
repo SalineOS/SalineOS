@@ -1,7 +1,0 @@
-TESTDLL   = oleacc.dll
-IMPORTS   = oleacc
-
-C_SRCS = \
-	main.c
-
-@MAKE_TEST_RULES@

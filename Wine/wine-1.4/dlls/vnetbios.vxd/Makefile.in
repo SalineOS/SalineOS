@@ -1,7 +1,0 @@
-MODULE    = vnetbios.vxd
-IMPORTS   = netapi32
-
-C_SRCS = \
-	vnetbios.c
-
-@MAKE_DLL_RULES@

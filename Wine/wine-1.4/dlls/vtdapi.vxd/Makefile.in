@@ -1,6 +1,0 @@
-MODULE    = vtdapi.vxd
-
-C_SRCS = \
-	vtdapi.c
-
-@MAKE_DLL_RULES@

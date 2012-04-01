@@ -1,7 +1,0 @@
-TESTDLL   = dxgi.dll
-IMPORTS   = dxgi
-
-C_SRCS = \
-	device.c
-
-@MAKE_TEST_RULES@

@@ -1,7 +1,0 @@
-MODULE    = hh.exe
-APPMODE   = -mwindows
-
-C_SRCS = \
-	main.c
-
-@MAKE_PROG_RULES@

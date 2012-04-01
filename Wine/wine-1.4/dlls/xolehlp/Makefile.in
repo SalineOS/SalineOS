@@ -1,5 +1,0 @@
-MODULE    = xolehlp.dll
-
-C_SRCS = xolehlp.c
-
-@MAKE_DLL_RULES@

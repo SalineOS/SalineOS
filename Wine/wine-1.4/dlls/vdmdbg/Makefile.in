@@ -1,7 +1,0 @@
-MODULE    = vdmdbg.dll
-IMPORTLIB = vdmdbg
-
-C_SRCS = \
-	vdmdbg.c
-
-@MAKE_DLL_RULES@

@@ -1,7 +1,0 @@
-MODULE    = dplay.dll
-IMPORTLIB = dplay
-IMPORTS   = dplayx
-
-RC_SRCS = version.rc
-
-@MAKE_DLL_RULES@

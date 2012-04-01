@@ -1,4 +1,0 @@
-MODULE    = softpub.dll
-IMPORTS   = wintrust
-
-@MAKE_DLL_RULES@

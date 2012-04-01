@@ -1,8 +1,0 @@
-MODULE    = winevdm.exe
-APPMODE   = -mconsole
-IMPORTS   = user32 kernel
-
-C_SRCS = \
-	winevdm.c
-
-@MAKE_PROG_RULES@

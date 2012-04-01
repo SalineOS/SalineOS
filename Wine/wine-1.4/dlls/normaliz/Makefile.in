@@ -1,7 +1,0 @@
-MODULE    = normaliz.dll
-IMPORTLIB = normaliz
-
-C_SRCS = \
-	normaliz.c
-
-@MAKE_DLL_RULES@

@@ -1,7 +1,0 @@
-TESTDLL   = credui.dll
-IMPORTS   = credui
-
-C_SRCS = \
-	credui.c
-
-@MAKE_TEST_RULES@
