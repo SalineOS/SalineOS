@@ -1,0 +1,10 @@
+TESTDLL   = fusion.dll
+IMPORTS   = user32
+
+C_SRCS = \
+	asmcache.c \
+	asmenum.c \
+	asmname.c \
+	fusion.c
+
+@MAKE_TEST_RULES@

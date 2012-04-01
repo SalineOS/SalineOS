@@ -1,0 +1,7 @@
+TESTDLL   = localui.dll
+IMPORTS   = winspool
+
+C_SRCS = \
+	localui.c
+
+@MAKE_TEST_RULES@

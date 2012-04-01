@@ -1,0 +1,7 @@
+TESTDLL   = msacm32.dll
+IMPORTS   = msacm32
+
+C_SRCS = \
+	msacm.c
+
+@MAKE_TEST_RULES@

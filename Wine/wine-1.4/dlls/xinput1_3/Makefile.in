@@ -1,0 +1,9 @@
+MODULE    = xinput1_3.dll
+IMPORTLIB = xinput
+
+C_SRCS = \
+	xinput1_3_main.c
+
+RC_SRCS = version.rc
+
+@MAKE_DLL_RULES@

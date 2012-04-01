@@ -1,0 +1,8 @@
+EXTRADEFS = -DUSE_MSVCRT_PREFIX
+MODULE    = msvcrt20.dll
+IMPORTLIB = msvcrt20
+IMPORTS   = msvcrt
+
+C_SRCS = msvcrt20.c
+
+@MAKE_DLL_RULES@

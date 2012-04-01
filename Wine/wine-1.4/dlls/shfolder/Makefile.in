@@ -1,0 +1,7 @@
+MODULE    = shfolder.dll
+IMPORTLIB = shfolder
+IMPORTS   = shell32
+
+RC_SRCS = version.rc
+
+@MAKE_DLL_RULES@

@@ -1,0 +1,14 @@
+MODULE    = qcap.dll
+IMPORTS   = strmiids strmbase uuid ole32 gdi32 advapi32
+
+C_SRCS = \
+	capturegraph.c \
+	enummedia.c \
+	qcap_main.c \
+	v4l.c \
+	vfwcapture.c \
+	yuv.c
+
+RC_SRCS = version.rc
+
+@MAKE_DLL_RULES@

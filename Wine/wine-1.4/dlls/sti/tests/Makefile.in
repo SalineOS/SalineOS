@@ -1,0 +1,9 @@
+EXTRADEFS = -DCOM_NO_WINDOWS_H
+TESTDLL   = sti.dll
+IMPORTS   = ole32
+EXTRALIBS = -luuid
+
+C_SRCS = \
+	sti.c
+
+@MAKE_TEST_RULES@

@@ -1,0 +1,8 @@
+MODULE    = olecli32.dll
+IMPORTLIB = olecli32
+IMPORTS   = ole32 gdi32
+
+C_SRCS = \
+	olecli_main.c
+
+@MAKE_DLL_RULES@

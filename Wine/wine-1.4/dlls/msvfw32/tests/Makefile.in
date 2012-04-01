@@ -1,0 +1,7 @@
+TESTDLL   = msvfw32.dll
+IMPORTS   = msvfw32
+
+C_SRCS = \
+	msvfw.c
+
+@MAKE_TEST_RULES@

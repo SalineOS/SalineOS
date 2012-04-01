@@ -1,0 +1,3 @@
+MODULE    = icmp.dll
+
+@MAKE_DLL_RULES@

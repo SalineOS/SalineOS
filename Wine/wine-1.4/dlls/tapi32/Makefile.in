@@ -1,0 +1,10 @@
+MODULE    = tapi32.dll
+IMPORTLIB = tapi32
+IMPORTS   = advapi32
+
+C_SRCS = \
+	assisted.c \
+	line.c \
+	phone.c
+
+@MAKE_DLL_RULES@

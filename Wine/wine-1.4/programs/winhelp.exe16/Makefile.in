@@ -1,0 +1,6 @@
+MODULE    = winhelp.exe16
+APPMODE   = -m16
+
+C_SRCS = winhelp.c
+
+@MAKE_PROG_RULES@

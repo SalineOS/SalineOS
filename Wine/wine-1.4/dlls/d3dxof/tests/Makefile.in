@@ -1,0 +1,7 @@
+TESTDLL   = d3dxof.dll
+IMPORTS   = d3dxof
+
+C_SRCS = \
+	d3dxof.c
+
+@MAKE_TEST_RULES@

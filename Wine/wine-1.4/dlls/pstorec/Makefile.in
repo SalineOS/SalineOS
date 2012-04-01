@@ -1,0 +1,9 @@
+MODULE    = pstorec.dll
+IMPORTS   = uuid
+
+C_SRCS = \
+	pstorec.c
+
+IDL_TLB_SRCS = pstorec_tlb.idl
+
+@MAKE_DLL_RULES@

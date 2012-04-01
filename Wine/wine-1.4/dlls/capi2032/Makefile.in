@@ -1,0 +1,6 @@
+MODULE    = capi2032.dll
+IMPORTLIB = capi2032
+
+C_SRCS = cap20wxx.c
+
+@MAKE_DLL_RULES@

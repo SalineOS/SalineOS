@@ -1,0 +1,10 @@
+TESTDLL   = version.dll
+IMPORTS   = version
+
+C_SRCS = \
+	info.c \
+	install.c
+
+RC_SRCS = version.rc
+
+@MAKE_TEST_RULES@

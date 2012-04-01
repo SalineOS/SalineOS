@@ -1,0 +1,6 @@
+TESTDLL   = spoolss.dll
+
+C_SRCS = \
+	spoolss.c
+
+@MAKE_TEST_RULES@

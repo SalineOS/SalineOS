@@ -1,0 +1,6 @@
+TESTDLL   = iphlpapi.dll
+
+C_SRCS = \
+	iphlpapi.c
+
+@MAKE_TEST_RULES@

@@ -1,0 +1,7 @@
+TESTDLL   = odbccp32.dll
+IMPORTS   = odbccp32
+
+C_SRCS = \
+	misc.c
+
+@MAKE_TEST_RULES@

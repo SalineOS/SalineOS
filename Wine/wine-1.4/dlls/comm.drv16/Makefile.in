@@ -1,0 +1,4 @@
+MODULE    = comm.drv16
+EXTRADLLFLAGS = -m16
+
+@MAKE_DLL_RULES@

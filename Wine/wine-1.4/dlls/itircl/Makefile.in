@@ -1,0 +1,6 @@
+MODULE    = itircl.dll
+
+C_SRCS = \
+	itircl_main.c
+
+@MAKE_DLL_RULES@

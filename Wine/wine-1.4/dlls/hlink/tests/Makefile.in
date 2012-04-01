@@ -1,0 +1,8 @@
+TESTDLL   = hlink.dll
+IMPORTS   = hlink ole32
+
+C_SRCS = \
+	browse_ctx.c \
+	hlink.c
+
+@MAKE_TEST_RULES@

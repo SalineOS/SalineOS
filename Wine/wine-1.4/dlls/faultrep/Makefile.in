@@ -1,0 +1,7 @@
+MODULE    = faultrep.dll
+IMPORTLIB = faultrep
+IMPORTS   = advapi32
+
+C_SRCS = faultrep.c
+
+@MAKE_DLL_RULES@

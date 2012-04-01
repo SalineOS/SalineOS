@@ -1,0 +1,6 @@
+MODULE    = mmdevldr.vxd
+
+C_SRCS = \
+	mmdevldr.c
+
+@MAKE_DLL_RULES@

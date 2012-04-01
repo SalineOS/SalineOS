@@ -1,0 +1,38 @@
+MODULE    = windowscodecs.dll
+IMPORTLIB = windowscodecs
+IMPORTS   = uuid ole32 oleaut32 shlwapi advapi32 rpcrt4
+EXTRAINCL = @PNGINCL@
+EXTRADEFS = -DENTRY_PREFIX=WIC_ -DPROXY_DELEGATION -DWINE_REGISTER_DLL
+EXTRALIBS = @APPLICATIONSERVICESLIB@
+
+C_SRCS = \
+	bmpdecode.c \
+	bmpencode.c \
+	clsfactory.c \
+	converter.c \
+	fliprotate.c \
+	gifformat.c \
+	icnsformat.c \
+	icoformat.c \
+	imgfactory.c \
+	info.c \
+	jpegformat.c \
+	main.c \
+	metadatahandler.c \
+	palette.c \
+	pngformat.c \
+	propertybag.c \
+	regsvr.c \
+	stream.c \
+	tgaformat.c \
+	tiffformat.c \
+	ungif.c
+
+RC_SRCS = version.rc
+
+IDL_P_SRCS = windowscodecs_wincodec.idl
+IDL_R_SRCS = windowscodecs_wincodec.idl
+
+EXTRA_OBJS = dlldata.o
+
+@MAKE_DLL_RULES@

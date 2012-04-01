@@ -1,0 +1,10 @@
+TESTDLL   = netapi32.dll
+IMPORTS   = advapi32
+
+C_SRCS = \
+	access.c \
+	apibuf.c \
+	ds.c \
+	wksta.c
+
+@MAKE_TEST_RULES@

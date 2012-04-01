@@ -1,0 +1,11 @@
+TESTDLL   = qmgr.dll
+IMPORTS   = ole32 shlwapi user32
+
+C_SRCS = \
+	enum_files.c \
+	enum_jobs.c \
+	file.c \
+	job.c \
+	qmgr.c
+
+@MAKE_TEST_RULES@

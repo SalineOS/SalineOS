@@ -1,0 +1,13 @@
+MODULE    = wshom.ocx
+IMPORTS   = uuid oleaut32 ole32 shell32
+
+C_SRCS = \
+	shell.c \
+	wshom_main.c
+
+RC_SRCS = wshom.rc
+
+IDL_H_SRCS = wshom.idl
+IDL_TLB_SRCS = wshom.idl
+
+@MAKE_DLL_RULES@

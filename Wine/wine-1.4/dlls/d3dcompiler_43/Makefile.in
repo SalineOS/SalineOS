@@ -1,0 +1,20 @@
+MODULE    = d3dcompiler_43.dll
+IMPORTLIB = d3dcompiler
+IMPORTS   = dxguid uuid
+EXTRALIBS = $(LIBWPP)
+
+C_SRCS = \
+	asmparser.c \
+	blob.c \
+	bytecodewriter.c \
+	compiler.c \
+	d3dcompiler_43_main.c \
+	reflection.c \
+	utils.c
+
+LEX_SRCS = asmshader.l
+BISON_SRCS = asmshader.y
+
+RC_SRCS = version.rc
+
+@MAKE_DLL_RULES@

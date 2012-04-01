@@ -1,0 +1,7 @@
+TESTDLL   = cryptui.dll
+IMPORTS   = cryptui crypt32 user32
+
+C_SRCS = \
+	cryptui.c
+
+@MAKE_TEST_RULES@

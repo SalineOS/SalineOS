@@ -1,0 +1,7 @@
+TESTDLL   = lz32.dll
+IMPORTS   = lz32
+
+C_SRCS = \
+	lzexpand_main.c
+
+@MAKE_TEST_RULES@

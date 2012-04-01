@@ -1,0 +1,7 @@
+MODULE    = wow32.dll
+IMPORTLIB = wow32
+IMPORTS   = kernel
+
+C_SRCS = wow_main.c
+
+@MAKE_DLL_RULES@

@@ -1,0 +1,44 @@
+DEFS = \
+	-DINCLUDEDIR="\"$(includedir)\"" \
+	-DDLLDIR="\"$(dlldir)\"" \
+	-DLIBDIR="\"$(libdir)\"" \
+	-DDLLFLAGS="\"@DLLFLAGS@\"" \
+	-DLDDLLFLAGS="\"@LDDLLFLAGS@\"" \
+	-DCC="\"$(CC)\"" \
+	-DCPP="\"@CPPBIN@\"" \
+	-DCXX="\"@CXX@\"" \
+	-DPRELINK="\"$(PRELINK)\""
+
+PROGRAMS = \
+	winecpp$(EXEEXT) \
+	winegcc$(EXEEXT) \
+	wineg++$(EXEEXT)
+
+MANPAGE = winegcc.man
+
+C_SRCS = \
+	utils.c \
+	winegcc.c
+
+INSTALLDIRS = $(DESTDIR)$(bindir) $(DESTDIR)$(mandir)/man$(prog_manext)
+
+all: $(PROGRAMS)
+
+@MAKE_RULES@
+
+winegcc$(EXEEXT): winegcc.o utils.o
+	$(CC) $(CFLAGS) -o $@ winegcc.o utils.o $(LIBPORT) $(LDFLAGS)
+
+winecpp$(EXEEXT) wineg++$(EXEEXT): winegcc$(EXEEXT)
+	$(RM) $@ && $(LN_S) winegcc$(EXEEXT) $@
+
+install install-dev:: $(PROGRAMS) $(DESTDIR)$(bindir) install-man-pages
+	$(INSTALL_PROGRAM) winegcc$(EXEEXT) $(DESTDIR)$(bindir)/winegcc$(EXEEXT)
+	cd $(DESTDIR)$(bindir) && $(RM) wineg++$(EXEEXT) && $(LN_S) winegcc$(EXEEXT) wineg++$(EXEEXT)
+	cd $(DESTDIR)$(bindir) && $(RM) winecpp$(EXEEXT) && $(LN_S) winegcc$(EXEEXT) winecpp$(EXEEXT)
+	cd $(DESTDIR)$(mandir)/man$(prog_manext) && $(RM) wineg++.$(prog_manext) && $(LN_S) winegcc.$(prog_manext) wineg++.$(prog_manext)
+	cd $(DESTDIR)$(mandir)/man$(prog_manext) && $(RM) winecpp.$(prog_manext) && $(LN_S) winegcc.$(prog_manext) winecpp.$(prog_manext)
+
+uninstall::
+	$(RM) $(DESTDIR)$(bindir)/winegcc$(EXEEXT) $(DESTDIR)$(bindir)/wineg++$(EXEEXT) $(DESTDIR)$(bindir)/winecpp$(EXEEXT)
+	$(RM) $(DESTDIR)$(mandir)/man$(prog_manext)/wineg++.$(prog_manext) $(DESTDIR)$(mandir)/man$(prog_manext)/winecpp.$(prog_manext)

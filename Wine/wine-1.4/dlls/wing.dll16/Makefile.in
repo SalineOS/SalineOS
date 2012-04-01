@@ -1,0 +1,7 @@
+MODULE    = wing.dll16
+IMPORTS   = gdi32
+EXTRADLLFLAGS = -m16
+
+C_SRCS = wing.c
+
+@MAKE_DLL_RULES@

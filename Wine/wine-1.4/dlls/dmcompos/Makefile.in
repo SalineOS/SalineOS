@@ -1,0 +1,15 @@
+MODULE    = dmcompos.dll
+IMPORTS   = dxguid uuid ole32 advapi32
+
+C_SRCS = \
+	chordmap.c \
+	chordmaptrack.c \
+	composer.c \
+	dmcompos_main.c \
+	signposttrack.c
+
+IDL_R_SRCS = dmcompos.idl
+
+RC_SRCS = version.rc
+
+@MAKE_DLL_RULES@

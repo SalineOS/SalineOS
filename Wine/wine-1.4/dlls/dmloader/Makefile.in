@@ -1,0 +1,15 @@
+MODULE    = dmloader.dll
+IMPORTS   = dxguid uuid ole32 advapi32
+
+C_SRCS = \
+	container.c \
+	debug.c \
+	dmloader_main.c \
+	loader.c \
+	loaderstream.c
+
+IDL_R_SRCS = dmloader.idl
+
+RC_SRCS = version.rc
+
+@MAKE_DLL_RULES@

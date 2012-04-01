@@ -1,0 +1,7 @@
+MODULE    = secedit.exe
+APPMODE   = -mconsole
+
+C_SRCS = \
+	main.c
+
+@MAKE_PROG_RULES@

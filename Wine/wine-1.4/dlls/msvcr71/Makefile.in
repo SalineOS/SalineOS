@@ -1,0 +1,8 @@
+MODULE    = msvcr71.dll
+IMPORTLIB = msvcr71
+IMPORTS   = msvcrt
+
+C_SRCS = \
+	msvcr71.c
+
+@MAKE_DLL_RULES@

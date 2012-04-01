@@ -1,0 +1,10 @@
+MODULE    = crtdll.dll
+IMPORTLIB = crtdll
+IMPORTS   = msvcrt
+MODCFLAGS = @BUILTINFLAG@
+EXTRAINCL = -I$(top_srcdir)/include/msvcrt
+
+C_SRCS = \
+	crtdll_main.c
+
+@MAKE_DLL_RULES@

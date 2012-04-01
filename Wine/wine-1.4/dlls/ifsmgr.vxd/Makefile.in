@@ -1,0 +1,7 @@
+MODULE    = ifsmgr.vxd
+IMPORTS   = kernel
+
+C_SRCS = \
+	ifsmgr.c
+
+@MAKE_DLL_RULES@

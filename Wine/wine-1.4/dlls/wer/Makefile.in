@@ -1,0 +1,8 @@
+MODULE    = wer.dll
+IMPORTLIB = wer
+IMPORTS   = advapi32
+
+C_SRCS = \
+	main.c
+
+@MAKE_DLL_RULES@

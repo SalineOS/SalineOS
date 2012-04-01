@@ -1,0 +1,7 @@
+TESTDLL   = inetmib1.dll
+IMPORTS   = snmpapi
+
+C_SRCS = \
+	main.c
+
+@MAKE_TEST_RULES@

@@ -1,0 +1,7 @@
+TESTDLL   = d3d10core.dll
+IMPORTS   = d3d10core dxgi
+
+C_SRCS = \
+	device.c
+
+@MAKE_TEST_RULES@

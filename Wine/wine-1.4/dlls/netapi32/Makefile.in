@@ -1,0 +1,20 @@
+EXTRADEFS = -D_SVRAPI_
+MODULE    = netapi32.dll
+IMPORTLIB = netapi32
+IMPORTS   = iphlpapi ws2_32 advapi32
+
+C_SRCS = \
+	access.c \
+	apibuf.c \
+	browsr.c \
+	ds.c \
+	local_group.c \
+	nbcmdqueue.c \
+	nbnamecache.c \
+	nbt.c \
+	netapi32.c \
+	netbios.c \
+	share.c \
+	wksta.c
+
+@MAKE_DLL_RULES@

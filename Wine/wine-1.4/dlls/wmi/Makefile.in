@@ -1,0 +1,4 @@
+MODULE    = wmi.dll
+IMPORTS   = advapi32
+
+@MAKE_DLL_RULES@

@@ -1,0 +1,7 @@
+MODULE    = mprapi.dll
+IMPORTLIB = mprapi
+
+C_SRCS = \
+	mprapi.c
+
+@MAKE_DLL_RULES@

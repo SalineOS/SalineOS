@@ -1,0 +1,6 @@
+TESTDLL   = schannel.dll
+
+C_SRCS = \
+	main.c
+
+@MAKE_TEST_RULES@

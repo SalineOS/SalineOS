@@ -1,0 +1,7 @@
+MODULE    = resutils.dll
+IMPORTLIB = resutils
+
+C_SRCS = \
+	resutils.c
+
+@MAKE_DLL_RULES@

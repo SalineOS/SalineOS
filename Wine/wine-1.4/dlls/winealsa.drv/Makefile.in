@@ -1,0 +1,10 @@
+MODULE    = winealsa.drv
+IMPORTS   = uuid ole32 advapi32
+DELAYIMPORTS = winmm
+EXTRALIBS = @ALSALIBS@
+
+C_SRCS = \
+	midi.c \
+	mmdevdrv.c
+
+@MAKE_DLL_RULES@
