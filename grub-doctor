@@ -218,6 +218,8 @@ else
  update-grub
 fi
 
+## Unmount partition
+umount -l /tmp/remmnt/Target
 
 ## Stop the progress bar
 killall -KILL tail
