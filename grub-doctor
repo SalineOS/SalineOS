@@ -15,7 +15,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ####################################################################################################
-## Copyright 2009-2011 Anthony Nordquist and Tony Brijeski
+## Copyright 2009-2012 Anthony Nordquist and Tony Brijeski
 ## Some of this code was borrowed from Tony Brijeski's Remastersys installer and Remastersys grub restore utility, and he deserves lots of credit for having code worth jacking. This code has been modified to suit the purpose of this program :) 
 
 Progress='yad --center --pulsate --progress --auto-close --title=Grub-Doctor --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png'
@@ -24,7 +24,6 @@ Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --b
 
 Info='yad --center --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/grub-doctor.png'
 
-Menu="yad --list --title=Grub-Doctor --column=Pick --column=Info --print-column=1"
 
 ## Cry like a little girl if we don't have root
 TestRoot="$(whoami)"
@@ -38,7 +37,7 @@ fi
 
 ## Just in case people don't know what this is, inform them.
 
-$Question --width=200 --text="This is a boot-loader restoration utility (Grub2. Would you like to restore the system boot-loader?"
+$Question --width=200 --text="This is a boot-loader restoration utility (GRUB2). Would you like to restore the system boot-loader?"
 
 if [ $? != 0 ]; then
  exit 0
@@ -51,19 +50,36 @@ Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "ext
 for i in $Drives; do
   PartDrive="$i"
   PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-  if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
-   PartDriveMenu="$PartDriveMenu $PartDrive $PartDriveSize"
-  fi
-  if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
-   GrubMenu="$PartDrive Master-Boot-Record $GrubMenu"
-  fi
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/sda1 | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+fi
+if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  PartDriveMenu="$PartDriveMenu $PartDrive $SizeInGB $SizeInMB"
+ fi
+fi
+if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
+ GrubMenu=("$PartDrive" "Master boot record of disk" "${GrubMenu[@]}")
+fi
 done
+
+GrubMenu=("${GrubMenu[@]}" "root" "Root Partition (Advanced)")
 
 GetRootPart () {
 
 RootPart=""
 
-RootPart=$($Menu --height="300" --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS, or another Grub2 based Linux distribution.\nThis partition will be the first entry in the installed GRUB's boot menu" $PartDriveMenu)
+RootPart=$(yad --height="300" --list --title="Grub-Doctor" --column="Name" --column="Aprox. Size in GiB" --column="Aprox. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS or, another\nGRUB2 based distribution." $PartDriveMenu)
 
 ret="$?"
 
@@ -84,7 +100,7 @@ elif [ "$RootPart" = "" ]; then
  exit 0
 fi
 
-RootPart=$( echo "$RootPart" | awk -F '|' '{print $1}')
+RootPart=$(echo "$RootPart" | awk -F '|' '{print $1}')
 
 
 
@@ -98,7 +114,9 @@ GetGrubLocation (){
 GrubLocation=""
 
 
-GrubLocation=$($Menu --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" $GrubMenu root "Root partition (Advanced)")
+GrubLocation=$(yad --list --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" "${GrubMenu[@]}")
+
+ret="$?"
 
 if [ "$ret" = "3" ]; then
   $Question --text="Are you sure you want to cancel the installation?"
@@ -109,8 +127,13 @@ if [ "$ret" = "3" ]; then
    exit 0
   fi
 elif [ "$ret" = "252" ]; then
- GetGrubLocation
- exit 0 
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GetGrubLocation
+   exit 0
+  fi
 elif [ "$GrubLocation" = "" ]; then
  $Info --text="No location selected, please retry." --button=$"gtk-ok:1"
  GetGrubLocation
