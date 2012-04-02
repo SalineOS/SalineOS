@@ -22,14 +22,14 @@ Progress='yad --center --pulsate --progress --auto-close --title=Grub-Doctor --n
  
 Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=Grub-Doctor --window-icon=/usr/share/pixmaps/grub-doctor.png'
 
-Info='yad --center --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/grub-doctor.png'
+Info='yad --center --title=Grub-Doctor --window-icon=/usr/share/pixmaps/grub-doctor.png'
 
 
 ## Cry like a little girl if we don't have root
 TestRoot="$(whoami)"
 
 if [ "$TestRoot" != "root" ]; then
- yad --title="Grub-Doctor" --text="Must be run with root privileges, will now exit" --button=$"gtk-ok:1"
+ yad --title="Grub Doctor" --text="Must be run with root privileges, will now exit" --button=$"gtk-ok:1"
  exit 0
 fi
 
@@ -79,7 +79,7 @@ GetRootPart () {
 
 RootPart=""
 
-RootPart=$(yad --height="300" --list --title="Grub-Doctor" --column="Name" --column="Aprox. Size in GiB" --column="Aprox. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS or, another\nGRUB2 based distribution." $PartDriveMenu)
+RootPart=$(yad --height="300" --list  --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Aprox. Size in GiB" --column="Aprox. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS or, another\nGRUB2 based distribution." $PartDriveMenu)
 
 ret="$?"
 
@@ -114,7 +114,7 @@ GetGrubLocation (){
 GrubLocation=""
 
 
-GrubLocation=$(yad --list --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" "${GrubMenu[@]}")
+GrubLocation=$(yad --list --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" "${GrubMenu[@]}")
 
 ret="$?"
 
@@ -166,15 +166,39 @@ tail -f /usr/bin/grub-doctor | $Progress --text="Installing and setting up grub.
 GrubDir="$(mount | grep $RootPart | awk '{print$3}')"
 
 if [ "$GrubDir" != "/" ]; then
+ umount "$GrubDir"
+ umount -l "$GrubDir"
  GrubDir="/tmp/remmnt/Target"
- 
+
  ## Mount the root directory
- umount /dev/$RootPart
+ umount "/dev/$RootPart"
+ umount -l "/dev/$RootPart"
  sleep 2
  if [ ! -d $GrubDir ]; then
   mkdir -p $GrubDir
  fi
  mount /dev/$RootPart $GrubDir -o rw
+
+## Check to ensure that the partition was mounted properly.
+
+if [ "$(mount | grep "/dev/$RootPart")" = "" ]; then
+ killall -KILL tail
+ yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Failed to mount $RootPart, please ensure there are no files in use on the partition and then run Grub Doctor again." --button=$"gtk-quit:1"
+ exit 0
+fi
+
+## Check the archetecture of host system and root partition matches.
+
+Arch1="$(file /usr/bin/file | awk '{print $3}')"
+Arch2="$(file /tmp/remmnt/Target/usr/bin/file | awk '{print $3}')"
+
+
+if [ "$Arch1" != "$Arch2" ]; then
+ killall -KILL tail
+ yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Archetecture of the host system does not match the selected root partition. To restore grub for $RootPart you will need to use a $Arch2 system." --button=$"gtk-quit:1"
+ umount -l /tmp/remmnt/Target
+ exit 0
+fi
  
  ## Prepare chroot
  mount -o bind /proc $GrubDir/proc
