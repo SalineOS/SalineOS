@@ -181,7 +181,7 @@ if [ "$GrubDir" != "/" ]; then
 
 ## Check to ensure that the partition was mounted properly.
 
-if [ "$(mount | grep "/dev/$RootPart")" = "" ]; then
+if [ "$(mount | grep "/dev/$RootPart" | awk '{print $3}')" != "/tmp/remmnt/Target" ]; then
  killall -KILL tail
  yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Failed to mount $RootPart, please ensure there are no files in use on the partition and then run Grub Doctor again." --button=$"gtk-quit:1"
  exit 0
@@ -195,7 +195,7 @@ Arch2="$(file /tmp/remmnt/Target/usr/bin/file | awk '{print $3}')"
 
 if [ "$Arch1" != "$Arch2" ]; then
  killall -KILL tail
- yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Archetecture of the host system does not match the selected root partition. To restore grub for $RootPart you will need to use a $Arch2 system." --button=$"gtk-quit:1"
+ yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Archetecture of the host system does not match the selected root partition. To restore grub for $RootPart you will need to run Grub Doctor from a $Arch2 system." --button=$"gtk-quit:1"
  umount -l /tmp/remmnt/Target
  exit 0
 fi
