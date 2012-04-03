@@ -49,6 +49,15 @@ Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "ext
 
 for i in $Drives; do
   PartDrive="$i"
+## Get the label of the disk if available
+ Label=$(ls /dev/disk/by-label -lah | grep "$PartDrive" | awk '{print $9}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
   PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
 ## Part Drive Size is in blocks, first we need to convert the blocks to bytes
 ## Don't bother with extended partitions
@@ -65,7 +74,7 @@ if [ "$PartDriveSize" != "1" ]; then
 fi
 if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then
-  PartDriveMenu="$PartDriveMenu $PartDrive $SizeInGB $SizeInMB"
+  PartDriveMenu=("${PartDriveMenu[@]}" "$PartDrive" "$Label" "$SizeInGB" "$SizeInMB")
  fi
 fi
 if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
@@ -79,7 +88,7 @@ GetRootPart () {
 
 RootPart=""
 
-RootPart=$(yad --height="300" --list  --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Aprox. Size in GiB" --column="Aprox. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS or, another\nGRUB2 based distribution." $PartDriveMenu)
+RootPart=$(yad --height="300" --list  --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Partition Label" --column="Aprox. Size in GiB" --column="Aprox. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS, or another GRUB2 based distribution." "${PartDriveMenu[@]}")
 
 ret="$?"
 
