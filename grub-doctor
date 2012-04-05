@@ -50,7 +50,7 @@ Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "ext
 for i in $Drives; do
   PartDrive="$i"
 ## Get the label of the disk if available
- Label=$(ls /dev/disk/by-label -lah | grep "$PartDrive" | awk '{print $9}' | sed -e 's|\\x20| |g')
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$PartDrive" | awk '{print $1}' | sed -e 's|\\x20| |g')
 
 if [ "$Label" = "" ]; then
  Label=' '
