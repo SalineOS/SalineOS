@@ -1,0 +1,35 @@
+#!/bin/bash 
+
+## Load kernel modules
+
+modprobe ip_conntrack
+modprobe ip_conntrack_ftp
+
+
+## Stop the firewall
+
+iptables --flush
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+## Set the starting rules, consisting of accept all outgoing connections on any port and silently drop incoming all incoming.
+
+iptables --policy INPUT DROP
+iptables --policy OUTPUT ACCEPT
+
+## Don't block connections on the local loopback device
+
+iptables -A INPUT -i lo -j ACCEPT
+
+## Allow connections that are related to an already established connection (Like passive ftp)
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+
+
+exit

@@ -1,0 +1,9 @@
+
+[Desktop Entry]
+Name=SalineOS Firewall
+Version=1.0
+Type=Application
+Exec=gksudo /usr/bin/SOS-Firewall-Config
+Icon=/usr/share/pixmaps/SOS-Firewall.png
+TryExec=gksudo /usr/bin/SOS-Firewall-Config
+Categories=System

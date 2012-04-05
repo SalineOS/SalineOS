@@ -1,0 +1,384 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+# Copyright 2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
+
+
+CloseFunction () {
+
+Rule=""
+Close=""
+CloseArray=("")
+
+for i in $(cat /etc/SOS-Firewall/rules); do
+ Port=$(echo "$i" | awk -F '/' '{print $7}')
+ Service=$(echo "$i" | awk -F '/' '{print $5}')
+ CloseArray=( "$Port" "$Service" "$i" "${CloseArray[@]}" )
+done
+
+Close=$(yad --list --height="300" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="Select the port to close from the list below" --column="Ports" --column="Service" --column="Full Entry" --hide-column="3" --print-column="3" --button=$"Main Menu:3" --button=$"gtk-ok:2" "${CloseArray[@]}" )
+
+ret="$?"
+
+Close=$(echo "$Close" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$Close" = "" ]; then
+ yad --width=200 --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --title="SOS Firewall" --text="No port selected" --button=$"gtk-ok:1"
+ CloseFunction
+ exit 0
+fi
+
+## Remove the selected port from rules file
+sed -i "s|"$Close"||g" /etc/SOS-Firewall/rules
+
+if [ "$(grep '## Firewall is Disabled' /usr/bin/Start-SOS-Firewall)" = "" ]; then
+## Remove old start script
+rm /usr/bin/Start-SOS-Firewall
+
+## Get the rules from configuration file
+Rules=$(cat /etc/SOS-Firewall/rules | sed -e 's|/| |g')
+
+## Generate a new start script with all the rules. 
+cat > /usr/bin/Start-SOS-Firewall <<FOO
+#!/bin/bash 
+
+## Load kernel modules
+
+modprobe ip_conntrack
+modprobe ip_conntrack_ftp
+
+
+## Stop the firewall
+
+iptables --flush
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+## Set the starting rules, consisting of accept all outgoing connections on any port and silently drop incoming all incoming.
+
+iptables --policy INPUT DROP
+iptables --policy OUTPUT ACCEPT
+
+## Don't block connections on the local loopback device
+
+iptables -A INPUT -i lo -j ACCEPT
+
+## Allow connections that are related to an already established connection (Like passive ftp)
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+## Use the rules in the configuration file
+
+$Rules
+
+
+exit
+
+FOO
+
+## Make the script executable
+chmod +x /usr/bin/Start-SOS-Firewall
+
+## Start the firewall
+/usr/bin/Start-SOS-Firewall
+
+fi
+
+## Return to main menu
+MainMenu
+exit 0
+
+}
+
+
+EnableFunction () {
+
+## Remove old start script
+rm /usr/bin/Start-SOS-Firewall
+
+## Get the rules from configuration file
+Rules=$(cat /etc/SOS-Firewall/rules | sed -e 's|/| |g')
+
+## Generate a new start script with all the rules. 
+cat > /usr/bin/Start-SOS-Firewall <<FOO
+#!/bin/bash 
+
+## Load kernel modules
+
+modprobe ip_conntrack
+modprobe ip_conntrack_ftp
+
+
+## Stop the firewall
+
+iptables --flush
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+## Set the starting rules, consisting of accept all outgoing connections on any port and silently drop incoming all incoming.
+
+iptables --policy INPUT DROP
+iptables --policy OUTPUT ACCEPT
+
+## Don't block connections on the local loopback device
+
+iptables -A INPUT -i lo -j ACCEPT
+
+## Allow connections that are related to an already established connection (Like passive ftp)
+iptables -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+
+## Use the rules in the configuration file
+
+$Rules
+
+exit
+
+FOO
+
+## Make the script executable
+chmod +x /usr/bin/Start-SOS-Firewall
+
+## Start the firewall
+/usr/bin/Start-SOS-Firewall
+
+## Inform the user that the firewall is active
+
+yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="SOS Firewall is now enabled" --button=$"gtk-ok:1"
+
+## Return to main menu
+MainMenu
+exit 0
+
+}
+
+
+
+AllowFunction () {
+
+AllowInfo=""
+AllowArray=("")
+
+AllowArray=( "" "" "tcp"!"udp"!"sctp" )
+
+AllowInfo=$(yad --form --wrap --width="250" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="Input the port you wish to open in the top box.  If you wish to open a whole range of ports, enter the ending port in the box below it." --field="Port to open:TXT" --field="Stop Port (Optional):TXT" --field="Service to allow on this port:CB" --button=$"gtk-ok:2" "${AllowArray[@]}") 
+
+AllowInfo=$(echo "$AllowInfo" | sed 's/ //g')
+
+Allow=$(echo "$AllowInfo" | awk -F '|' '{print $1}')
+EndPort=$(echo "$AllowInfo" | awk -F '|' '{print $2}')
+Service=$(echo "$AllowInfo" | awk -F '|' '{print $3}')
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$Allow" = "" ]; then
+ yad --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="No port specified" --button=$"gtk-ok:1"
+ AllowFunction
+ exit 0
+elif [ "$EndPort" != "" ]; then
+ Allow="$Allow:$EndPort"
+fi
+
+## Add new rule
+echo "iptables/-A/INPUT/-p/$Service/--dport/$Allow/-m/state/--state/NEW/-j/ACCEPT">>/etc/SOS-Firewall/rules
+
+if [ "$(grep '## Firewall is Disabled' /usr/bin/Start-SOS-Firewall)" = "" ]; then
+## Remove old start script
+rm /usr/bin/Start-SOS-Firewall
+
+## Get the rules from configuration file
+Rules=$(cat /etc/SOS-Firewall/rules | sed -e 's|/| |g')
+
+## Generate a new start script with all the rules. 
+cat > /usr/bin/Start-SOS-Firewall <<FOO
+#!/bin/bash 
+
+## Load kernel modules
+
+modprobe ip_conntrack
+modprobe ip_conntrack_ftp
+
+
+## Stop the firewall
+
+iptables --flush
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+## Set the starting rules, consisting of accept all outgoing connections on any port and silently drop incoming all incoming.
+
+iptables --policy INPUT DROP
+iptables --policy OUTPUT ACCEPT
+
+## Don't block connections on the local loopback device
+
+iptables -A INPUT -i lo -j ACCEPT
+
+## Allow connections that are related to an already established connection (Like passive ftp)
+iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT
+
+## Use the rules in the configuration file
+
+$Rules
+
+
+exit
+
+FOO
+
+## Make the script executable
+chmod +x /usr/bin/Start-SOS-Firewall
+
+## Start the firewall
+/usr/bin/Start-SOS-Firewall
+
+fi
+
+## Return to main menu
+MainMenu
+exit 0
+
+}
+
+MainMenu () {
+
+mkdir -p /etc/SOS-Firewall
+
+if [ "$(grep '## Firewall is Disabled' /usr/bin/Start-SOS-Firewall)" = "" ]; then
+
+MainMenuArray=("Allow" "Open a port to allow incoming connections" "Close" "Close a port, previously opened with SOS Firewall" "Disable" "Stop the firewall and prevent it from starting, until it is re-enabled" "Start" "Start the firewall" "Stop" "Stop the firewall temporarily") 
+
+else
+
+MainMenuArray=("Allow" "Open a port to allow incoming connections" "Close" "Close a port, previously opened with SOS Firewall" "Enable" "Enable the firewall" "Start" "Start the firewall" "Stop" "Stop the firewall temporarily") 
+
+fi
+
+Operation=$(yad --list --width="600" --title="SOS Firewall" --column="Action" --column="Description" --height="300" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --button=$"gtk-help:3" --button=$"gtk-quit:5" --button=$"gtk-ok:2" "${MainMenuArray[@]}")
+
+
+ret="$?"
+
+Operation=$(echo "$Operation" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "5" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "3" ]; then
+ yad --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --title="SOS Firewall" --wrap --width="300" --text="SOS Firewall is designed to be an easy and painless front-end to the Linux firewall system iptables. By default all incoming connections will be silently dropped, and all outgoing connections will be allowed. SOS Firewall is meant for machines that will have only one network connection active at any given time, and where simplicity is more important than fine grained control. For more advanced use cases, it is advised to disable SOS Firewall and install the Firestarter firewall utility.\n\nSOS Firewall will protect each and every network interface, even if that interface is not connected to the internet. Simply put, this means that it does not matter to SOS Firewall what device is connected to the internet or if a device is connected at all, it will apply the same rules universally and automatically (Unless disabled)." --button=$"gtk-ok:1"
+ MainMenu
+ exit 0
+elif [ "$Operation" = "Allow" ]; then
+ AllowFunction
+ exit 0
+elif [ "$Operation" = "Close" ]; then
+ CloseFunction
+ exit 0
+elif [ "$Operation" = "Disable" ]; then
+
+rm /usr/bin/Start-SOS-Firewall
+cat > /usr/bin/Start-SOS-Firewall <<FOO
+#!/bin/bash
+## Firewall is Disabled 
+exit
+FOO
+
+## Stop the firewall
+
+iptables --flush
+iptables -X
+iptables -t nat -F
+iptables -t nat -X
+iptables -t mangle -F
+iptables -t mangle -X
+iptables -P INPUT ACCEPT
+iptables -P FORWARD ACCEPT
+iptables -P OUTPUT ACCEPT
+
+## Inform the user
+yad --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="SOS Firewall is now completely disabled" --button=$"gtk-ok:1"
+MainMenu
+exit 0
+elif [ "$Operation" = "Enable" ]; then
+ EnableFunction
+ exit 0
+elif [ "$Operation" = "Start" ]; then
+ if [ "$(grep '## Firewall is Disabled' /usr/bin/Start-SOS-Firewall)" != "" ]; then
+  yad --window-icon=/usr/share/pixmaps/SOS-Firewall.png --title="SOS Firewall" --text="Firewall is currently disabled, would you like to enable it?" --button=$"gtk-no:3" --button="gtk-yes:5"
+
+  ret="$?"
+
+  if [ "$ret" = "252" ]; then
+   MainMenu
+   exit 0
+  elif [ "$ret" = "3" ]; then
+   MainMenu
+   exit 0
+  fi 
+  EnableFunction
+  exit 0
+ else
+  /usr/bin/Start-SOS-Firewall
+  yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="SOS Firewall is now active" --button=$"gtk-ok:1"
+  MainMenu
+  exit 0
+ fi
+elif [ "$Operation" = "Stop" ]; then
+ ## Stop the firewall
+ iptables --flush
+ iptables -X
+ iptables -t nat -F
+ iptables -t nat -X
+ iptables -t mangle -F
+ iptables -t mangle -X
+ iptables -P INPUT ACCEPT
+ iptables -P FORWARD ACCEPT
+ iptables -P OUTPUT ACCEPT
+ MainMenu
+ exit 0
+fi
+
+}
+
+MainMenu
+exit 0
