@@ -1,0 +1,1112 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+#  Copyright 2008,2009,2010,2012 Under the GNU GPL2 License
+# Authors Tony Brijeski, Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
+
+
+## Set options for yet another dialog, this makes creating dialogs much easier.
+
+Info='yad --center --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-backup.png'
+
+Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-backup.png'
+
+SingleMenu='yad  --center --list --column=Choices --title=SalineOS-Backup --window-icon=/usr/share/icons/pixmaps/salineos-backup.png'
+
+Menu='yad --print-column=1 --center --list --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-backup.png'
+
+Progress='yad --center --progress --auto-close --title=SalineOS-Backup --no-buttons --window-icon=/usr/share/pixmaps/salineos-backup.png'
+
+TextEntry='yad --center --entry --title=SalineOS-Backup --window-icon=/usr/share/pixmaps/salineos-backup.png'
+
+
+SetExcludes () {
+
+Selection=""
+Excludes=""
+NewExclude=""
+CurrentExcludes=""
+
+mkdir -p /etc/salineos-backup
+if [ -f /etc/salineos-backup/excludes ]; then
+ Excludes=$(cat /etc/salineos-backup/excludes)
+fi
+
+CurrentExcludes=$(echo -n "$Excludes" | yad --always-print-result --text-info --height=350 --editable --title="SalineOS-Backup" --wrap --width=400 --text="If desired you can exclude select files or folders from being included in the generated .backup file. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog." --button=$"gtk-quit:3" --button=$"Add New:5" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ SetExcludes
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "5" ]; then
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+ NewExclude=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --directory --text="\n                     Select the file or folder you wish to exclude\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ ret="$?"
+
+ if [ "$ret" = "252" ]; then
+  SetExcludes
+  exit 0
+ elif [ "$ret" = "3" ]; then
+  exit 0
+ else
+  echo "$NewExclude">>/etc/salineos-backup/excludes
+  SetExcludes
+  exit 0
+ fi
+else
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+ StartBackup
+ exit 0
+fi
+
+} 
+
+StartBackup () {
+
+
+SaveFolder=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --directory --text="\n                     Select the folder to save the backup image to\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ StartBackup
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$SaveFolder" = "" ]; then
+ StartBackup
+ exit 0
+fi
+
+ContinueBackup
+
+}
+
+ContinueBackup () { 
+
+ImageName=""
+
+ImageName=$($TextEntry --wrap --width=250 --entry-text="$(date +%Y%m%d-%H%M)" --text="Enter a name for the backup file." --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ ContinueBackup
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ImageName" = "" ]; then
+ ImageName=$(date +%Y%m%d-%H%M)
+elif [ -f "$SaveFolder/$ImageName" ]; then
+ $Question --text="Warning "$ImageName" already exists in folder "$SaveFolder", would you like to overwrite?"
+ if [ "$?" != "0" ]; then
+  ContinueBackup
+  exit 0
+ fi
+fi
+
+if [ "$BackupPart" = "root" ]; then
+ $Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-quit:3" --button=$"gtk-ok:1"
+ UseRoot='/'
+fi
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" ="3" ]; then
+ exit 0
+fi
+
+E=$(head --lines=1 /etc/salineos-backup/excludes)
+E1=$(head -n 2 /etc/salineos-backup/excludes | tail -n 1)
+E2=$(head -n 3 /etc/salineos-backup/excludes | tail -n 1)
+E3=$(head -n 4 /etc/salineos-backup/excludes | tail -n 1)
+E4=$(head -n 5 /etc/salineos-backup/excludes | tail -n 1)
+E5=$(head -n 6 /etc/salineos-backup/excludes | tail -n 1)
+E6=$(head -n 7 /etc/salineos-backup/excludes | tail -n 1)
+E7=$(head -n 8 /etc/salineos-backup/excludes | tail -n 1)
+E8=$(head -n 9 /etc/salineos-backup/excludes | tail -n 1)
+E9=$(head -n 10 /etc/salineos-backup/excludes | tail -n 1)
+E10=$(head -n 11 /etc/salineos-backup/excludes | tail -n 1)
+E11=$(head -n 12 /etc/salineos-backup/excludes | tail -n 1)
+E12=$(head -n 13 /etc/salineos-backup/excludes | tail -n 1)
+E13=$(head -n 14 /etc/salineos-backup/excludes | tail -n 1)
+E14=$(head -n 15 /etc/salineos-backup/excludes | tail -n 1)
+E15=$(head -n 16 /etc/salineos-backup/excludes | tail -n 1)
+E16=$(head -n 17 /etc/salineos-backup/excludes | tail -n 1)
+E17=$(head -n 18 /etc/salineos-backup/excludes | tail -n 1)
+E18=$(head -n 19 /etc/salineos-backup/excludes | tail -n 1)
+E19=$(head -n 20 /etc/salineos-backup/excludes | tail -n 1)
+E20=$(head -n 21 /etc/salineos-backup/excludes | tail -n 1)
+E21=$(head -n 22 /etc/salineos-backup/excludes | tail -n 1)
+E22=$(head -n 23 /etc/salineos-backup/excludes | tail -n 1)
+E23=$(head -n 24 /etc/salineos-backup/excludes | tail -n 1)
+E24=$(head -n 25 /etc/salineos-backup/excludes | tail -n 1)
+E25=$(head -n 26 /etc/salineos-backup/excludes | tail -n 1)
+E26=$(head -n 27 /etc/salineos-backup/excludes | tail -n 1)
+E27=$(head -n 28 /etc/salineos-backup/excludes | tail -n 1)
+E28=$(head -n 29 /etc/salineos-backup/excludes | tail -n 1)
+E29=$(head -n 30 /etc/salineos-backup/excludes | tail -n 1)
+E30=$(head -n 31 /etc/salineos-backup/excludes | tail -n 1)
+E31=$(head -n 32 /etc/salineos-backup/excludes | tail -n 1)
+E32=$(head -n 33 /etc/salineos-backup/excludes | tail -n 1)
+E33=$(head -n 34 /etc/salineos-backup/excludes | tail -n 1)
+E34=$(head -n 35 /etc/salineos-backup/excludes | tail -n 1)
+E35=$(head -n 36 /etc/salineos-backup/excludes | tail -n 1)
+E36=$(head -n 37 /etc/salineos-backup/excludes | tail -n 1)
+E37=$(head -n 38 /etc/salineos-backup/excludes | tail -n 1)
+E38=$(head -n 39 /etc/salineos-backup/excludes | tail -n 1)
+E39=$(head -n 40 /etc/salineos-backup/excludes | tail -n 1)
+E40=$(head -n 41 /etc/salineos-backup/excludes | tail -n 1)
+E41=$(head -n 42 /etc/salineos-backup/excludes | tail -n 1)
+E42=$(head -n 43 /etc/salineos-backup/excludes | tail -n 1)
+E43=$(head -n 44 /etc/salineos-backup/excludes | tail -n 1)
+E44=$(head -n 45 /etc/salineos-backup/excludes | tail -n 1)
+E45=$(head -n 46 /etc/salineos-backup/excludes | tail -n 1)
+E46=$(head -n 47 /etc/salineos-backup/excludes | tail -n 1)
+E47=$(head -n 48 /etc/salineos-backup/excludes | tail -n 1)
+E48=$(head -n 49 /etc/salineos-backup/excludes | tail -n 1)
+E49=$(head -n 50 /etc/salineos-backup/excludes | tail -n 1)
+E50=$(head -n 51 /etc/salineos-backup/excludes | tail -n 1)
+
+mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
+.bash_history \
+.cache \
+.thumbnails \
+boot/grub \
+Cache \
+"$E" \
+"$E1" \
+"$E2" \
+"$E3" \
+"$E4" \
+"$E5" \
+"$E6" \
+"$E7" \
+"$E8" \
+"$E9" \
+"$E10" \
+"$E11" \
+"$E12" \
+"$E13" \
+"$E14" \
+"$E15" \
+"$E16" \
+"$E17" \
+"$E18" \
+"$E19" \
+"$E20" \
+"$E21" \
+"$E22" \
+"$E23" \
+"$E24" \
+"$E25" \
+"$E26" \
+"$E27" \
+"$E28" \
+"$E29" \
+"$E30" \
+"$E31" \
+"$E32" \
+"$E33" \
+"$E34" \
+"$E35" \
+"$E36" \
+"$E37" \
+"$E38" \
+"$E39" \
+"$E40" \
+"$E41" \
+"$E42" \
+"$E43" \
+"$E44" \
+"$E45" \
+"$E46" \
+"$E47" \
+"$E48" \
+"$E49" \
+"$E50" \
+media \
+"$SaveFolder/$ImageName.backup" \
+mnt \
+proc \
+swap \
+sys \
+tmp \
+var/run >>/tmp/salineos-backup-temp-file &
+
+sleep 1
+
+(while [ "$(pidof mksquashfs)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
+echo "$CurrentOutput" | awk -F ' ' '{print $NF}' | awk -F '%' '{print $1}' 
+done)| $Progress --text="Creating backup image $ImageName.backup, Please wait..."
+
+
+## Let all users move the file around
+chmod o+rwx "$SaveFolder/$ImageName.backup"
+
+ls /home>>/tmp/salineos-backup-home-list
+UserNameTemp=$(tail --lines=1 /tmp/salineos-backup-home-list)
+
+chown "$UserNameTemp" "$SaveFolder/$ImageName.backup" 
+
+rm /tmp/salineos-backup-temp-file
+
+$Info --text="Creation of backup image "$ImageName.backup" complete.\nImage saved to directory $SaveFolder" --button=$"gtk-ok:1"
+
+
+exit 0
+
+}
+
+
+RunInstallation () { 
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Preparing disk and partitions           " &
+
+
+if [ "$Input" = "ext3" ]; then
+ FilesystemType="ext3"
+else
+ FilesystemType="ext4"
+fi
+
+if [ "$AutoPart" = "Auto" ]; then 
+ parted --script --align optimal /dev/$PartDrive mklabel msdos
+ parted --script --align optimal /dev/$PartDrive mkpart primary 1 -- -1
+ parted --script --align optimal /dev/$PartDrive set 1 boot on
+ TargetHomePart="root"
+ TargetPart="$PartDrive"1
+fi
+
+if [ "$(mount | grep $TargetPart)" != "" ]; then
+ umount /dev/$TargetPart
+ sleep 3
+fi
+
+mke2fs -t $FilesystemType /dev/$TargetPart
+
+mkdir -p /Target
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="                   Mounting $TargetPart                   " &
+
+mount /dev/$TargetPart /Target -o rw
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="Configure the filesystem to be checked\nevery 35 mounts" &
+
+tune2fs -c 35 -i 0 /dev/$TargetPart
+
+sleep 3
+
+rm -rf /Target/lost+found
+
+killall -KILL tail
+
+if [ "$TargetHomePart" != "root" ]; then
+ if [ "$FormatHome" = "True" ]; then
+  tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
+  umount /dev/$TargetHomePart
+  sleep 2
+  mke2fs -t $FilesystemType /dev/$TargetHomePart
+  sleep 3
+  killall -KILL tail
+ fi
+
+ tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="              Mounting $TargetHomePart              " &
+
+ mkdir -p /Target/home
+
+ mount /dev/$TargetHomePart /Target/home -o rw
+
+ tune2fs -c 35 -i 0 /dev/$TargetHomePart
+
+ rm -rf /Target/home/lost+found
+
+ TargetHomeUUID=$(blkid /dev/$TargetHomePart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+
+ ## Get fs type for the home partition in case the user chose not to format it
+ HomeFilesystemType=$(mount | grep "/dev/$TargetHomePart" | awk '{print $5}' | awk -F ' ' '{print $1}')
+
+ killall -KILL tail
+fi
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="               Generating UUID values for fstab               " &
+
+TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+TargetCDRom="/dev/cdrom"
+
+sleep 3
+
+killall -KILL tail
+
+## Copy the backup image contents to $Target
+tail -f /usr/bin/salineos-backup | $Progress --text="                   Copying files to $TargetPart                   " --pulsate &
+
+## Mount the backup image
+
+mkdir -p /mnt/Super-Happy-Mount-Point
+
+mount "$BackupImage" -o loop /mnt/Super-Happy-Mount-Point
+
+## Rsync
+rsync -a /mnt/Super-Happy-Mount-Point/ /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
+
+## Update the home folders of users if need be
+
+if [ "$TargetHomePart" != "root" ]; then
+if [ "$FormatHome" != "True" ]; then
+ for i in $(ls /mnt/Super-Happy-Mount-Point/home); do
+  cp -rf /mnt/Super-Happy-Mount-Point/home/"$i" /Target/home/
+ done
+fi
+fi
+
+sleep 3
+
+## Unmount backup image
+umount "/mnt/Super-Happy-Mount-Point"
+
+sleep 1
+
+## Remove mount point
+rm -rf /mnt/Super-Happy-Mount-Point
+
+## Make needed aditional folders on the system.
+mkdir -p /Target/{proc,dev,mnt,sys,tmp,media/cdrom}
+mkdir -p /Target/var/run
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --text="                    Setting up swap space                    " --pulsate &
+
+
+if [ "$UseSwapFile" = "True" ]; then
+ mkdir -p /Target/swap
+ fallocate --l "$SwapFileSize"m /Target/swap/salineos-swap
+ sleep 2
+ mkswap /Target/swap/salineos-swap
+ SwapFstab="/swap/salineos-swap"
+else
+ mkswap "$Swap"
+ sleep 2
+ blkid
+ sleep 2
+ TargetSwapUUID=$(blkid /dev/$Swap | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+ SwapFstab="UUID=$TargetSwapUUID"
+fi
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --text="Changing configuration files on installed system" --pulsate &
+
+## Prepare a chroot envoirnment for post install changes
+
+mount -o bind /proc /Target/proc
+mount -o bind /dev /Target/dev
+mount -o bind /sys /Target/sys
+rm -rf /Target/etc/fstab
+
+## Create a new fstab file for the system
+
+
+if [ "$TargetHomePart" = "root" ]; then
+cat > /Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+# Swap space created during install
+$SwapFstab none swap sw 0 0
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+
+FOO
+
+else
+
+cat > /Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+# /dev/$TargetHomePart home
+UUID=$TargetHomeUUID /home $HomeFilesystemType relatime 0 0
+# Swap space created during install
+$SwapFstab none swap sw 0 0
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+
+FOO
+
+fi
+
+## Make the users on the system own their home folders
+for i in $(ls /Target/home); do
+ chown -R "$i" /Target/home/"$i"
+done
+
+## Fix permissions on /tmp
+chmod og+rw /Target/tmp
+
+sleep 3
+
+killall -KILL tail
+
+
+## Install GRUB2
+tail -f /usr/bin/salineos-backup | $Progress --text="         Installing and configuring GRUB2         " --pulsate &
+chroot /Target chmod -x /etc/grub.d/20_memtest86+
+chroot /Target grub-install --force --no-floppy "$GrubLocation"
+sleep 2
+chroot /Target update-grub
+sleep 2
+
+
+
+killall -KILL tail
+
+## Unmount the target partition  
+tail -f /usr/bin/salineos-backup | $Progress --text="                  Unmounting $TargetPart                  " --pulsate &
+
+sleep 2
+umount /Target/home
+sleep 2
+umount /Target/proc
+sleep 2
+umount /Target/dev
+sleep 2
+umount /Target/sys
+sleep 2
+umount /Target
+umount -l /Target
+sleep 2
+
+killall -KILL tail
+
+$Question --wrap --width=250 --text="Restoration is complete. If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?" 
+
+if [ $? = 0 ]; then
+ reboot
+else
+ exit 0
+fi
+
+}
+
+
+FinishedMenu () {
+
+Change=""
+
+if [ "$AutoPart" = "Manual" ]; then
+ if [ "$UseSwapFile" = "True" ]; then
+  SwapFinished='Swap-File'
+  SwapFinished2="A $SwapFileSize Megabytes swap file will be created"
+ else
+  SwapFinished='Swap-Partition'
+  SwapFinished2="$Swap will be used as the swap partition"
+ fi
+
+RootPartition="Root-Partition"
+
+ if [ "$Input" = "ext3" ]; then
+  RootPartition2="$TargetPart will be formatted (erased) ext3 and used for root"
+ else
+  RootPartition2="$TargetPart will be formatted (erased) ext4 and used for root"
+ fi
+
+HomePartFinished="Home"
+
+ if [ "$TargetHomePart" = "root" ]; then
+  HomePartFinished2="The home folder will be placed on the root partition"
+ else
+  if [ "$FormatHome" = "True" ]; then
+   if [ "$Input" = "ext3" ]; then
+    HomePartFinished2="$TargetHomePart will be formated (erased) ext3 and used for /home"
+   else
+    HomePartFinished2="$TargetHomePart will be formated (erased) ext4 and used for /home"
+   fi
+  else
+   HomePartFinished2="$TargetHomePart will be used for /home without erasing data"
+  fi
+ fi
+else
+ SwapFinished='Swap-File'
+ SwapFinished2="A $SwapFileSize Megabytes swap file will be created"
+ RootPartition="Use-Disk"
+ RootPartition2="$PartDrive will be erased and the entire disk used"
+fi
+
+
+GrubFinished="Boot-Loader"
+GrubFinished2="The GRUB2 boot loader will be installed to "$GrubLoc""
+
+if [ "$AutoPart" = "Auto" ]; then
+Change=$($Menu --height=300 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"gtk-quit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$GrubFinished" "$GrubFinished2")
+else
+Change=$($Menu --height=300 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"gtk-quit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$HomePartFinished" "$HomePartFinished2" "$GrubFinished" "$GrubFinished2")
+fi
+
+ret="$?"
+
+Change=$(echo "$Change" | awk -F '|' '{print $1}')
+ 
+if [ "$ret" = "252" ]; then
+ FinishedMenu
+ exit 0 
+elif [ "$ret" = "3" ]; then 
+  $Question --text="Are you sure you want to cancel the restoration?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   FinishedMenu
+   exit 0
+  fi
+elif [ "$ret" = "5" ]; then
+ rm -rf /tmp/Finished-Menu
+ RunInstallation
+ exit 0
+elif [ "$Change" = "Swap-Partition" ]; then
+ SelectSwapPart
+ exit 0
+elif [ "$Change" = "Root-Partition" ]; then
+ SelectRootPart
+ exit 0
+elif [ "$Change" = "Swap-File" ]; then
+ SwapFile
+ exit 0
+elif [ "$Change" = "Home" ]; then
+ SelectHomePart
+ exit 0
+elif [ "$Change" = "Boot-Loader" ]; then
+ GrubSelect
+ exit 0
+elif [ "$Change" = "Use-Disk" ]; then
+ ChooseDrive
+ exit 0
+elif [ "$Change" = "" ]; then
+ $Info --text="No change selected" --button=$"gtk-ok:1"
+ FinishedMenu
+ exit 0
+fi
+
+
+rm -rf /tmp/Finished-Menu
+
+
+}
+
+
+GrubSelect () {
+
+## Grub location
+
+GrubLocation=""
+GrubLoc=""
+
+GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="Please select where to install the grub boot loader\n" $GrubMenu root "Root partition - (Advanced)")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ GrubSelect
+ exit 0 
+elif [ "$ret" = "3" ]; then 
+  $Question --text="Are you sure you want to cancel the restoration?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   GrubSelect
+   exit 0
+  fi
+elif [ "$GrubLoc" = "" ]; then
+ $Info --text="The grub location cannot be blank, please choose where to install grub." --button=$"gtk-ok:1"
+ GrubSelect
+ exit 0
+fi
+
+GrubLoc=$(echo "$GrubLoc" | awk -F '|' '{print $1}')
+
+if [ "$GrubLoc" != "root" ]; then
+ GrubLocation="/dev/$GrubLoc"
+else
+ GrubLocation="/dev/$TargetPart"
+fi
+
+touch /tmp/Finished-Menu
+
+FinishedMenu
+
+}
+
+SelectHomePart () {
+
+HomePartMenu=""
+
+ExtraParts="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "swap" | grep -v 'p1' | grep -v "extended" | grep -v "Hidden" | cut -d " " -f1)"
+
+## Cleanup the fdisk output
+HomeParts=$(echo "$ExtraParts" | sed -r "s/\/dev\///g")
+
+for i in $HomeParts; do
+ HomePart="$i"
+ HomePartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+ HomePartMenu="$HomePartMenu $HomePart $HomePartSize"
+done
+
+HomePart=$($Menu --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column=Partition --column="Size in Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" $HomePartMenu)
+
+ret=$?
+
+if [ "$ret" = "252" ]; then
+ SelectHomePart
+ exit 0
+elif [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   SelectSwapPart
+   exit 0
+  fi
+elif [ "$ret" = "5" ]; then
+ if [ -f /tmp/Finished-Menu ]; then
+  TargetHomePart="root"
+  FinishedMenu
+  exit 0
+ fi
+ TargetHomePart="root"
+ GrubSelect
+ exit 0
+elif [ "$HomePart" = "" ]; then
+ SelectHomePart
+ exit 0
+else
+ TargetHomePart=$(echo "$HomePart" | awk -F '|' '{print $1}')
+ $Question --text="Format (Erase all data) on the target home partition, $TargetHomePart?"
+  if [ "$?" = "0" ]; then
+   FormatHome="True"
+  else
+   FormatHome="False"
+  fi
+fi
+
+if [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
+ exit 0
+else
+GrubSelect
+exit 0
+fi
+
+
+}
+
+
+SelectSwapPart () {
+
+SwapPartMenu=""
+Swap=""
+
+## Find swap partitions and find out which to use.
+TargetSwap=$(fdisk -l | grep "swap" | cut -d " " -f1)
+TargetSwap=$(echo "$TargetSwap" | sed -r "s/\/dev\///g")
+
+for i in $TargetSwap; do
+ SwapPart="$i"
+ SwapPartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+ SwapPartMenu="$SwapPartMenu $SwapPart $SwapPartSize"
+done
+
+
+Swap=$($Menu --width=300 --height=250 --text="  Please select the partition to use for swap\n" --column=Partition --column="Size in Megabytes" --button=$"gtk-quit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" $SwapPartMenu)
+
+ret=$?
+
+
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the restoration?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   SelectSwapPart
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ SelectSwapPart
+ exit 0 
+elif [ "$ret" = "5" ]; then
+ SwapFile
+ exit 0
+elif [ "$Swap" = "" ]; then
+ SelectSwapPart
+ exit 0
+elif [ -f /tmp/Finished-Menu ]; then
+ Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
+ FinishedMenu
+ exit 0
+else
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ if [ "$HomePartTest" != "" ]; then
+  Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
+  SelectHomePart
+  exit 0
+ fi
+ Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
+ GrubSelect
+ exit 0
+fi
+ 
+}
+
+SwapFile () {
+
+SwapFileSize=""
+
+if [ "$AutoPart" = "Auto" ]; then
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Continue:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+else
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+fi
+
+ret=$?
+
+if [ "$ret" = "3" ]; then
+ UseSwapFile="False"
+ SelectSwapPart
+ exit 0
+elif [ "$ret" = "252" ]; then
+ SwapFile
+ exit 0 
+elif [ "$SwapFileSize" = "" ]; then
+ SwapFile
+ exit 0
+else
+ UseSwapFile="True"
+ SwapFileSize=$(echo "$SwapFileSize" | awk -F '|' '{print $1}') 
+  if [ -f /tmp/Finished-Menu ]; then
+   FinishedMenu
+   exit 0
+  elif [ "$AutoPart" = "Auto" ]; then
+   GrubSelect
+   exit 0
+  fi
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ if [ "$HomePartTest" != "" ]; then
+  SelectHomePart
+  exit 0
+ fi
+ GrubSelect
+ exit 0
+fi
+
+}
+
+## Choose the partition to install to
+
+SelectRootPart () { 
+
+PartMenu=""
+
+Partitions=$(cat /proc/partitions | grep "$PartDrive" | awk '{print $4}' | grep "[0-9]" | grep -v 'p1')
+InstallPart="$(echo $Partitions)"
+for i in $Partitions; do
+TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+if [ "$TempSize" = "1" ]; then
+ InstallPart=$(echo $InstallPart | sed -r "s/$i//")
+fi
+done
+
+
+for i in $InstallPart; do
+  Part="$i"
+  PartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  PartMenu="$PartMenu $Part $PartSize"
+done
+
+
+TargetPart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select a partition to install the root (Main) directory to.\n" $PartMenu )
+
+ret=$?
+
+
+
+if [ "$ret" = "252" ]; then
+ SelectRootPart
+ exit 0
+elif [ "$ret" = "3" ]; then
+   $Question --text="Are you sure you want to cancel the restoration?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   SelectRootPart
+   exit 0
+  fi
+elif [ "$TargetPart" = "" ]; then
+ SelectRootPart
+ exit 0
+fi
+
+TargetPart=$(echo "$TargetPart" | awk -F '|' '{print $1}')
+
+
+## Since unlike the salineos-installer this utility can be run from a non live envoirnment
+## We need to make sure that the user doesn't try to install to the current partition
+RootDir="$(mount | grep -B 0 ' / ')"
+
+if [ "$(echo "$RootDir" | grep "$TargetPart")" != "" ]; then
+ $Info --wrap --width=300 --text="You cannot erase the partition this utility is running from, please select another partition to install to, or run this utility from a live environment.\n"
+ SelectRootPart
+fi
+
+if [ -f /tmp/Finished-Menu ]; then
+ FinishedMenu
+ exit 0
+else
+ SwapFile
+ exit 0
+fi
+
+
+}
+
+
+
+## Choose the drive to partition
+
+ChooseDrive () { 
+
+GrubMenu=""
+PartDriveMenu=""
+PartDrive=""
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v major | grep -v "^$" | awk '{print $4}' | grep -v "[0-9]")
+
+for i in $Drives; do
+  PartDrive="$i"
+  PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+  PartDriveMenu="$PartDriveMenu $PartDrive $PartDriveSize"
+  GrubMenu="$PartDrive Master-Boot-Record $GrubMenu"
+done
+
+
+if [ "$AutoPart" = "Auto" ]; then
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
+else
+PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
+fi
+
+ret=$?
+
+
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the resoration?"
+  if [ "$?" = "0" ]; then
+   if [ -f /tmp/Finished-Menu ]; then
+    rm /tmp/Finished-Menu
+   fi
+   exit 1
+  else
+   ChooseDrive
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ ChooseDrive
+ exit 0
+elif [ "$PartDrive" = "" ]; then
+ ChooseDrive
+ exit 0
+fi 
+
+
+PartDrive=$(echo "$PartDrive" | awk -F '|' '{print $1}')
+
+## Since unlike the salineos-installer this utility can be run from a non live envoirnment
+## We need to make sure that the user doesn't try to autopartition the currently used disk.
+RootDir="$(mount | grep -B 0 ' / ')"
+
+if [ "$AutoPart" = "Auto" ]; then
+ if [ "$(echo "$RootDir" | grep "$PartDrive")" != "" ]; then
+  $Info --wrap --width=300 --text="You cannot erase the partition this utility is running from, please select another disk or use manual partitioning to select another partition on this disk.\n"
+  AutoPartitioning
+ fi
+fi
+  
+
+## Launch GParted
+if [ "$AutoPart" != "Auto" ]; then
+ gparted /dev/$PartDrive
+fi
+
+if [ "$AutoPart" = "Auto" ]; then
+ SwapFile
+ exit 0
+else
+ SelectRootPart
+ exit 0
+fi
+
+}
+
+
+
+
+## Ask the user if they wish to use automatic partitioning.
+
+AutoPartitioning () {
+$Info --width=400 --wrap --text="You will need at least one partition in order to restore your backup image.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
+
+ret=$?
+
+if [ "$ret" = "252" ]; then
+ AutoPartitioning 
+ exit 0
+elif [ "$ret" = "5" ]; then
+ AutoPart="Auto"
+ ChooseDrive
+ exit 0
+elif [ "$ret" = "3" ]; then
+ AutoPart="Manual"
+ ChooseDrive
+ exit 0
+fi 
+
+}
+
+SelectBackupImage () {
+
+BackupImage=""
+
+BackupImage=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to restore\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+BackupImage=$(echo $BackupImage | awk -F '|' '{print $1}')
+
+
+if [ "$ret" = "252" ]; then
+ SelectBackupImage
+ exit 0
+elif [ "$ret" = "3" ]; then
+ $Question --text="Are you sure you want to cancel the resoration?"
+ if [ "$?" = "0" ]; then
+  if [ -f /tmp/Finished-Menu ]; then
+   rm /tmp/Finished-Menu
+  fi
+ fi
+  exit 1
+elif [ "$BackupImage" = "" ]; then
+ SelectBackupImage
+ exit 0
+elif [ "$(echo "$BackupImage" | grep ".backup")"  = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="$BackupImage is not a valid backup image"
+ SelectBackupImage
+ exit 0
+fi
+
+AutoPartitioning
+exit 0
+
+
+}
+
+
+
+MainMenu () {
+
+$Info --wrap  --width=300 --text="Welcome to the SalineOS backup utility. For complete usage information please refer to the SalineOS backup section in the user manual." --button=$"Restore Backup:5" --button=$"Create Backup:7"
+
+ret="$?"
+
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "7" ]; then
+ BackupPart="root"
+ SetExcludes
+ exit 0
+elif [ "$ret" = "5" ]; then
+ SelectBackupImage
+ exit 0
+fi
+
+}
+
+
+## Check for root and cry like a little girl if we don't have it.
+
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ $Info --button=$"gtk-quit:1" --text="SalineOS Backup must be run as root."
+ exit 1
+fi
+
+if [ "$1" = "Restore" ]; then
+ BackupImage="$2"
+ AutoPartitioning
+else
+ MainMenu
+fi
+
+

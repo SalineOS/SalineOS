@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=SalineOS Backup
+GenericName=Backup System
+Comment=Backup your system
+Exec=gksudo /usr/bin/salineos-backup
+Icon=disks
+Terminal=false
+MultipleArgs=false
+Type=Application
+Categories=SystemBackup;Applications;GTK;System
+NotShowIn=KDE
+X-KDE-SubstituteUID=true
+GenericName[en_US]=Backup System
