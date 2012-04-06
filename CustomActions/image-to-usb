@@ -15,54 +15,117 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ####################################################################################################
-## Authored and maintained by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 2011
-## LOTS of code borrowed from the Remastersys USB copy tool authored by Tony Brijeski, this code has been heavily modified for the use in this script. 
-## Copyright 2011 Anthony Nordquist and Copyright 2009 by Tony Brijeski under the GPL V2 
+## Authored and maintained by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
+## Copyright Anthony Nordquist 2011 2012 Licensed under the GPL v2
 
-
-DIALOG="$(which zenity) --width=300 --height=200"
-TITLE="--title="
-TEXT="--text="
-ENTRY="--entry "
-ENTRYTEXT="--entry-text "
-FILESELECTION="--file-selection "
-MENU="--list --column=Pick --column=Info"
-YESNO="--question "
-MSGBOX="--info "
-TITLETEXT="Image To USB Burner"
+Icon="--window-icon=drive-removable-media-usb"
+DisplayName=$(echo "$1" | awk -F '/' '{print $NF}')
+Iso="$1"
 
 progressbar () {
-tail -f /usr/bin/image-to-usb | $DIALOG $TEXT"$@" --progress --pulsate --auto-close
+tail -f /usr/bin/image-to-usb | yad --text="$@" --title="Image to USB" --progress --pulsate --auto-close --no-buttons $Icon
 }
 
+USBDrives=""
 
-DEVS=""
-DEVS=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
-for i in $DEVS; do
-USBDRIVESIZE=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-USBDRIVES="$USBDRIVES $i $USBDRIVESIZE "
+## Check to make sure that is at least one USB drive connected to the system.
+## Without this code the user will be displayed something REALLY ugly
+## Pay no mind to the man behind the curtain :)
+
+if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
+USBDrives=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
+else
+yad $Icon --title="Image to USB" --text="          No USB drives found.\n" --width=250 --button=$"gtk-quit:1"
+exit 0
+fi
+
+GetDrive () {
+
+
+for i in $USBDrives; do
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+DriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($DriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+
+if [ "$USBDriveMenu" = "" ]; then
+ USBDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+else
+ USBDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB" "${USBDriveMenu[@]}")
+fi
+
 done
 
-USBDRIVE=$($DIALOG $TITLE"$TITLETEXT" $MENU $TEXT'\nPlease select the USB drive you would like to "burn" to.' $USBDRIVES Exit "Quit")
 
-$DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"This will completely erase the contents of /dev/$USBDRIVE\nand replace them with the contents of $1.\n\nDo you want to continue?"
+UseDrive=$(yad --height="350" --list  $Icon --title="Image to USB" --column="Name" --column="Associated Label(s)" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="                            Please select the drive to copy the image to.                            \n" "${USBDriveMenu[@]}")
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ exit 0 
+elif [ "$UseDrive" = "" ]; then
+ yad $Icon --title="Image to USB" --text="No USB drive selected, please retry." --button=$"gtk-ok:1"
+ GetDrive
+ exit 0
+fi
+
+UseDrive=$(echo "$UseDrive" | awk -F '|' '{print $1}')
+
+Continue
+
+}
+
+Continue () {
+
+yad --width=300 --wrap --title="Image to USB" $Icon --text="This will completely erase the contents of $UseDrive and replace them with the contents of $DisplayName. Are you sure you want to continue?" --button=$"gtk-no:1" --button=$"gtk-yes:0"
 
 if [ $? != 0 ]; then
  exit
 fi
 
-umount $(mount | grep $USBDRIVE | awk '{print $1}')
+## Unmount all partitions on the drive
+Unmount=$(mount | grep "$UseDrive" | awk '{print $1}')
 
-progressbar "Copying $1 to /dev/$USBDRIVE Now\n\nPlease Wait \n" &
+for i in $Unmount; do
+ umount "$i"
+ umount -l "$i"
+done
+
+progressbar "     Copying $DisplayName to $UseDrive.     \n" &
 
 
-dd if="$1" of=/dev/$USBDRIVE bs=1M
+dd if="$Iso" of=/dev/$UseDrive
 sync
 
 
 killall -KILL tail
 
-zenity --info --title="$TITLETEXT" --text="Copying of image complete, press ok to exit."
+yad $Info --info --title="Image to USB" --text="          Copying of image complete.          \n" --button=$"gtk-ok:1"
+
+exit 0
+
+}
+
+
+GetDrive
+
 exit
-
-
