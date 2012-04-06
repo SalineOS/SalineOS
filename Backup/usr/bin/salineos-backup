@@ -306,10 +306,22 @@ fi
 
 if [ "$(mount | grep $TargetPart)" != "" ]; then
  umount /dev/$TargetPart
+ umount -l /dev/$TargetPart
  sleep 3
 fi
 
+## Perserve labels set by users in GParted
+if [ "$(ls /dev/disk/by-label)" != "" ]; then
+ LabelRoot=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$TargetPart" | awk '{print $1}' | sed -e 's|\\x20| |g')
+fi
+sleep 2
 mke2fs -t $FilesystemType /dev/$TargetPart
+
+sleep 2
+
+if [ "$LabelRoot" != "" ]; then
+ tune2fs -L "$LabelRoot" /dev/$TargetPart
+fi
 
 mkdir -p /Target
 
@@ -339,9 +351,18 @@ if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "True" ]; then
   tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
   umount /dev/$TargetHomePart
+  umount -l /dev/$TargetHomePart
+  sleep 2
+ ## Perserve labels set by users in GParted
+ if [ "$(ls /dev/disk/by-label)" != "" ]; then
+  LabelHome=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$TargetHomePart" | awk '{print $1}' | sed -e 's|\\x20| |g')
+ fi
   sleep 2
   mke2fs -t $FilesystemType /dev/$TargetHomePart
   sleep 3
+  if [ "$LabelHome" != "" ]; then
+   tune2fs -L "$LabelHome" /dev/$TargetHomePart
+  fi
   killall -KILL tail
  fi
 
