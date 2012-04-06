@@ -18,7 +18,6 @@
 ## Copyright 2009-2012 Anthony Nordquist and Tony Brijeski
 ## Some of this code was borrowed from Tony Brijeski's Remastersys installer and Remastersys grub restore utility, and he deserves lots of credit for having code worth jacking. This code has been modified to suit the purpose of this program :) 
 
-Progress='yad --center --pulsate --progress --auto-close --title=Grub-Doctor --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png'
  
 Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=Grub-Doctor --window-icon=/usr/share/pixmaps/grub-doctor.png'
 
@@ -58,11 +57,11 @@ else
  Label="$Label     "
 fi
 
-  PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
 ## Part Drive Size is in blocks, first we need to convert the blocks to bytes
 ## Don't bother with extended partitions
 if [ "$PartDriveSize" != "1" ]; then
-  BlockSize=$(df -P /dev/sda1 | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+  BlockSize=$(df -P /dev/$PartDrive | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
 ## Multiply blocks by block size to get bytes
  SizeInBytes=$(($PartDriveSize * $BlockSize))
 ## Divide Bytes by 1024 to get Kilobytes
@@ -74,11 +73,15 @@ if [ "$PartDriveSize" != "1" ]; then
 fi
 if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then
-  PartDriveMenu=("${PartDriveMenu[@]}" "$PartDrive" "$Label" "$SizeInGB" "$SizeInMB")
+  if [ "$PartDriveMenu" = "" ]; then
+   PartDriveMenu=("$PartDrive" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   PartDriveMenu=("${PartDriveMenu[@]}" "$PartDrive" "$Label" "$SizeInGB" "$SizeInMB")
+  fi
  fi
 fi
 if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
- GrubMenu=("$PartDrive" "Master boot record of disk" "${GrubMenu[@]}")
+ GrubMenu=("${GrubMenu[@]}" "$PartDrive" "Master boot record of disk")
 fi
 done
 
@@ -123,7 +126,7 @@ GetGrubLocation (){
 GrubLocation=""
 
 
-GrubLocation=$(yad --list --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select where to install grub, selecting a disk will install grub to that disk's master boot record.\n" "${GrubMenu[@]}")
+GrubLocation=$(yad --list --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="   Please select where to install grub.   \n" "${GrubMenu[@]}")
 
 ret="$?"
 
@@ -170,7 +173,7 @@ if [ "$?" = "1" ]; then
 fi
 
 ## Start Progress bar
-tail -f /usr/bin/grub-doctor | $Progress --text="Installing and setting up grub...Please Wait" &
+tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="     Installing and setting up grub...Please Wait     \n" &
 
 GrubDir="$(mount | grep $RootPart | awk '{print$3}')"
 
@@ -236,6 +239,6 @@ killall -KILL tail
 ## Tell the user we are done now
 $Info --text="             Grub installation complete.             \n" --button=$"gtk-ok:1"
 
-## We came we did and now its time to leave, wam bam thank you mam style.
+##
 #
 exit 0

@@ -650,7 +650,7 @@ GrubSelect () {
 GrubLocation=""
 GrubLoc=""
 
-GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="Please select where to install the grub boot loader\n" $GrubMenu root "Root partition - (Advanced)")
+GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="Please select where to install the grub boot loader\n" "${GrubMenu[@]}")
 
 ret="$?"
 
@@ -691,19 +691,46 @@ FinishedMenu
 SelectHomePart () {
 
 HomePartMenu=""
+Partitions=""
 
-ExtraParts="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "swap" | grep -v 'p1' | grep -v "extended" | grep -v "Hidden" | cut -d " " -f1)"
+Partitions="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "swap" | grep -v 'p1' | grep -v "extended" | grep -v "Hidden" | cut -d " " -f1 | sed 's|/dev/||g')"
 
-## Cleanup the fdisk output
-HomeParts=$(echo "$ExtraParts" | sed -r "s/\/dev\///g")
+for i in $Partitions; do
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
 
-for i in $HomeParts; do
- HomePart="$i"
- HomePartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
- HomePartMenu="$HomePartMenu $HomePart $HomePartSize"
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+fi
+if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  if [ "$HomePartMenu" = "" ]; then
+   HomePartMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   HomePartMenu=("${HomePartMenu[@]}" "$i" "$Label" "$SizeInGB" "$SizeInMB")
+  fi
+ fi
+fi
+
 done
-
-HomePart=$($Menu --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column=Partition --column="Size in Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" $HomePartMenu)
+HomePart=$($Menu --width="575" --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column="Name" --column="Partition Label" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" "${HomePartMenu[@]}")
 
 ret=$?
 
@@ -759,19 +786,38 @@ SelectSwapPart () {
 
 SwapPartMenu=""
 Swap=""
+BlockSize=""
 
 ## Find swap partitions and find out which to use.
 TargetSwap=$(fdisk -l | grep "swap" | cut -d " " -f1)
 TargetSwap=$(echo "$TargetSwap" | sed -r "s/\/dev\///g")
 
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+
 for i in $TargetSwap; do
- SwapPart="$i"
- SwapPartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
- SwapPartMenu="$SwapPartMenu $SwapPart $SwapPartSize"
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+
+if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
+ if [ "$SwapPartMenu" = "" ]; then
+  SwapPartMenu=("$i" "$SizeInGB" "$SizeInMB")
+ else
+  SwapPartMenu=("${SwapPartMenu[@]}" "$i" "$SizeInGB" "$SizeInMB")
+ fi
+fi
+
 done
 
 
-Swap=$($Menu --width=300 --height=250 --text="  Please select the partition to use for swap\n" --column=Partition --column="Size in Megabytes" --button=$"gtk-quit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" $SwapPartMenu)
+Swap=$($Menu --width=415 --height=250 --text="            Please select the partition to use for swap            \n" --column="Name" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" "${SwapPartMenu[@]}")
 
 ret=$?
 
@@ -862,26 +908,48 @@ fi
 
 SelectRootPart () { 
 
-PartMenu=""
+PartDriveMenu=""
 
-Partitions=$(cat /proc/partitions | grep "$PartDrive" | awk '{print $4}' | grep "[0-9]" | grep -v 'p1')
-InstallPart="$(echo $Partitions)"
+Partitions=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}' | grep -v 'p1')
+
 for i in $Partitions; do
-TempSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-if [ "$TempSize" = "1" ]; then
- InstallPart=$(echo $InstallPart | sed -r "s/$i//")
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
 fi
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+fi
+if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  if [ "$PartDriveMenu" = "" ]; then
+   PartDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   PartDriveMenu=("${PartDriveMenu[@]}" "$i" "$Label" "$SizeInGB" "$SizeInMB")
+   fi
+ fi
+fi
+
 done
 
 
-for i in $InstallPart; do
-  Part="$i"
-  PartSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-  PartMenu="$PartMenu $Part $PartSize"
-done
-
-
-TargetPart=$($Menu --height=300 --width=300 --wrap --column="Partition Name" --column="Size In Megabytes" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="Please select a partition to install the root (Main) directory to.\n" $PartMenu )
+TargetPart=$($Menu --height=300 --width=575 --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="    Please select a partition to install the SalineOS root (Main) directory to.\n" "${PartDriveMenu[@]}" )
 
 ret=$?
 
@@ -942,17 +1010,41 @@ PartDrive=""
 Drives=$(cat /proc/partitions | grep -v loop | grep -v major | grep -v "^$" | awk '{print $4}' | grep -v "[0-9]")
 
 for i in $Drives; do
-  PartDrive="$i"
-  PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
-  PartDriveMenu="$PartDriveMenu $PartDrive $PartDriveSize"
-  GrubMenu="$PartDrive Master-Boot-Record $GrubMenu"
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+
+BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+
+if [ "$(echo "$i" | grep [0-9] )" = "" ]; then
+ if [ "$PartDriveMenu" = "" ]; then
+  PartDriveMenu=( "$i" "$SizeInGB" "$SizeInMB" )
+ else
+  PartDriveMenu=( "${PartDriveMenu[@]}" "$i" "$SizeInGB" "$SizeInMB" )
+ fi
+ if [ "$GrubMenu" = "" ]; then
+  GrubMenu=("$i" "Master boot record of disk")
+ else
+  GrubMenu=("${GrubMenu[@]}" "$i" "Master boot record of disk")
+ fi
+fi
 done
 
 
+GrubMenu=("${GrubMenu[@]}" "root" "Root Partition (Advanced)")
+
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
+PartDrive=$($Menu --width=425 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="               Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}")
 else
-PartDrive=$($Menu --width=300 --height=300 --column="Drive" --column="Size In Megabytes" --text="Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" $PartDriveMenu )
+PartDrive=$($Menu --width=425 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="                 Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}")
 fi
 
 ret=$?
