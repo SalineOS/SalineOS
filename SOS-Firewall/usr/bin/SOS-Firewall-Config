@@ -27,7 +27,11 @@ CloseArray=("")
 for i in $(cat /etc/SOS-Firewall/rules); do
  Port=$(echo "$i" | awk -F '/' '{print $7}')
  Service=$(echo "$i" | awk -F '/' '{print $5}')
- CloseArray=( "$Port" "$Service" "$i" "${CloseArray[@]}" )
+ if [ "$CloseArray" = "" ]; then
+  CloseArray=( "$Port" "$Service" "$i" )
+ else
+  CloseArray=( "$Port" "$Service" "$i" "${CloseArray[@]}" )
+ fi
 done
 
 Close=$(yad --list --height="300" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="Select the port to close from the list below" --column="Ports" --column="Service" --column="Full Entry" --hide-column="3" --print-column="3" --button=$"Main Menu:3" --button=$"gtk-ok:2" "${CloseArray[@]}" )
@@ -191,7 +195,9 @@ AllowArray=("")
 
 AllowArray=( "" "" "tcp"!"udp"!"sctp" )
 
-AllowInfo=$(yad --form --wrap --width="250" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="Input the port you wish to open in the top box.  If you wish to open a whole range of ports, enter the ending port in the box below it." --field="Port to open:TXT" --field="Stop Port (Optional):TXT" --field="Service to allow on this port:CB" --button=$"gtk-ok:2" "${AllowArray[@]}") 
+AllowInfo=$(yad --form --wrap --width="250" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="Input the port you wish to open in the top box.  If you wish to open a whole range of ports, enter the ending port in the box below it." --field="Port to open:" --field="Stop Port (Optional):" --field="Service to allow on this port:CB" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" "${AllowArray[@]}") 
+
+ret="$?"
 
 AllowInfo=$(echo "$AllowInfo" | sed 's/ //g')
 
@@ -199,13 +205,15 @@ Allow=$(echo "$AllowInfo" | awk -F '|' '{print $1}')
 EndPort=$(echo "$AllowInfo" | awk -F '|' '{print $2}')
 Service=$(echo "$AllowInfo" | awk -F '|' '{print $3}')
 
-ret="$?"
 
 if [ "$ret" = "252" ]; then
  MainMenu
  exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
 elif [ "$Allow" = "" ]; then
- yad --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="No port specified" --button=$"gtk-ok:1"
+ yad --width=250 --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="No port specified" --button=$"gtk-ok:1"
  AllowFunction
  exit 0
 elif [ "$EndPort" != "" ]; then
