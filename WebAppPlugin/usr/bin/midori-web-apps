@@ -35,10 +35,16 @@ exit 0
 
 Delete () {
 
+DeleteMeArray=("")
+
 ## Huzzah!
 for i in $(ls $HOME/.webapps/desktopfiles); do 
  NewEntry=$(grep -B 0 "Name=" "$HOME/.webapps/desktopfiles/$i" | awk -F 'Name=' '{print $2}') 
- DeleteMeArray=( "$NewEntry" "$i" "${DeleteMeArray[@]}" )
+ if [ "$DeleteMeArray" = "" ]; then
+  DeleteMeArray=( "$NewEntry" "$i" )
+ else 
+  DeleteMeArray=( "$NewEntry" "$i" "${DeleteMeArray[@]}" )
+ fi
 done
 
 DeleteMe=$(yad --title='            ' --window-icon="midori" --list --width=250 --height=300 --no-headers --column=' ' --column=' ' --hide-column="2" --text="Select the entry you wish to remove" --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${DeleteMeArray[@]}")
