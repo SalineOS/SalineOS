@@ -1151,7 +1151,7 @@ SelectBackupImage () {
 
 BackupImage=""
 
-BackupImage=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to restore\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+BackupImage=$(yad --file-selection --file-filter "*.backup" --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to restore\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 ret="$?"
 
