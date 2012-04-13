@@ -16,30 +16,45 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ####################################################################################################
 ## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
-## Copyright 2011 Anthony Nordquist under the GPL V2 License
+## Copyright 2011,2012 Anthony Nordquist
 
+Icon="--window-icon=image-x-generic"
 
-Selection=$(zenity --list --column="Select One" --title="Scale Image(s)" --text="Select the size to scale image to." custom 220x176 240x340 320x200 320x240 320x480 352x288 480x320 480x800 480x854 640x350 640x480 640x960 720x400 800x600 1024x768 1152x864 1280x800 1280x1024 1366x768 1400x1050 1440x900 1600x900 1600x1050 1600x1200 1680x1050 1920x1080 1920x1200)
+Selection=$(yad $Icon --list --height=350 --no-headers --column="Select One" --title="Scale Image(s)" --text="Select the size to scale image(s) to." custom 220x176 240x340 320x200 320x240 320x480 352x288 480x320 480x800 480x854 640x350 640x480 640x960 720x400 800x600 1024x768 1152x864 1280x800 1280x1024 1366x768 1400x1050 1440x900 1600x900 1600x1050 1600x1200 1680x1050 1920x1080 1920x1200)
 
-if [ "$?" = "1" ]; then
+ret="$?"
+
+Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "1" ]; then
  exit
+elif [ "$ret" = "252"]; then
+ exit
+elif [ "$Selection" = "" ]; then
+ yad $Icon --title=ERROR --text="          No resolution selected.          \n" --button=$"gtk-quit:1"
+ exit 0
 fi
 
 progressbar () {
-tail -f /usr/bin/scale-image-ca |  zenity --progress --pulsate --auto-close --title="Scale Image(s)" --text="$@"
+tail -f /usr/bin/scale-image-ca |  yad $Icon --no-buttons --progress --pulsate --auto-close --title="Scale Image(s)" --text="$@"
 }
 
 if [ "$Selection" = "custom" ]; then
- ScaleTo="$(zenity --entry --title="Scale Image(s)" --text="Please enter the desired resolution to scale to.")"
-if [ "$?" = "1" ]; then
- exit
-fi
+ ScaleTo="$(yad $Icon --entry --title="Scale Image(s)" --text="Please enter the desired resolution to scale to.")"
+ if [ "$?" = "1" ]; then
+  exit
+ elif [ "$?" = "252" ]; then
+  exit
+ elif [ "$ScaleTo" = "" ];then
+  yad --title=ERROR --text="No resolution specified" --button=$"gtk-quit"
+  exit
+ fi
 else
  ScaleTo=$Selection
 fi
 
 
-progressbar "Scaling image(s) to $ScaleTo now, please wait..." &
+progressbar "      Scaling image(s) to $ScaleTo now      \n" &
 
 for i in "$@"; do
  Extension="$(echo "$i" | awk -F "." '{print $NF}')"
@@ -51,6 +66,6 @@ sleep 5
 
 killall -KILL tail
 
-zenity --info --title="Scale Image(s)" --text="Scaling operation completed."
+yad $Icon --title="Scale Image(s)" --text="          Scaling operation completed.          \n" --button=$"gtk-ok:1"
 
 exit

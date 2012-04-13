@@ -16,19 +16,30 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ####################################################################################################
 ## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
-## Copyright 2011 Anthony Nordquist under the GPL V2 License
+## Copyright 2011,2012 Anthony Nordquist 
 
-ResizeTo=$(zenity --list --column="Select One" --title="Image(s) Resize" --text="Select the percentage to resize to." 10% 15% 20% 25% 30% 35% 40% 45% 50% 55% 60% 65% 70% 75% 80% 85% 90% 95% 100% 105% 110% 115% 120% 125% 130% 135% 140% 145% 150% 155% 160% 165% 170% 175% 180% 185% 190% 195% 200%)
+Icon="--window-icon=image-x-generic"
 
-if [ "$?" = "1" ]; then
+ResizeTo=$(yad $Icon --list --height=300 --column="Select One" --no-headers --title="Image(s) Resize" --text="Select the percentage to resize to." 10% 15% 20% 25% 30% 35% 40% 45% 50% 55% 60% 65% 70% 75% 80% 85% 90% 95% 100% 105% 110% 115% 120% 125% 130% 135% 140% 145% 150% 155% 160% 165% 170% 175% 180% 185% 190% 195% 200%)
+
+ret="$?"
+
+ResizeTo=$(echo "$ResizeTo" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "1" ]; then
  exit
+elif [ "$ret" = "252" ]; then
+ exit
+elif [ "$ResizeTo" = "" ]; then
+ yad $Icon --title=ERROR --text="           No percentage selected           \n" --button=$"gtk-quit:1"
+ exit 0
 fi
 
 progressbar () {
-tail -f /usr/bin/resize-image-ca |  zenity --progress --pulsate --auto-close --title="Image(s) Resize" --text="$@"
+tail -f /usr/bin/resize-image-ca |  yad $Icon --progress --pulsate --auto-close --title="Image(s) Resize" --text="$@"
 }
 
-progressbar "Resizing image(s) to $ResizeTo now, please wait..." &
+progressbar "       Resizing image(s) to $ResizeTo now       \n" &
 
 for i in "$@"; do
  Extension="$(echo "$i" | awk -F "." '{print $NF}')"
@@ -40,6 +51,6 @@ sleep 5
 
 killall -KILL tail
 
-zenity --info --title="Resize Image(s)" --text="Resize operation completed."
+yad $Icon --title="Resize Image(s)" --text="          Resize operation completed.          \n" --button=$"gtk-ok:1"
 
 exit

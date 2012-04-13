@@ -16,19 +16,30 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ####################################################################################################
 ## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
-## Copyright 2011 Anthony Nordquist under the GPL V2 License
+## Copyright 2011,2012 Anthony Nordquist 
 
-Rotation=$(zenity --list --column="Select One" --title="Rotate Image(s)" --text="Select the desired number\n of degrees to rotate." 90 180 270)
+Icon="--window-icon=image-x-generic"
 
-if [ "$?" = "1" ]; then
- exit
+Rotation=$(yad $Icon --height=150 --list --no-headers --column="Select One" --title="Rotate Image(s)" --text="Select the desired number of degrees\nto rotate." 90 180 270)
+
+ret="$?"
+
+Rotation=$(echo "$Rotation" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "1" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$Rotation" = "" ]; then
+ yad $Icon --title=ERROR --text="          No rotation amount selected          \n" --button=$"gtk-quit:1"
+ exit 0
 fi
 
 progressbar () {
-tail -f /usr/bin/rotate-image-ca |  zenity --progress --pulsate --auto-close --title="Rotate Image(s)" --text="$@"
+tail -f /usr/bin/rotate-image-ca |  yad $Icon --no-buttons --progress --pulsate --auto-close --title="Rotate Image(s)" --text="$@"
 }
 
-progressbar "Rotating image(s) $Rotation degrees now, please wait..." &
+progressbar "     Rotating image(s) $Rotation degrees now     \n" &
 
 for i in "$@"; do
  convert "$i" -rotate $Rotation "$i"
@@ -38,6 +49,6 @@ sleep 5
 
 killall -KILL tail
 
-zenity --info --title="Rotate Image(s)" --text="Rotation completed."
+yad $Icon --info --title="Rotate Image(s)" --text="          Rotation completed.          \n" --button=$"gtk-ok:1"
 
 exit

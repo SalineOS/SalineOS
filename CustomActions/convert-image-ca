@@ -16,20 +16,32 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ####################################################################################################
 ## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
-## Copyright 2011 Anthony Nordquist under the GPL V2 License
+## Copyright 2011,2012 Anthony Nordquist 
 
-ImageList="$@"
-ConvertTo=$(zenity --list --column="Select One" --title="Image(s) Conversion" --text="Select the format to convert to" jpg gif jpeg png tiff dpx xhtml bmp pdf)
+Icon="--window-icon=image-x-generic"
 
-if [ "$?" = "1" ]; then
+ConvertArray=("jpg" "gif" "jpeg" "png" "tiff" "dpx" "xhtml" "bmp" "pdf")
+
+ConvertTo=$(yad $Icon --height=285 --width=300 --no-headers --list --column="Select One" --title="Image(s) Conversion" --text="Select the format to convert to" "${ConvertArray[@]}")
+
+ret="$?"
+
+ConvertTo=$(echo "$ConvertTo" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "1" ]; then
  exit
+elif [ "$ret" = "252" ]; then
+ exit
+elif [ "$ConvertTo" = "" ]; then
+ yad $Icon --title=ERROR --text="          No image format selected          \n" --button=$"gtk-quit:1"
+ exit 0
 fi
 
 progressbar () {
-tail -f /usr/bin/convert-image-ca |  zenity --progress --pulsate --auto-close --title="Image(s) Conversion" --text="$@"
+tail -f /usr/bin/convert-image-ca |  yad $Icon --no-buttons --progress --pulsate --auto-close --title="Image(s) Conversion" --text="$@"
 }
 
-progressbar "Converting image(s) to $ConvertTo now, please wait..." &
+progressbar "     Converting image(s) to $ConvertTo now     \n" &
 
 for i in "$@"; do
  Extension="$(echo "$i" | awk -F "." '{print $NF}')"
@@ -41,6 +53,6 @@ sleep 5
 
 killall -KILL tail
 
-zenity --info --title="Image(s) Conversion" --text="Conversion Complete"
+yad $Icon --title="Image(s) Conversion" --text="            Conversion Complete            \n" --button=$"gtk-ok:1"
 
 exit
