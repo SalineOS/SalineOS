@@ -11,18 +11,20 @@ cp -f ./mount-iso-ca /usr/bin
 cp -f ./convert-img-iso-ca /usr/bin 
 cp -f ./convert-nrg-iso-ca /usr/bin
 cp -f ./mount-backup-ca /usr/bin
+cp -f ./sync-folder-ca /usr/bin
 
 chmod +x /usr/bin/convert-image-ca
 chmod +x /usr/bin/resize-image-ca
 chmod +x /usr/bin/rotate-image-ca
 chmod +x /usr/bin/scale-image-ca
 chmod +x /usr/bin/image-to-usb
-chmod +x ./procurator /usr/bin
-chmod +x ./notes-ca /usr/bin
-chmod +x ./mount-iso-ca /usr/bin
-chmod +x ./convert-img-iso-ca /usr/bin 
-chmod +x ./convert-nrg-iso-ca /usr/bin
-chmod +x ./mount-backup-ca /usr/bin
+chmod +x /usr/bin/procurator 
+chmod +x /usr/bin/notes-ca
+chmod +x /usr/bin/mount-iso-ca
+chmod +x /usr/bin/convert-img-iso-ca 
+chmod +x /usr/bin/convert-nrg-iso-ca
+chmod +x /usr/bin/mount-backup-ca
+chmod +x /usr/bin/sync-folder-ca
 
 for i in $(ls /home); do
  cp -f ./uca.xml /home/$i/.config/Thunar
