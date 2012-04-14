@@ -18,40 +18,20 @@
 ## Authored and maintained by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
 ## Copyright Anthony Nordquist 2012
 
-Icon="--window-icon=text-editor"
+FullPath="$1"
+JustName="$2"
 
-mkdir -p $HOME/.notes-ca
+## Make Directory
 
-Input="$@"
+mkdir -p "/mnt/$JustName" 
 
+## Mount the image
 
-if [ -f "$HOME/.notes-ca/$Input" ]; then
- Text="$(cat "$HOME/.notes-ca/$Input")"
-fi
+mount -o loop -t iso9660 "$FullPath" "/mnt/$JustName"
 
-if [ "$Text" != "" ]; then
-Note="$(echo -n "$Text" | yad $Icon --text-info --editable --title="$Input Notes" --height=550 --width=450 --button=$"gtk-quit:3" --button=$"gtk-save:2" )"
-else
-Note="$(yad $Icon --text-info --editable --title="$Input Notes" --height=550 --width=450 --button=$"gtk-quit:3" --button=$"gtk-save:2" )"
-fi
+## Open thunar for the user
+thunar "/mnt/$JustName"
 
-
-ret="$?"
-
-if [ "$ret" = "3" ]; then
- exit 0
-elif [ "$ret" = "252" ]; then
- exit 0
-fi
-
-echo "$Note"
-
-rm "$HOME/.notes-ca/$Input"
-
-if [ ! -f "$HOME/.notes-ca/$Input" ]; then
- touch "$HOME/.notes-ca/$Input"
-fi
-
-echo -n "$Note">>"$HOME/.notes-ca/$Input"
+## Exit
 
 exit

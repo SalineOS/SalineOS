@@ -16,7 +16,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 ####################################################################################################
 ## Authored and maintained by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
-## Copyright Anthony Nordquist 2011 2012 Licensed under the GPL v2
+## Copyright Anthony Nordquist 2012
 
 Icon="--window-icon=drive-removable-media-usb"
 DisplayName=$(echo "$1" | awk -F '/' '{print $NF}')

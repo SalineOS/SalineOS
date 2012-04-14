@@ -1,0 +1,45 @@
+#!/bin/bash
+
+cp -f ./convert-image-ca /usr/bin
+cp -f ./resize-image-ca /usr/bin
+cp -f ./rotate-image-ca /usr/bin
+cp -f ./scale-image-ca /usr/bin
+cp -f ./image-to-usb /usr/bin
+cp -f ./procurator /usr/bin
+cp -f ./notes-ca /usr/bin
+cp -f ./mount-iso-ca /usr/bin
+cp -f ./convert-img-iso-ca /usr/bin 
+cp -f ./convert-nrg-iso-ca /usr/bin
+cp -f ./mount-backup-ca /usr/bin
+
+chmod +x /usr/bin/convert-image-ca
+chmod +x /usr/bin/resize-image-ca
+chmod +x /usr/bin/rotate-image-ca
+chmod +x /usr/bin/scale-image-ca
+chmod +x /usr/bin/image-to-usb
+chmod +x ./procurator /usr/bin
+chmod +x ./notes-ca /usr/bin
+chmod +x ./mount-iso-ca /usr/bin
+chmod +x ./convert-img-iso-ca /usr/bin 
+chmod +x ./convert-nrg-iso-ca /usr/bin
+chmod +x ./mount-backup-ca /usr/bin
+
+for i in $(ls /home); do
+ cp -f ./uca.xml /home/$i/.config/Thunar
+ chmod 0777 /home/$i/.config/Thunar/uca.xml
+done
+
+cp -f ./uca.xml /root/.config/Thunar
+
+sleep 2
+
+aptitude update
+aptitude install -y imagemagick nrg2iso dmg2img ccd2iso mdf2iso unoconv kvm gtkhash
+
+
+sleep 2
+
+zenity --info --title="Install" --text="Installation complete, please reboot your machine"
+
+
+exit

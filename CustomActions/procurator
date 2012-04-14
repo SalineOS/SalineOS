@@ -67,6 +67,10 @@ fi
 
 NewDiskNotes=$(yad --entry --width=250 --wrap --title="Procurator" --text="If desired, enter some notes to be associated with this disk." --button=$"gtk-ok:2")
 
+if [ -f "$HOME/.procurator/notes/$NewDiskName" ]; then
+ rm -rf "$HOME/.procurator/notes/$NewDiskName"
+fi
+
 if [ "$NewDiskNotes" != "" ]; then
  echo "$NewDiskNotes">>"$HOME/.procurator/notes/$NewDiskName"
 fi

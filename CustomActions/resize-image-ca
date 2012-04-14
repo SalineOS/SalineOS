@@ -36,7 +36,7 @@ elif [ "$ResizeTo" = "" ]; then
 fi
 
 progressbar () {
-tail -f /usr/bin/resize-image-ca |  yad $Icon --progress --pulsate --auto-close --title="Image(s) Resize" --text="$@"
+tail -f /usr/bin/resize-image-ca |  yad $Icon --progress --no-buttons --pulsate --auto-close --title="Image(s) Resize" --text="$@"
 }
 
 progressbar "       Resizing image(s) to $ResizeTo now       \n" &
