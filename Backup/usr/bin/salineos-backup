@@ -137,7 +137,7 @@ ret="$?"
 
 if [ "$ret" = "252" ]; then
  exit 0
-elif [ "$ret" ="3" ]; then
+elif [ "$ret" = "3" ]; then
  exit 0
 fi
 
@@ -264,7 +264,7 @@ sleep 1
 (while [ "$(pidof mksquashfs)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
 echo "$CurrentOutput" | awk -F ' ' '{print $NF}' | awk -F '%' '{print $1}' 
-done)| $Progress --text="Creating backup image $ImageName.backup, Please wait..."
+done)| yad --center --progress --auto-close --title="SalineOS Backup" --no-buttons --window-icon="/usr/share/pixmaps/salineos-backup.png" --text="Creating backup image $ImageName.backup, Please wait..."
 
 
 ## Let all users move the file around
