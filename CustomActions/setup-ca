@@ -7,11 +7,11 @@ cp -f ./scale-image-ca /usr/bin
 cp -f ./image-to-usb /usr/bin
 cp -f ./procurator /usr/bin
 cp -f ./notes-ca /usr/bin
-cp -f ./mount-iso-ca /usr/bin
 cp -f ./convert-img-iso-ca /usr/bin 
 cp -f ./convert-nrg-iso-ca /usr/bin
 cp -f ./mount-backup-ca /usr/bin
 cp -f ./sync-folder-ca /usr/bin
+cp -f ./create-playlist-ca /usr/bin
 
 chmod +x /usr/bin/convert-image-ca
 chmod +x /usr/bin/resize-image-ca
@@ -20,11 +20,11 @@ chmod +x /usr/bin/scale-image-ca
 chmod +x /usr/bin/image-to-usb
 chmod +x /usr/bin/procurator 
 chmod +x /usr/bin/notes-ca
-chmod +x /usr/bin/mount-iso-ca
 chmod +x /usr/bin/convert-img-iso-ca 
 chmod +x /usr/bin/convert-nrg-iso-ca
 chmod +x /usr/bin/mount-backup-ca
 chmod +x /usr/bin/sync-folder-ca
+chmod +x /usr/bin/create-playlist-ca
 
 for i in $(ls /home); do
  cp -f ./uca.xml /home/$i/.config/Thunar
@@ -36,7 +36,7 @@ cp -f ./uca.xml /root/.config/Thunar
 sleep 2
 
 aptitude update
-aptitude install -y imagemagick nrg2iso dmg2img ccd2iso mdf2iso unoconv kvm gtkhash
+aptitude install -y imagemagick nrg2iso dmg2img ccd2iso mdf2iso unoconv kvm gtkhash fuseiso
 
 
 sleep 2
