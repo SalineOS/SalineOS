@@ -8,11 +8,12 @@
     <DefaultDirectoryDirs/>
     <DefaultMergeDirs/>
    
- <Include>
+    <Include>
         <Category>X-Xfce-Toplevel</Category>
     </Include>
 
     <Layout>
+        <Filename>xfrun4.desktop</Filename>
         <Menuname>Settings</Menuname>
         <Separator/>
         <Merge type="all"/>
@@ -129,11 +130,22 @@
     </Menu>
 
     <Menu>
+        <Name>Midori WebApps</Name>
+        <Directory>midori-webapps.directory</Directory>
         <Include>
-            <Or>
-                <Category>WebApps</Category>
-            </Or>
+             <Filename>duck-duck-go-search.desktop</Filename>
+             <Filename>add-or-remove-web-apps.desktop</Filename>
         </Include>
+        <Include>
+            <Category>WebApps</Category>
+        </Include>
+    <Layout>
+        <Filename>duck-duck-go-search.desktop</Filename>
+        <Filename>add-or-remove-web-apps.desktop</Filename>
+        <Separator/>
+        <Category>WebApps</Category>
+        <Merge type="all"/>
+    </Layout>
     </Menu>
 
     <Menu>
