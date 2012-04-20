@@ -7,7 +7,10 @@
     <DefaultAppDirs/>
     <DefaultDirectoryDirs/>
     <DefaultMergeDirs/>
-
+   
+ <Include>
+        <Category>X-Xfce-Toplevel</Category>
+    </Include>
 
     <Layout>
         <Menuname>Settings</Menuname>
@@ -121,6 +124,14 @@
             <Or>
                 <Category>Emulator</Category>
                 <Category>System</Category>
+            </Or>
+        </Include>
+    </Menu>
+
+    <Menu>
+        <Include>
+            <Or>
+                <Category>WebApps</Category>
             </Or>
         </Include>
     </Menu>
