@@ -19,11 +19,11 @@
 
 ## Set a variable of the input :)
 ## Not needed but I like it this way.
+Input="$@"
 
 ## Set a variable of YAD options for questions, just cleaner this way.
 Question='yad --on-top --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=PackageKit-URL'
 
-Input="$@"
 
 ## Got root?
 testroot="$(whoami)"
@@ -84,13 +84,13 @@ $Question --text="This will install $Package.\n\nContinue with installation?"
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="Installing $Package"
+done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         Installing $Package                         \n"
    if [ "$(grep -B 0  "Installed" /tmp/packagekit-url-tmp)" = "" ]; then
     Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage" | grep -v "Package:" | grep -v "Downloaded")"
    else
     Result="$(grep "Installed" /tmp/packagekit-url-tmp)"
    fi
-   yad --title="Package Kit URL" --text="$Result" --button=$"gtk-ok:1"
+   yad --title="Package Kit URL" --width=275 --text="$Result" --button=$"gtk-ok:1"
    rm -rf /tmp/packagekit-url-lock-file
    rm -rf /tmp/packagekit-url-tmp
    exit
@@ -106,13 +106,13 @@ $Question --text="This will install $Package.\n\nContinue with installation?"
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="Installing $Package"
+done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         Installing $Package                         \n"
    if [ "$(grep -B 0  "Installed" /tmp/packagekit-url-tmp)" = "" ]; then
     Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage" | grep -v "Package:" | grep -v "Downloaded")"
    else
     Result="$(grep "Installed" /tmp/packagekit-url-tmp)"
    fi
-   yad --title="Package Kit URL" --text="$Result" --button=$"gtk-ok:1"
+   yad --title="Package Kit URL" --width=275 --text="$Result" --button=$"gtk-ok:1"
    rm -rf /tmp/packagekit-url-lock-file
    rm -rf /tmp/packagekit-url-tmp
    exit
@@ -128,9 +128,9 @@ pkcon -p -y remove $Package>>/tmp/packagekit-url-tmp &
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="Removing $Package"
+done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         Removing $Package                         \n"
    Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage")"
-   yad --title="Package Kit URL" --text="$Result" --button=$"gtk-ok:1"
+   yad --title="Package Kit URL" --width=275 --text="$Result" --button=$"gtk-ok:1"
    rm -rf /tmp/packagekit-url-lock-file
    rm -rf /tmp/packagekit-url-tmp
    exit
