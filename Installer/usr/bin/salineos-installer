@@ -575,7 +575,7 @@ for i in $(cat /tmp/SalineOS-TimeZones); do
 done
 rm /tmp/SalineOS-TimeZones
 
-TimeZone=$(yad --on-top --width=300 --height=450 --center --list --column="Select your time zone:" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --button=$"gtk-ok:2" $TimeZones)
+TimeZone=$(yad --on-top --width=300 --height=450 --center --list --column="Select your time zone:" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --button=$"gtk-ok:2" $TimeZones)
 
 ret="$?"
 
@@ -662,7 +662,7 @@ TargetUser=""
 TargetUserPassword1=""
 TargetUserPassword2=""
 RequirePassword=""
-UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require the user's password to logon?:CHK" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require the user's password to logon?:CHK" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 ret=$?
 
@@ -1147,7 +1147,7 @@ RestrictedMultimedia () {
 
 InstallCodec=""
 
-yad --wrap --height=300 --width=500 --center --image=gtk-dialog-question --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights. In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
+yad --wrap --height=300 --width=500 --center --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright). In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
 
 ret="$?"
 
@@ -1166,7 +1166,7 @@ elif [ "$ret" = "5" ]; then
   exit 0
  fi
 elif [ "$ret" = "3" ]; then
- yad --list --column='   ' --on-top --title="Adobe EULA" --window-icon=/usr/share/icons/SalineTango/salineos-installer.png --height="550" --width=700 --wrap --button=$"gtk-ok:5" "$(cat /etc/salineos-installer/adobeEULA)"
+ yad --list --column='   ' --on-top --title="Adobe EULA" --window-icon=/usr/share/pixmaps/salineos-installer.png --height="550" --width=700 --wrap --button=$"gtk-ok:5" "$(cat /etc/salineos-installer/adobeEULA)"
  RestrictedMultimedia
  exit 0
 elif [ "$ret" = "7" ]; then
