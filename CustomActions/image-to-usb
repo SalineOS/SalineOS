@@ -35,12 +35,13 @@ USBDrives=""
 if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
 USBDrives=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
 else
-yad $Icon --title="Image to USB" --text="          No USB drives found.\n" --width=250 --button=$"gtk-quit:1"
+yad $Icon --title="Image to USB" --text="             No USB drives found.             \n" --width=250 --button=$"gtk-quit:1"
 exit 0
 fi
 
 GetDrive () {
 
+USBDriveMenu=("")
 
 for i in $USBDrives; do
 ## Get the label of the disk if available
@@ -96,7 +97,7 @@ Continue
 
 Continue () {
 
-yad --width=300 --wrap --title="Image to USB" $Icon --text="This will completely erase the contents of $UseDrive and replace them with the contents of $DisplayName. Are you sure you want to continue?" --button=$"gtk-no:1" --button=$"gtk-yes:0"
+yad --width=300 --wrap --image=gtk-dialog-warning --title="Image to USB" $Icon --text="This will completely erase the contents of $UseDrive and replace them with the contents of $DisplayName. Are you sure you want to continue?" --button=$"gtk-no:1" --button=$"gtk-yes:0"
 
 if [ $? != 0 ]; then
  exit

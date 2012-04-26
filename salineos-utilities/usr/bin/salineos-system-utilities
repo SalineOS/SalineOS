@@ -50,7 +50,7 @@ if [ "$Test" = "" ]; then
  echo "deb http://www.debian-multimedia.org wheezy main non-free" >> /etc/apt/sources.list
 fi
 
-tail /usr/bin/salineos-system-utilities | yad --progress --pulsate --title='  ' --no-buttons --text="     Updating package cache, please wait.     \n" 
+tail -f /usr/bin/salineos-system-utilities | yad --progress --pulsate --title='  ' --no-buttons --text="     Updating package cache, please wait.     \n" 
 
 apt-get update
 
