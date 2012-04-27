@@ -1,0 +1,23 @@
+#!/bin/bash
+
+echo GPG keys are being fetched...
+echo Importing keys: $*
+
+#Choose a server wich is the fastest in your area
+#gpg --keyserver subkeys.pgp.net --recv-keys $* 
+#gpg --keyserver wwwkeys.eu.pgp.net --recv-keys $*
+gpg --keyserver wwwkeys.pgp.net --recv-keys $*
+#gpg --keyserver wwwkeys.gpg.cz --recv-keys $* 
+#gpg --keyserver wwwkeys.cz.pgp.net --recv-keys $*
+#gpg --keyserver wwwkeys.ch.pgp.net --recv-keys $*
+#gpg --keyserver keyserver.kjsl.com --recv-keys $*
+#gpg --keyserver sks.keyserver.penguin.de --recv-keys $*
+#gpg --keyserver pgp.keyserver.ch --recv-keys $*
+#gpg --keyserver pks.ms.mff.cuni.cz --recv-keys $*
+#gpg --keyserver pks.gpg.cz --recv-keys $*
+#gpg --keyserver irdu.nus.edu.sg --recv-keys $*
+
+#Exorting fetched keys:
+gpg --armor --export $* | apt-key add -
+
+exit

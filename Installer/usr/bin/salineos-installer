@@ -903,12 +903,12 @@ SwapFile () {
 SwapFileSize=""
 
 if [ "$AutoPart" = "Auto" ]; then
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Continue:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Continue:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 else
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 fi
 
-ret=$?
+ret="$?"
 
 if [ "$ret" = "3" ]; then
  UseSwapFile="False"

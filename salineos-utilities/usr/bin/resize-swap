@@ -1,0 +1,62 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+# Copyright 2011,2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
+
+
+SwapFile () {
+
+SwapFileSize=""
+
+SwapFileSize=$(yad --list --window-icon="preferences-system" --print-column="1" --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ exit 0 
+elif [ "$SwapFileSize" = "" ]; then
+ SwapFile
+ exit 0
+else
+ ActualWork
+fi
+
+}
+
+ActualWork () {
+
+tail -f /usr/bin/resize-swap | yad --progress --pulsate --title="Resize Swap" --no-buttons --window-icon="preferences-system" --text="          Resizing SalineOS Swap Now.          \n"
+
+swapoff /swap/salineos-swap
+rm -rf /swap/salineos-swap
+fallocate --l "$SwapFileSize"m /swap/salineos-swap
+sleep 2
+mkswap /swap/salineos-swap
+swapon /swap/salineos-swap
+sleep 2
+
+killall -KILL tail
+yad --title="Resize Swap" --window-icon="preferences-system" --text="          Swap resized to $SwapFileSize megabytes.         \n" --button=$"gtk-ok:1"
+
+exit 0
+}
+
+SwapFile
+
+exit 0

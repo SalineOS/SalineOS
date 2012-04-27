@@ -30,7 +30,7 @@ for i in $(ls /home); do
  chmod +x "/home/$i/.winetricks/winetricks"
  chown "$i" "/home/$i/.winetricks/winetricks"
 
-cat > "/home/$i/.local/share/applications/winetricks.desktop" <<FOO
+cat > "/home/$i/.local/share/applications/winetricks" <<FOO
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -39,6 +39,9 @@ Exec=/home/$i/.winetricks/winetricks
 Categories=Other;
 
 FOO
+
+mv -f "/home/$i/.local/share/applications/winetricks" "/home/$i/.local/share/applications/winetricks.desktop"
+
 done
 
 sleep 1
