@@ -148,6 +148,10 @@ elif [ "$Operation" = "Local DNS" ]; then
  gksudo sed -i -e 's|#prepend domain-name-servers|prepend domain-name-servers|g' /etc/dhcp/dhclient.conf
  MainMenu
  exit 0
+elif [ "$Operation" = "Install Wine" ]; then
+ gksudo /usr/bin/salineos-system-utilities-INSTALLWINE
+ MainMenu
+ exit 0
 fi
 
 

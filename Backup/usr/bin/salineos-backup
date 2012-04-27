@@ -1186,6 +1186,8 @@ exit 0
 
 UpdateRestore () {
 
+tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="     Unmounting all partitions on $UseDrive     \n" --no-buttons &
+
 ## Unmount all partitions on the drive
 Unmount=$(mount | grep "$UseDrive" | awk '{print $1}')
 
@@ -1203,6 +1205,10 @@ if [ ! -f /etc/salineos-backup/mount-points/Target/use.backup ]; then
  MainMenu
  exit 0
 fi
+
+sleep 3
+
+killall -KILL tail
 
 BackupImage=$(yad --file-selection --window-icon=/usr/share/pixmaps/salineos-backup.png --file-filter "*.backup" --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to use:\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
@@ -1243,7 +1249,7 @@ elif [ "$ret" = "3" ]; then
  exit 0
 fi
 
-tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="       Coping $BackupImage to $UseDrive now.       \n" --no-buttons
+tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="       Coping $BackupImage to $UseDrive now.       \n" --no-buttons &
 
 cp -f "$BackupImage" /etc/salineos-backup/mount-points/Target/use.backup
 
@@ -1308,7 +1314,7 @@ elif [ "$ret" = "3" ]; then
  exit 0
 fi
 
-tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="     Creating USB recovery drive now, this may take awhile.     \n" --no-buttons
+tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="     Creating USB recovery drive now, this may take awhile.     \n" --no-buttons &
 
 ## Unmount all partitions on the drive
 Unmount=$(mount | grep "$UseDrive" | awk '{print $1}')
@@ -1400,6 +1406,8 @@ umount /etc/salineos-backup/mount-points/Target
 sleep 2
 umount /etc/salineos-backup/mount-points/Source
 
+killall -KILL tail
+
 yad --title="SalineOS Backup" --wrap --width=250 --window-icon=/usr/share/pixmaps/salineos-backup.png --text="Creation of USB recovery drive on $UseDrive complete." --button=$"gtk-ok:1"
 
 rm /tmp/salineos-backup-create
@@ -1417,10 +1425,11 @@ USBDriveMenu=("")
 ## Pay no mind to the man behind the curtain :)
 
 if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
-USBDrives=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
+ USBDrives=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
 else
-yad $Icon --title="Image to USB" --text="             No USB drives found.             \n" --width=250 --button=$"gtk-quit:1"
-exit 0
+ yad $Icon --title="Image to USB" --text="             No USB drives found.             \n" --width=250 --button=$"gtk-ok:1"
+ MainMenu
+ exit 0
 fi
 
 for i in $USBDrives; do
