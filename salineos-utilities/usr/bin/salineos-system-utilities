@@ -111,15 +111,15 @@ OperationArray=""
 
 if [ -f /swap/salineos-swap ]; then
 
-OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the systems time and date" "Resize Swap" "Resize the SalineOS swapfile")
+OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the system's time and date" "Resize Swap" "Resize the SalineOS swapfile")
 
 else
 
-OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the systems time and date")
+OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the system's time and date")
 
 fi
 
-Operation=$(yad --wrap --width="650" --height="350" --list --title="SalineOS System Utilities" --window-icon="preferences-system" --always-print-result --print-column="1" --column="Action" --column="Description" --text="Welcome to SalineOS system utilities. This program allows you to tweak and manage your system with a set of straight forward and simple utilities. To view more detailed information about each action simply highlight it and press Info." --button=$"gtk-quit:3" --button=$"gtk-info:5" --button=$"gtk-ok:7" "${OperationArray[@]}")
+Operation=$(yad --wrap --width="675" --height="350" --list --title="SalineOS System Utilities" --window-icon="preferences-system" --always-print-result --print-column="1" --column="Action" --column="Description" --text="Welcome to SalineOS system utilities. This program allows you to tweak and manage your system with a set of straight forward and simple utilities. To view more detailed information about each action simply highlight it and press Info." --button=$"gtk-quit:3" --button=$"gtk-info:5" --button=$"gtk-ok:7" "${OperationArray[@]}")
 
 ret="$?"
 
@@ -185,7 +185,7 @@ elif [ "$Operation" = "Resize Swap" ]; then
  MainMenu
  exit 0
 elif [ "$Operation" = "Set Clock" ]; then
-CurrentDate=$(yad --window-icon="clock" --calendar --title="Set Clock" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" | awk -F '/' '{print $3$1$2}')
+CurrentDate=$(yad --window-icon="clock" --calendar --title="Set Clock" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
  
 ret="$?"
 
@@ -196,6 +196,8 @@ ret="$?"
   MainMenu
   exit 0
  fi
+
+CurrentDate=$(echo "$CurrentDate" | awk -F '/' '{print $3$1$2}')
 
 HourArray=( "12 AM (Midnight)" "00" "1 AM" "01" "2 AM" "02" "3 AM" "03" "4 AM" "04" "5 AM" "05" "6 AM" "06" "7 AM" "07" "8 AM" "08" "9 AM" "09" "10 AM" "10" "11 AM" "11" "12 PM" "12" "1 PM" "13" "2 PM" "14" "3 PM" "15" "4 PM" "16" "5 PM" "17" "6 PM" "18" "7 PM" "19" "8 PM" "20" "9 PM" "21" "10 PM" "22" "11 PM" "23" )
 
