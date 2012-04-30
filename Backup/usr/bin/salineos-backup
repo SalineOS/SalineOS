@@ -42,18 +42,20 @@ NewExclude=""
 CurrentExcludes=""
 
 mkdir -p /etc/salineos-backup
+
 if [ -f /etc/salineos-backup/excludes ]; then
  Excludes=$(cat /etc/salineos-backup/excludes)
 fi
 
-CurrentExcludes=$(echo -n "$Excludes" | yad --always-print-result --text-info --height=350 --editable --title="SalineOS-Backup" --wrap --width=400 --text="If desired you can exclude select files or folders from being included in the generated .backup file. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog." --button=$"gtk-quit:3" --button=$"Add New:5" --button=$"gtk-ok:2")
+CurrentExcludes=$(echo -n "$Excludes" | yad --always-print-result --text-info --height=350 --editable --title="SalineOS-Backup" --wrap --width=400 --text="If desired you can exclude select files or folders from being included in the generated .backup file. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog." --button=$"gtk-cancel:3" --button=$"Add New:5" --button=$"gtk-ok:2")
 
 ret="$?"
 
 if [ "$ret" = "252" ]; then
- SetExcludes
+ MainMenu
  exit 0
 elif [ "$ret" = "3" ]; then
+ MainMenu
  exit 0
 elif [ "$ret" = "5" ]; then
  if [ -f /etc/salineos-backup/excludes ]; then
@@ -418,7 +420,7 @@ fi
 sleep 3
 
 ## Unmount backup image
-umount "/mnt/Super-Happy-Mount-Point"
+umount -l "/mnt/Super-Happy-Mount-Point"
 
 sleep 1
 
@@ -550,7 +552,7 @@ killall -KILL tail
 
 $Question --wrap --width=250 --text="Restoration is complete. If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?" 
 
-if [ $? = 0 ]; then
+if [ "$?" = "0" ]; then
  reboot
 else
  exit 0
@@ -625,7 +627,7 @@ elif [ "$ret" = "3" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
    fi
-   exit 1
+   exit 0
   else
    FinishedMenu
    exit 0
@@ -653,7 +655,7 @@ elif [ "$Change" = "Use-Disk" ]; then
  ChooseDrive
  exit 0
 elif [ "$Change" = "" ]; then
- $Info --text="No change selected" --button=$"gtk-ok:1"
+ $Info --text="          No change selected          \n" --button=$"gtk-ok:1"
  FinishedMenu
  exit 0
 fi
@@ -685,7 +687,7 @@ elif [ "$ret" = "3" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
    fi
-   exit 1
+   exit 0
   else
    GrubSelect
    exit 0
@@ -888,9 +890,9 @@ SwapFile () {
 SwapFileSize=""
 
 if [ "$AutoPart" = "Auto" ]; then
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Continue:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Continue:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 else
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 fi
 
 ret=$?
@@ -1155,8 +1157,6 @@ BackupImage=$(yad --file-selection --file-filter "*.backup" --title="SalineOS-Ba
 
 ret="$?"
 
-BackupImage=$(echo $BackupImage | awk -F '|' '{print $1}')
-
 
 if [ "$ret" = "252" ]; then
  SelectBackupImage
@@ -1201,7 +1201,7 @@ mount "/dev/$UseDrive"1 /etc/salineos-backup/mount-points/Target -o rw
 
 ## Check to make sure this is a recovery drive
 if [ ! -f /etc/salineos-backup/mount-points/Target/use.backup ]; then
- yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup --text="     $UseDrive is not a valid recovery drive.     \n" --button=$"gtk-ok:1"
+ yad --wrap --width=250 --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup --text="$UseDrive is not a valid recovery drive.\n" --button=$"gtk-ok:1"
  MainMenu
  exit 0
 fi
@@ -1213,8 +1213,6 @@ killall -KILL tail
 BackupImage=$(yad --file-selection --window-icon=/usr/share/pixmaps/salineos-backup.png --file-filter "*.backup" --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to use:\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 ret="$?"
-
-BackupImage=$(echo $BackupImage | awk -F '|' '{print $1}')
 
 
 if [ "$ret" = "252" ]; then
@@ -1235,7 +1233,11 @@ elif [ "$(echo "$BackupImage" | grep ".backup")"  = "" ]; then
  exit 0
 fi
 
-yad --wrap --window-icon=/usr/share/pixmaps/salineos-backup.png --width=275 --title="SalineOS Backup" --image=gtk-dialog-warning --text="This operation will replace the old .backup file on $UseDrive and replace it with $BackupImage.\n\nAre you sure you want to continue?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"  
+## Don't show path on dialog
+BackupImageDisplay=$(echo "$BackupImage" | awk -F '/' '{print $NF}')
+
+## Ask the user for confirmation before doing anything drastic
+yad --wrap --window-icon=/usr/share/pixmaps/salineos-backup.png --width=275 --title="SalineOS Backup" --image=gtk-dialog-warning --text="This operation will replace the old .backup file on $UseDrive and replace it with $BackupImageDisplay.\n\nAre you sure you want to continue?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"  
 
 ret="$?"
 
@@ -1249,7 +1251,7 @@ elif [ "$ret" = "3" ]; then
  exit 0
 fi
 
-tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="       Coping $BackupImage to $UseDrive now.       \n" --no-buttons &
+tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="       Copying $BackupImageDisplay to $UseDrive now.       \n" --no-buttons &
 
 cp -f "$BackupImage" /etc/salineos-backup/mount-points/Target/use.backup
 
@@ -1261,7 +1263,9 @@ sleep 1
 
 killall -KILL tail
 
+## Tell the user we are done and return to main menu
 yad --title="SalineOS Backup" --text="          $UseDrive has been updated.          \n"
+
 MainMenu
 exit 0
 
@@ -1272,8 +1276,6 @@ CreateRestore () {
 BackupImage=$(yad --file-selection --window-icon=/usr/share/pixmaps/salineos-backup.png --file-filter "*.backup" --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to use:\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 ret="$?"
-
-BackupImage=$(echo $BackupImage | awk -F '|' '{print $1}')
 
 
 if [ "$ret" = "252" ]; then
@@ -1314,7 +1316,7 @@ elif [ "$ret" = "3" ]; then
  exit 0
 fi
 
-tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="     Creating USB recovery drive now, this may take awhile.     \n" --no-buttons &
+tail -f /usr/bin/salineos-backup | yad --progress --window-icon=/usr/share/pixmaps/salineos-backup.png --pulsate --title="SalineOS Backup" --text="Creating USB recovery drive now, this may take awhile.\n" --no-buttons &
 
 ## Unmount all partitions on the drive
 Unmount=$(mount | grep "$UseDrive" | awk '{print $1}')
@@ -1392,7 +1394,7 @@ chroot /etc/salineos-backup/mount-points/Target update-grub
 sleep 2
 
 ## Copy the backup image to the USB drive
-cp -f $BackupImage /etc/salineos-backup/mount-points/Target/use.backup
+cp -f "$BackupImage" /etc/salineos-backup/mount-points/Target/use.backup
  
 ## Unmount the target partition  
 sleep 2
@@ -1427,7 +1429,7 @@ USBDriveMenu=("")
 if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
  USBDrives=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
 else
- yad $Icon --title="Image to USB" --text="             No USB drives found.             \n" --width=250 --button=$"gtk-ok:1"
+ yad --window-icon=/usr/share/pixmaps/salineos-backup.png --title="Image to USB" --text="             No USB drives found.             \n" --width=250 --button=$"gtk-ok:1"
  MainMenu
  exit 0
 fi
@@ -1479,7 +1481,7 @@ elif [ "$ret" = "252" ]; then
  fi
  exit 0 
 elif [ "$UseDrive" = "" ]; then
- yad $Icon --title="SalineOS Backup" --text="No USB drive selected, please retry." --button=$"gtk-ok:1"
+ yad --window-icon=/usr/share/pixmaps/salineos-backup.png --title="SalineOS Backup" --text="No USB drive selected, please retry." --button=$"gtk-ok:1"
  GetDrive
  exit 0
 fi
@@ -1503,13 +1505,357 @@ GetDrive
 
 }
 
+CreateRestorePart () {
+
+TargetPart=""
+PartDriveMenu=("")
+
+## Don't display the current root partition as an option
+CurrentRootDir=$(mount | grep -B 0 ' / ' | awk '{print $1}')
+
+Partitions=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{print $4}' | grep -v 'p1' | grep -v "$CurrentRootDir")
+
+for i in $Partitions; do
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+fi
+if [ "$(echo "$i" | grep [0-9])" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  if [ "$PartDriveMenu" = "" ]; then
+   PartDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   PartDriveMenu=("${PartDriveMenu[@]}" "$i" "$Label" "$SizeInGB" "$SizeInMB")
+   fi
+ fi
+fi
+
+done
+
+
+TargetPart=$($Menu --height=300 --width=575 --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" --text="                        Please select a partition to format and use.\n" "${PartDriveMenu[@]}" )
+
+ret=$?
+
+
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$TargetPart" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="     You must select a partition before continuing.     \n"
+ CreateRestorePart
+ exit 0
+fi
+
+TargetPart=$(echo "$TargetPart" | awk -F '|' '{print $1}')
+
+CreateRestorePartSelectImage
+exit 0
+
+}
+
+CreateRestorePartSelectImage () {
+
+
+BackupImage=""
+
+BackupImage=$(yad --file-selection --file-filter "*.backup" --title="SalineOS Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to use.\n" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$BackupImage" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="        No backup file selected.        \n"
+ CreateRestorePartSelectImage
+ exit 0
+elif [ "$(echo "$BackupImage" | grep ".backup")"  = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="$BackupImage is not a valid backup image.\n"
+ CreateRestorePartSelectImage
+ exit 0
+fi
+
+CreateRestorePartRun
+exit 0
+
+}
+
+CreateRestorePartRun () {
+
+BackupImageDisplay=$(echo "$BackupImage" | awk -F '/' '{print $NF}')
+
+yad --wrap --window-icon=/usr/share/pixmaps/salineos-backup.png --width=275 --title="SalineOS Backup" --image=gtk-dialog-warning --text="This operation will erase all information on $TargetPart and create a restore and recovery partition that can be used to restore $BackupImageDisplay.\n\nAre you sure you want to continue?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"  
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup.png --text="               Operation Cancelled.               \n" --button=$"gtk-ok:1" 
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup.png --text="               Operation Cancelled.               \n" --button=$"gtk-ok:1" 
+ MainMenu
+ exit 0
+fi
+
+tail -f /usr/bin/salineos-backup | yad --progress --window-icon=/usr/share/pixmaps/salineos-backup.png --pulsate --title="SalineOS Backup" --text="Creating recovery partition now, this may take awhile.\n" --no-buttons &
+
+## Unmount the target partition
+umount -l /dev/$TargetPart
+
+sleep 2
+
+## Create a partition 
+mke2fs -t ext4 /dev/$TargetPart
+
+sleep 2
+
+tune2fs -L "SalineOS Restore" /dev/$TargetPart
+
+sleep 1
+
+## Mount needed filesystems
+mkdir -p /etc/salineos-backup/mount-points/Target
+mkdir -p /etc/salineos-backup/mount-points/Source
+mount /dev/$TargetPart /etc/salineos-backup/mount-points/Target -o rw
+mount -o loop -t squashfs "/etc/salineos-backup/recovery.backup" "/etc/salineos-backup/mount-points/Source"
+
+sleep 1
+
+## Copy the files using rsync
+rsync -a /etc/salineos-backup/mount-points/Source /etc/salineos-backup/mount-points/Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
+
+sleep 2
+
+## Unmount source since it is no longer needed
+umount -l /etc/salineos-backup/mount-points/Source
+
+## Remove old fstab file
+rm -rf /etc/salineos-backup/mount-points/Target/etc/fstab
+
+## Get UUID for fstab
+blkid
+TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+TargetCDRom="/dev/cdrom"
+
+## Create the new fstab file
+sleep 1
+cat > /etc/salineos-backup/mount-points/Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / ext4 relatime,errors=remount-ro 0 1
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+
+FOO
+
+## Update grub
+update-grub
+
+## Copy the backup image to the new recovery partition 
+cp -f "$BackupImage" /etc/salineos-backup/mount-points/Target/use.backup
+ 
+## Unmount the partitions
+sleep 2  
+umount /etc/salineos-backup/mount-points/Target
+sleep 2
+umount /etc/salineos-backup/mount-points/Source
+
+killall -KILL tail
+
+yad --title="SalineOS Backup" --wrap --width=250 --window-icon=/usr/share/pixmaps/salineos-backup.png --text="Creation of recovery partition on $TargetPart complete." --button=$"gtk-ok:1"
+
+MainMenu
+exit 0
+
+}
+
+
+UpdateRestorePart () { 
+
+TargetPart=""
+PartDriveMenu=("")
+
+## Don't display the current root partition as an option
+CurrentRootDir=$(mount | grep -B 0 ' / ' | awk '{print $1}')
+
+Partitions=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{print $4}' | grep -v 'p1' | grep -v "$CurrentRootDir")
+
+for i in $Partitions; do
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+fi
+if [ "$(echo "$i" | grep [0-9])" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  if [ "$PartDriveMenu" = "" ]; then
+   PartDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   PartDriveMenu=("${PartDriveMenu[@]}" "$i" "$Label" "$SizeInGB" "$SizeInMB")
+   fi
+ fi
+fi
+
+done
+
+
+TargetPart=$($Menu --height=300 --width=575 --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" --text="                             Please select a partition to update.\n" "${PartDriveMenu[@]}" )
+
+ret=$?
+
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$TargetPart" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="     You must select a partition before continuing.     \n"
+ UpdateRestorePart
+ exit 0
+fi
+
+TargetPart=$(echo "$TargetPart" | awk -F '|' '{print $1}')
+
+
+## Unmount the selected partition 
+umount -l "/dev/$TargetPart"
+
+## Mount the first partition on the drive
+mount "/dev/$TargetPart" /etc/salineos-backup/mount-points/Target -o rw
+
+## Check to make sure this is a recovery drive
+if [ ! -f /etc/salineos-backup/mount-points/Target/use.backup ]; then
+ yad --wrap --width=250 --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup --text="$TargetPart is not a valid recovery partition.\n" --button=$"gtk-ok:1"
+ MainMenu
+ exit 0
+fi
+
+sleep 3
+
+killall -KILL tail
+
+BackupImage=$(yad --file-selection --window-icon=/usr/share/pixmaps/salineos-backup.png --file-filter "*.backup" --title="SalineOS-Backup" --height=450 --width=600 --text="\n                     Select the backup image you wish to use:\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+
+if [ "$ret" = "252" ]; then
+ yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup.png --text="               Operation Cancelled.               \n" --button=$"gtk-ok:1" 
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup.png --text="               Operation Cancelled.               \n" --button=$"gtk-ok:1" 
+ MainMenu
+ exit 0
+elif [ "$BackupImage" = "" ]; then
+yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup.png --text="               Error, no backup image selected.               \n" --button=$"gtk-ok:1"
+ MainMenu 
+ exit 0
+elif [ "$(echo "$BackupImage" | grep ".backup")"  = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="          $BackupImage is not a valid backup image.          \n"
+ MainMenu 
+ exit 0
+fi
+
+## Don't show path on dialog
+BackupImageDisplay=$(echo "$BackupImage" | awk -F '/' '{print $NF}')
+
+## Get confirmation from the user before continuing
+
+yad --wrap --window-icon=/usr/share/pixmaps/salineos-backup.png --width=275 --title="SalineOS Backup" --image=gtk-dialog-warning --text="This operation will replace the old .backup file on $TargetPart and replace it with $BackupImageDisplay.\n\nAre you sure you want to continue?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"  
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup.png --text="               Operation Cancelled.               \n" --button=$"gtk-ok:1" 
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ yad --title="SalineOS Backup" --window-icon=/usr/share/pixmaps/salineos-backup.png --text="               Operation Cancelled.               \n" --button=$"gtk-ok:1" 
+ MainMenu
+ exit 0
+fi
+
+tail -f /usr/bin/salineos-backup | yad --progress --pulsate --title="SalineOS Backup" --text="       Copying $BackupImageDisplay to $TargetPart now.       \n" --no-buttons &
+
+cp -f "$BackupImage" /etc/salineos-backup/mount-points/Target/use.backup
+
+sleep 2
+
+umount -l /etc/salineos-backup/mount-points/Target
+
+sleep 1
+
+killall -KILL tail
+
+## Tell the user we are done
+yad --title="SalineOS Backup" --text="          $TargetPart has been updated.          \n"
+
+MainMenu
+exit 0
+
+}
 
 MainMenu () {
 
 MainMenuArray=("")
-MainMenuArray=( "false" "Create Backup Image" "Create a new .backup file" "false" "Restore Backup Image" "Restore a .backup file to a partition(s)" "false" "Create USB Restore Drive" "Turn a USB drive and .backup file into a bootable restore drive" "false" "Update USB Restore Drive" "Update a select restore drive with a new .backup file" )
+MainMenuArray=(  "Create Backup Image" "Create a new .backup file" "Restore Backup Image" "Restore a .backup file to a partition(s)" "Create USB Restore Drive" "Turn a USB drive and .backup file into a bootable restore drive" "Update USB Restore Drive" "Update a select restore drive with a new .backup file" "Create Restore Partition" "Format a partition and make it a restore partition" "Update Restore Partition" "Update a restore partition with a new .backup file" )
 
-Action=$(yad --list --title="SalineOS Backup" --checklist --column='  ' --column="Action" --column="Description" --print-column="2" --wrap  --width=715 --height=300 --text="Welcome to the SalineOS backup utility. For complete usage information please refer to the SalineOS backup section in the user manual." --button=$"gtk-quit:5" --button=$"gtk-ok:2" "${MainMenuArray[@]}")
+Action=$(yad --list --title="SalineOS Backup" --column="Action" --column="Description" --print-column="1" --wrap  --width=715 --height=300 --text="Welcome to the SalineOS backup utility. For complete usage information please refer to the SalineOS backup section in the user manual." --button=$"gtk-quit:5" --button=$"gtk-ok:2" "${MainMenuArray[@]}")
 
 ret="$?"
 
@@ -1532,6 +1878,16 @@ elif [ "$Action" = "Create USB Restore Drive" ]; then
 elif [ "$Action" = "Update USB Restore Drive" ]; then
  GetDrive
  exit 0
+elif [ "$Action" = "Create Restore Partition" ]; then
+ CreateRestorePart
+ exit 0
+elif [ "$Action" = "Update Restore Partition" ]; then
+ UpdateRestorePart
+ exit 0
+elif [ "$Action" = "" ]; then
+ yad --title="SalineOS Backup" --text="You must select an action before continuing.\n" --button=$"gtk-ok:1"
+ MainMenu
+ exit 0
 fi
 
 }
@@ -1542,12 +1898,17 @@ fi
 TestRoot="$(whoami)"
 
 if [ "$TestRoot" != "root" ]; then
- $Info --button=$"gtk-quit:1" --text="SalineOS Backup must be run as root."
+ $Info --button=$"gtk-quit:1" --text="     SalineOS Backup must be run as root.     \n"
  exit 1
 fi
 
 if [ "$1" = "Restore" ]; then
  BackupImage="$2"
+## Check to make sure we are passed a valid .backup file
+ if [ "$(echo "$BackupImage" | grep ".backup")" = "" ]; then
+  $Info --wrap --width=250 --button=$"gtk-quit:1" --text="You must specify a valid .backup file with the Restore option.\n"
+  exit 0
+ fi
  AutoPartitioning
 else
  MainMenu
