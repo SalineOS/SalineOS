@@ -1426,12 +1426,22 @@ USBDriveMenu=("")
 ## Without this code the user will be displayed something REALLY ugly
 ## Pay no mind to the man behind the curtain :)
 
+USBDrives=""
 if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
- USBDrives=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
-else
- yad --window-icon=/usr/share/pixmaps/salineos-backup.png --title="Image to USB" --text="             No USB drives found.             \n" --width=250 --button=$"gtk-ok:1"
- MainMenu
- exit 0
+ USBDriveTemp=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
+
+for i in $USBDriveTemp; do 
+ DriveTest=$(cat /var/log/messages | grep "$i" | grep "removable disk" | tail -1)
+ 
+ if [ "$DriveTest" != "" ]; then 
+  if [ "$USBDrives" = "" ]; then
+   USBDrives="$i"
+  else
+   USBDrives="$USBDrives $i"
+  fi
+ fi
+
+done
 fi
 
 for i in $USBDrives; do

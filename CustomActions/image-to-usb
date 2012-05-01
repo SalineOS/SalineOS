@@ -32,16 +32,33 @@ USBDrives=""
 ## Without this code the user will be displayed something REALLY ugly
 ## Pay no mind to the man behind the curtain :)
 
+USBDrives=""
 if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
-USBDrives=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
-else
-yad $Icon --title="Image to USB" --text="             No USB drives found.             \n" --width=250 --button=$"gtk-quit:1"
-exit 0
+ USBDriveTemp=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
+
+for i in $USBDriveTemp; do 
+ DriveTest=$(cat /var/log/messages | grep "$i" | grep "removable disk" | tail -1)
+ 
+ if [ "$DriveTest" != "" ]; then 
+  if [ "$USBDrives" = "" ]; then
+   USBDrives="$i"
+  else
+   USBDrives="$USBDrives $i"
+  fi
+ fi
+
+done
+fi
+
+if [ "$USBDrives" = "" ]; then
+ yad $Icon --title="Image to USB" --text="      No USB drives found.      \n" --width=250 --button=$"gtk-ok:1"
+ MainMenu
+ exit 0 
 fi
 
 GetDrive () {
 
-USBDriveMenu=("")
+USBDriveMenu=""
 
 for i in $USBDrives; do
 ## Get the label of the disk if available
@@ -75,7 +92,7 @@ fi
 done
 
 
-UseDrive=$(yad --height="350" --list  $Icon --title="Image to USB" --column="Name" --column="Associated Label(s)" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="                            Please select the drive to copy the image to.                            \n" "${USBDriveMenu[@]}")
+UseDrive=$(yad --height="350" --list  $Icon --title="Image to USB" --column="Name" --column="Associated Label(s)" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="                            Please select the drive to copy the image to.                            \n" "${USBDriveMenu[@]}")
 
 ret="$?"
 
@@ -99,7 +116,7 @@ Continue () {
 
 yad --width=300 --wrap --image=gtk-dialog-warning --title="Image to USB" $Icon --text="This will completely erase the contents of $UseDrive and replace them with the contents of $DisplayName. Are you sure you want to continue?" --button=$"gtk-no:1" --button=$"gtk-yes:0"
 
-if [ $? != 0 ]; then
+if [ "$?" != "0" ]; then
  exit
 fi
 
@@ -120,7 +137,7 @@ sync
 
 killall -KILL tail
 
-yad $Info --info --title="Image to USB" --text="          Copying of image complete.          \n" --button=$"gtk-ok:1"
+yad $Icon --title="Image to USB" --text="          Copying of image complete.          \n" --button=$"gtk-ok:1"
 
 exit 0
 
