@@ -756,7 +756,7 @@ fi
 done
 HomePart=$($Menu --width="575" --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column="Name" --column="Partition Label" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" "${HomePartMenu[@]}")
 
-ret=$?
+ret="$?"
 
 if [ "$ret" = "252" ]; then
  SelectHomePart
@@ -843,7 +843,7 @@ done
 
 Swap=$($Menu --width=415 --height=250 --text="            Please select the partition to use for swap            \n" --column="Name" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" "${SwapPartMenu[@]}")
 
-ret=$?
+ret="$?"
 
 
 
@@ -895,7 +895,7 @@ else
 SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 fi
 
-ret=$?
+ret="$?"
 
 if [ "$ret" = "3" ]; then
  UseSwapFile="False"
@@ -975,7 +975,7 @@ done
 
 TargetPart=$($Menu --height=300 --width=575 --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="    Please select a partition to install the SalineOS root (Main) directory to.\n" "${PartDriveMenu[@]}" )
 
-ret=$?
+ret="$?"
 
 
 
@@ -1071,7 +1071,7 @@ else
 PartDrive=$($Menu --width=425 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="                 Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}")
 fi
 
-ret=$?
+ret="$?"
 
 
 
@@ -1132,7 +1132,7 @@ fi
 AutoPartitioning () {
 $Info --width=400 --wrap --text="You will need at least one partition in order to restore your backup image.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
 
-ret=$?
+ret="$?"
 
 if [ "$ret" = "252" ]; then
  AutoPartitioning 
@@ -1860,10 +1860,208 @@ exit 0
 
 }
 
+CreateUseBackup () {
+
+E=$(head --lines=1 /etc/salineos-backup/excludes)
+E1=$(head -n 2 /etc/salineos-backup/excludes | tail -n 1)
+E2=$(head -n 3 /etc/salineos-backup/excludes | tail -n 1)
+E3=$(head -n 4 /etc/salineos-backup/excludes | tail -n 1)
+E4=$(head -n 5 /etc/salineos-backup/excludes | tail -n 1)
+E5=$(head -n 6 /etc/salineos-backup/excludes | tail -n 1)
+E6=$(head -n 7 /etc/salineos-backup/excludes | tail -n 1)
+E7=$(head -n 8 /etc/salineos-backup/excludes | tail -n 1)
+E8=$(head -n 9 /etc/salineos-backup/excludes | tail -n 1)
+E9=$(head -n 10 /etc/salineos-backup/excludes | tail -n 1)
+E10=$(head -n 11 /etc/salineos-backup/excludes | tail -n 1)
+E11=$(head -n 12 /etc/salineos-backup/excludes | tail -n 1)
+E12=$(head -n 13 /etc/salineos-backup/excludes | tail -n 1)
+E13=$(head -n 14 /etc/salineos-backup/excludes | tail -n 1)
+E14=$(head -n 15 /etc/salineos-backup/excludes | tail -n 1)
+E15=$(head -n 16 /etc/salineos-backup/excludes | tail -n 1)
+E16=$(head -n 17 /etc/salineos-backup/excludes | tail -n 1)
+E17=$(head -n 18 /etc/salineos-backup/excludes | tail -n 1)
+E18=$(head -n 19 /etc/salineos-backup/excludes | tail -n 1)
+E19=$(head -n 20 /etc/salineos-backup/excludes | tail -n 1)
+E20=$(head -n 21 /etc/salineos-backup/excludes | tail -n 1)
+E21=$(head -n 22 /etc/salineos-backup/excludes | tail -n 1)
+E22=$(head -n 23 /etc/salineos-backup/excludes | tail -n 1)
+E23=$(head -n 24 /etc/salineos-backup/excludes | tail -n 1)
+E24=$(head -n 25 /etc/salineos-backup/excludes | tail -n 1)
+E25=$(head -n 26 /etc/salineos-backup/excludes | tail -n 1)
+E26=$(head -n 27 /etc/salineos-backup/excludes | tail -n 1)
+E27=$(head -n 28 /etc/salineos-backup/excludes | tail -n 1)
+E28=$(head -n 29 /etc/salineos-backup/excludes | tail -n 1)
+E29=$(head -n 30 /etc/salineos-backup/excludes | tail -n 1)
+E30=$(head -n 31 /etc/salineos-backup/excludes | tail -n 1)
+E31=$(head -n 32 /etc/salineos-backup/excludes | tail -n 1)
+E32=$(head -n 33 /etc/salineos-backup/excludes | tail -n 1)
+E33=$(head -n 34 /etc/salineos-backup/excludes | tail -n 1)
+E34=$(head -n 35 /etc/salineos-backup/excludes | tail -n 1)
+E35=$(head -n 36 /etc/salineos-backup/excludes | tail -n 1)
+E36=$(head -n 37 /etc/salineos-backup/excludes | tail -n 1)
+E37=$(head -n 38 /etc/salineos-backup/excludes | tail -n 1)
+E38=$(head -n 39 /etc/salineos-backup/excludes | tail -n 1)
+E39=$(head -n 40 /etc/salineos-backup/excludes | tail -n 1)
+E40=$(head -n 41 /etc/salineos-backup/excludes | tail -n 1)
+E41=$(head -n 42 /etc/salineos-backup/excludes | tail -n 1)
+E42=$(head -n 43 /etc/salineos-backup/excludes | tail -n 1)
+E43=$(head -n 44 /etc/salineos-backup/excludes | tail -n 1)
+E44=$(head -n 45 /etc/salineos-backup/excludes | tail -n 1)
+E45=$(head -n 46 /etc/salineos-backup/excludes | tail -n 1)
+E46=$(head -n 47 /etc/salineos-backup/excludes | tail -n 1)
+E47=$(head -n 48 /etc/salineos-backup/excludes | tail -n 1)
+E48=$(head -n 49 /etc/salineos-backup/excludes | tail -n 1)
+E49=$(head -n 50 /etc/salineos-backup/excludes | tail -n 1)
+E50=$(head -n 51 /etc/salineos-backup/excludes | tail -n 1)
+
+mksquashfs "/" "/etc/salineos-backup/mount-points/Target/use.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
+.bash_history \
+.cache \
+.thumbnails \
+boot/grub \
+Cache \
+"$E" \
+"$E1" \
+"$E2" \
+"$E3" \
+"$E4" \
+"$E5" \
+"$E6" \
+"$E7" \
+"$E8" \
+"$E9" \
+"$E10" \
+"$E11" \
+"$E12" \
+"$E13" \
+"$E14" \
+"$E15" \
+"$E16" \
+"$E17" \
+"$E18" \
+"$E19" \
+"$E20" \
+"$E21" \
+"$E22" \
+"$E23" \
+"$E24" \
+"$E25" \
+"$E26" \
+"$E27" \
+"$E28" \
+"$E29" \
+"$E30" \
+"$E31" \
+"$E32" \
+"$E33" \
+"$E34" \
+"$E35" \
+"$E36" \
+"$E37" \
+"$E38" \
+"$E39" \
+"$E40" \
+"$E41" \
+"$E42" \
+"$E43" \
+"$E44" \
+"$E45" \
+"$E46" \
+"$E47" \
+"$E48" \
+"$E49" \
+"$E50" \
+media \
+etc/salineos-backup/mount-points \
+mnt \
+proc \
+swap \
+sys \
+tmp \
+var/run >>/tmp/salineos-backup-temp-file &
+
+sleep 1
+
+(while [ "$(pidof mksquashfs)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/salineos-backup-temp-file)"
+echo "$CurrentOutput" | awk -F ' ' '{print $NF}' | awk -F '%' '{print $1}' 
+done)| yad --center --progress --auto-close --title="SalineOS Backup" --no-buttons --window-icon="/usr/share/pixmaps/salineos-backup.png" --text="          Creating backup file now.          \n"
+
+
+## Let all users move the file around
+chmod o+rwx "/etc/salineos-backup/mount-points/Target/use.backup"
+ 
+
+rm /tmp/salineos-backup-temp-file
+
+}
+
+SetExcludesUse () {
+
+Selection=""
+Excludes=""
+NewExclude=""
+CurrentExcludes=""
+
+mkdir -p /etc/salineos-backup
+
+if [ -f /etc/salineos-backup/excludes ]; then
+ Excludes=$(cat /etc/salineos-backup/excludes)
+fi
+
+CurrentExcludes=$(echo -n "$Excludes" | yad --always-print-result --text-info --height=350 --editable --title="SalineOS Backup" --wrap --width=400 --text="If desired you can exclude select files or folders from being included in the generated .backup file. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog." --button=$"gtk-cancel:3" --button=$"Add New:5" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "5" ]; then
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+ NewExclude=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --directory --text="\n                     Select the file or folder you wish to exclude\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ ret="$?"
+
+ if [ "$ret" = "252" ]; then
+  SetExcludesUse
+  exit 0
+ elif [ "$ret" = "3" ]; then
+  exit 0
+ else
+  echo "$NewExclude">>/etc/salineos-backup/excludes
+  SetExcludesUse
+  exit 0
+ fi
+else
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+fi
+
+$Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-cancel:3" --button=$"gtk-ok:1"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+fi
+
+}
+
 MainMenu () {
 
 MainMenuArray=("")
-MainMenuArray=(  "Create Backup Image" "Create a new .backup file" "Restore Backup Image" "Restore a .backup file to a partition(s)" "Create USB Restore Drive" "Turn a USB drive and .backup file into a bootable restore drive" "Update USB Restore Drive" "Update a select restore drive with a new .backup file" "Create Restore Partition" "Format a partition and make it a restore partition" "Update Restore Partition" "Update a restore partition with a new .backup file" )
+MainMenuArray=(  "Create Backup Image" "Create a new .backup file" "Restore Backup Image" "Restore a .backup file to a partition(s)" "Create USB Restore Drive" "Turn a USB drive  into a bootable restore drive" "Update USB Restore Drive" "Update a select restore drive with a new .backup file" "Create Restore Partition" "Format a partition and make it a restore partition" "Update Restore Partition" "Update a restore partition with a new .backup file" )
 
 Action=$(yad --list --title="SalineOS Backup" --column="Action" --column="Description" --print-column="1" --wrap  --width=715 --height=300 --text="Welcome to the SalineOS backup utility. For complete usage information please refer to the SalineOS backup section in the user manual." --button=$"gtk-quit:5" --button=$"gtk-ok:2" "${MainMenuArray[@]}")
 
