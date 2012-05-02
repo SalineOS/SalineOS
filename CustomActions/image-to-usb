@@ -34,25 +34,28 @@ USBDrives=""
 
 USBDrives=""
 if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
- USBDriveTemp=$(find /dev/disk/by-path/ -name "*usb*" | xargs ls -l | grep -v "part" | awk '{print $NF}' | awk -F "/" '{print $NF}')
+ USBDriveTemp=$(find /dev/disk/by-path/* -printf %f" "%l\\n | grep -v part | grep "usb" | awk '{print $2}' | sed -e 's|../../||g')
 
 for i in $USBDriveTemp; do 
  DriveTest=$(cat /var/log/messages | grep "$i" | grep "removable disk" | tail -1)
+ DriveTestTwo=$(grep "$i" /proc/partitions)
  
- if [ "$DriveTest" != "" ]; then 
+ if [ "$DriveTest" != "" ]; then
+ if [ "$DriveTestTwo" != "" ]; then
   if [ "$USBDrives" = "" ]; then
    USBDrives="$i"
   else
    USBDrives="$USBDrives $i"
   fi
  fi
+ fi
 
 done
 fi
 
+## Error out if no USB drive is found
 if [ "$USBDrives" = "" ]; then
- yad $Icon --title="Image to USB" --text="      No USB drives found.      \n" --width=250 --button=$"gtk-ok:1"
- MainMenu
+ yad $Icon --title="Image To USB" --text="      No USB drives found.      \n" --width=250 --button=$"gtk-ok:1"
  exit 0 
 fi
 
