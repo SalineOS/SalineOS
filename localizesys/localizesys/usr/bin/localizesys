@@ -1,0 +1,1120 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Script for changing the system language of Debian based systems
+## Written by Anthony Nordquist salinelinux@gmail.com http://www.salineos.com
+## Copyright 2011 2012 Under the GNU GPL2 License
+
+Icon="--window-icon=config-language"
+
+Input="$@"
+
+## Cry like a little girl if we don't have root
+testroot="$(whoami)"
+
+if [ "$testroot" != "root" ]; then
+ echo " Must be run with root privileges, will now exit "
+ exit 0
+fi
+
+
+progressbar () {
+tail -f /usr/bin/localizesys | yad --text="$@" $Icon --progress --pulsate --auto-close --title="Localizesys" --no-buttons
+}
+
+if [ "$Input" != "Installer" ]; then
+
+## Since the use of this script is entirely optional, ask the user if they need it.
+yad --title="Localizesys" $Icon --width="250" --wrap --text"Would you like to change the current system language and keyboard layout?" --button=$"gtk-no:3" --button=$"gtk-yes:5" 
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ exit 0
+fi
+
+fi
+
+GetLanguage () {
+
+## Give the user a list of languages to choose from using our nifty variable,then set another nifty variable of their choice.
+Language=$(yad --height="375" $Icon --list --column='  ' --no-headers --title="Localizesys" --text="                Please select your language                \n" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" $(cat /etc/localizesys/languages) )
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$Language" = "" ]; then
+ yad --title="Localizesys" $Icon --width="250" --wrap --text="You must select a language before continuing.\n" --button=$"gtk-ok:1"
+ GetLanguage
+ exit 0
+fi
+
+Language=$(echo "$Language" | awk -F '|' '{print $1}')
+
+
+}
+
+GetLanguage
+
+## Now that we have the language it be time to do the happy happy variable setting dance.
+## http://www.youtube.com/watch?v=dQw4w9WgXcQ
+
+case $Language in
+ Afar-Djibouti)
+  NewLocale="aa_DJ.utf8"
+  KeyMap="aa"
+  ;;
+ Afar-Eritrea)
+  NewLocale="aa_ER.utf8"
+  KeyMap="aa"
+  ;;
+ Afar-Ethiopia)
+  NewLocale="aa_ET.utf8"
+  KeyMap="aa"
+  ;;
+ Afrikaans)
+  NewLocale="af_ZA.utf8"
+  KeyMap="af"
+  ;;
+ Amharic)
+  NewLocale="am_ET.utf8"
+  KeyMap="am"
+  ;;
+ Aragonese)
+  NewLocale="an_ES.utf8"
+  KeyMap="an"
+  ;;
+ Arabic-United-Arab-Emirates)
+  NewLocale="ar_AE.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Bahrain)
+  NewLocale="ar_BH.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Algeria)
+  NewLocale="ar_DZ.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Egypt)
+  NewLocale="ar_EG.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-India)
+  NewLocale="ar_IN.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Iraq)
+  NewLocale="ar_IQ.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Jordan)
+  NewLocale="ar_JO.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Kuwait)
+  NewLocale="ar_KW.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Lebanon)
+  NewLocale="ar_LB.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Libyan-Arab-Jamahiriya)
+  NewLocale="ar_LY.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Morocco)
+  NewLocale="ar_MA.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Oman)
+  NewLocale="ar_OM.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Qatar)
+  NewLocale="ar_QA.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Saudi-Arabia)
+  NewLocale="ar_SA.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Sudan)
+  NewLocale="ar_SD.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Syrian-Arab-Republic)
+  NewLocale="ar_SY.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Tunisia)
+  NewLocale="ar_TN.utf8"
+  KeyMap="ar"
+  ;;
+ Arabic-Yemen)
+  NewLocale="ar_YE.utf8"
+  KeyMap="ar"
+  ;;
+ Asturian)
+  NewLocale="ast_es.utf8"
+  KeyMap="ast"
+  ;;
+ Assamese)
+  NewLocale="as_IN.utf8"
+  KeyMap="as"
+  ;;
+ Azerbaijani)
+  NewLocale="az_AZ.utf8"
+  KeyMap="az"
+  ;;
+ Belarusian)
+  NewLocale="be_BY.utf8"
+  KeyMap="be"
+  ;;
+ Belarusian-Latin)
+  NewLocale="be_BY.utf8@latin"
+  KeyMap="be"
+  ;;
+ Berber-Launguage-Algeria)
+  NewLocale="ber_DZ.utf8"
+  KeyMap="ber"
+  ;;
+ Berber-Language-Morocco)
+  NewLocale="ber_MA.utf8"
+  KeyMap="ber"
+  ;;
+ Bulgarian)
+  NewLocale="bg_BG.utf8"
+  KeyMap="bg"
+  ;;
+ Bengali-Bangladesh)
+  NewLocale="bn_BD.utf8"
+  KeyMap="bn"
+  ;;
+ Bengali-India)
+  NewLocale="bn_IN.utf8"
+  KeyMap="bn"
+  ;;
+ Tibetan-China)
+  NewLocale="bo_CN.utf8"
+  KeyMap="bo"
+  ;;
+ Tibetan-India)
+  NewLocale="bo_IN.utf8"
+  KeyMap="bo"
+  ;;
+ Breton)
+  NewLocale="br_FR@euro"
+  KeyMap="br"
+  ;;
+ Bosnian)
+  NewLocale="bs_BA.utf8"
+  KeyMap="bs"
+  ;;
+ Catalan-Valencian-Andorra)
+  NewLocale="ca_AD.utf8"
+  KeyMap="ca"
+  ;;
+ Catalan-Valencian-Spain)
+  NewLocale="ca_ES.utf8@valencia"
+  KeyMap="ca"
+  ;;
+ Catalan-Valencian-France)
+  NewLocale="ca_FR.utf8"
+  KeyMap="ca"
+  ;;
+ Catalan-Valencian-Italy)
+  NewLocale="ca_IT.utf8"
+  KeyMap="ca"
+  ;;
+ Turkish-Crimean)
+  NewLocale="crh_UA.utf8"
+  KeyMap="crh"
+  ;;
+ Czech)
+  NewLocale="cs_CZ.utf8"
+  KeyMap="cs"
+  ;;
+ Kashubian)
+  NewLocale="csb_PL.utf8"
+  KeyMap="csb"
+  ;;
+ Welsh)
+  NewLocale="cy_GB.utf8"
+  KeyMap="cy"
+  ;;
+ Danish)
+  NewLocale="da_DK.utf8"
+  KeyMap="da"
+  ;;
+ German-Germany)
+  NewLocale="de_DE@euro"
+  KeyMap="de"
+  ;;
+ German-Belgium)
+  NewLocale="de_BE@euro"
+  KeyMap="de"
+  ;;
+ German-Liechtenstein)
+  NewLocale="de_LI.utf8"
+  KeyMap="de"
+  ;;
+ German-Luxembourg)
+  NewLocale="de_LU@euro"
+  KeyMap="de"
+  ;;
+ Divehi-Dhivehi-Maldivian)
+  NewLocale="dv_MV.utf8"
+  KeyMap="dv"
+  ;;
+ Dzongkha)
+  NewLocale="dz_BT.utf8"
+  KeyMap="dz"
+  ;;
+ Greek-Modern-Cyprus)
+  NewLocale="el_CY.utf8"
+  KeyMap="el"
+  ;;
+ Greek-Modern-Greece)
+  NewLocale="el_GR.utf8"
+  KeyMap="el"
+  ;;
+ English-United-States)
+  NewLocale="en_US.utf8"
+  KeyMap="us"
+  ;;
+ English-Antigua-and-Barbuda)
+  NewLocale="en_AG.utf8"
+  KeyMap="us"
+  ;;
+ English-Australia)
+  NewLocale="en_AU.utf8"
+  KeyMap="us"
+  ;;
+ English-Botswana)
+  NewLocale="en_BW.utf8"
+  KeyMap="us"
+  ;;
+ English-Canada)
+  NewLocale="en_CA.utf8"
+  KeyMap="ca"
+  ;;
+ English-Denmark)
+  NewLocale="en_DK.utf8"
+  KeyMap="dk"
+  ;;
+ English-England)
+  NewLocale="en_GB.utf8"
+  KeyMap="gb"
+  ;;
+ English-Hong-Kong)
+  NewLocale="en_HK.utf8"
+  KeyMap="us"
+  ;;
+ English-Ireland)
+  NewLocale="en_IE@euro"
+  KeyMap="ie"
+  ;;
+ English-India)
+  NewLocale="en_IN.utf8"
+  KeyMap="gb"
+  ;;
+ English-Nigeria)
+  NewLocale="en_NG.utf8"
+  KeyMap="gb"
+  ;;
+ English-New-Zealand)
+  NewLocale="en_NZ.utf8"
+  KeyMap="gb"
+  ;;
+ English-Philippines)
+  NewLocale="en_PH.utf8"
+  KeyMap="us"
+  ;;
+ English-Singapore)
+  NewLocale="en_SG.utf8"
+  KeyMap="us"
+  ;;
+ English-South-Africa)
+  NewLocale="en_ZA.utf8"
+  KeyMap="gb"
+  ;;
+ English-Zimbabwe)
+  NewLocale="en_ZW.utf8"
+  KeyMap="gb"
+  ;;
+ Esperanto)
+  NewLocale="eo.utf8"
+  KeyMap="eo"
+  ;;
+ Spanish-Argentina)
+  NewLocale="es_AR.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Bolivia)
+  NewLocale="es_BO.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Chile)
+  NewLocale="es_CL.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Costa-Rica)
+  NewLocale="es_CR.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Colombia)
+  NewLocale="es_CO.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Dominican-Republic)
+  NewLocale="es_DO.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Ecuador)
+  NewLocale="es_EC.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Spain)
+  NewLocale="es_ES@euro"
+  KeyMap="es"
+  ;;
+ Spanish-Guatemala)
+  NewLocale="es_GT.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Honduras)
+  NewLocale="es_HN.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Mexico)
+  NewLocale="es_MX.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Nicaragua)
+  NewLocale="es_NI.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Panama)
+  NewLocale="es_PA.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Peru)
+  NewLocale="es_PE.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Puerto-Rico)
+  NewLocale="es_PR.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Paraguay)
+  NewLocale="es_PY.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-El-Salvador)
+  NewLocale="es_SV.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-United-States)
+  NewLocale="es_US.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Uruguay)
+  NewLocale="es_UY.utf8"
+  KeyMap="es"
+  ;;
+ Spanish-Venezuela)
+  NewLocale="es_VE.utf8"
+  KeyMap="es"
+  ;;
+ Estonian)
+  NewLocale="et_EE.utf8"
+  KeyMap="et"
+  ;;
+ Basque-Spain)
+  NewLocale="eu_ES@euro"
+  KeyMap="es"
+  ;;
+ Basque-France)
+  NewLocale="eu_FR@euro"
+  KeyMap="es"
+  ;;
+ Persian)
+  NewLocale="fa_IR.utf8"
+  KeyMap="fa"
+  ;;
+ Finnish)
+  NewLocale="fi_FI@euro"
+  KeyMap="fi"
+  ;;
+ Filipino)
+  NewLocale="fil_PH.utf8"
+  KeyMap="us"
+  ;;
+ Faroese)
+  NewLocale="fo_FO.utf8"
+  KeyMap="fo"
+  ;;
+ French-France)
+  NewLocale="fr_FR@euro"
+  KeyMap="fr"
+  ;;
+ French-Belgium)
+  NewLocale="fr_BE@euro"
+  KeyMap="fr"
+  ;;
+ French-Canada)
+  NewLocale="fr_CA.utf8"
+  KeyMap="fr"
+  ;;
+ French-Switzerland)
+  NewLocale="fr_CH.utf8"
+  KeyMap="fr"
+  ;;
+ French-Luxembourg)
+  NewLocale="fr_LU@euro"
+  KeyMap="fr"
+  ;;
+ Friulian)
+  NewLocale="fur_IT.utf8"
+  KeyMap="it"
+  ;;
+ Western-Frisian-Germany)
+  NewLocale="fy_DE.utf8"
+  KeyMap="de"
+  ;;
+ Western-Frisian-Netherlands)
+  NewLocale="fy_NL.utf8"
+  KeyMap="nl"
+  ;;
+ Irish)
+  NewLocale="ga_IE@euro"
+  KeyMap="ie"
+  ;;
+ Gaelic-Scottish-Gaelic)
+  NewLocale="gd_GB.utf8"
+  KeyMap="gb"
+  ;;
+ Galician)
+  NewLocale="gl_ES@euro"
+  KeyMap="es"
+  ;;
+ Gujarati)
+  NewLocale="gu_IN.utf8"
+  KeyMap="in"
+  ;;
+ Hausa)
+  NewLocale="ha_NG.utf8"
+  KeyMap="ha"
+  ;;
+ Hebrew)
+  NewLocale="he_IL.utf8"
+  KeyMap="il"
+  ;;
+ Hindi)
+  NewLocale="hi_IN.utf8"
+  KeyMap="in"
+  ;;
+ Croatian)
+  NewLocale="hr_HR.utf8"
+  KeyMap="hr"
+  ;;
+ Haitian)
+  NewLocale="ht_HT.utf8"
+  KeyMap="ht"
+  ;;
+ Hungarian)
+  NewLocale="hu_HU.utf8"
+  KeyMap="hu"
+  ;;
+ Armenian)
+  NewLocale="hy_AM.utf8"
+  KeyMap="am"
+  ;;
+ Interlingua)
+  NewLocale="ia.utf8"
+  KeyMap="ia"
+  ;;
+ Indonesian)
+  NewLocale="id_ID.utf8"
+  KeyMap="id"
+  ;;
+ Igbo)
+  NewLocale="ig_NG.utf8"
+  KeyMap="ng"
+  ;;
+ Icelandic)
+  NewLocale="is_IS.utf8"
+  KeyMap="is"
+  ;;
+ Italian)
+  NewLocale="it_IT@euro"
+  KeyMap="it"
+  ;;
+ Inuktiut)
+  NewLocale="iu_CA.utf8"
+  KeyMap="iu"
+  ;;
+ Japanese)
+  NewLocale="ja_JP.utf8"
+  KeyMap="jp"
+  ;;
+ Georgian)
+  NewLocale="ka_GE.utf8"
+  KeyMap="ge"
+  ;;
+ Kazakh)
+  NewLocale="kk_KZ.utf8"
+  KeyMap="kz"
+  ;;
+ Central-Khmer)
+  NewLocale="km_KH.utf8"
+  KeyMap="kh"
+  ;;
+ Kannada)
+  NewLocale="kn_IN.utf8"
+  KeyMap="kn"
+  ;;
+ Korean)
+  NewLocale="ko_KR.utf8"
+  KeyMap="kr"
+  ;;
+ Kashmiri)
+  NewLocale="ks_IN.utf8"
+  KeyMap="in"
+  ;;
+ Kurdish)
+  NewLocale="ku_TR.utf8"
+  KeyMap="tr"
+  ;;
+ Cornish)
+  NewLocale="kw_GB.utf8"
+  KeyMap="gb"
+  ;;
+ Kirghiz-Kyrgyz)
+  NewLocale="ky_KG.utf8"
+  KeyMap="kg"
+  ;;
+ Ganda)
+  NewLocale="lg_UG.utf8"
+  KeyMap="ug"
+  ;;
+ Limburgan-Limburger-Limburgish-Belgium)
+  NewLocale="li_BE.utf8"
+  KeyMap="be"
+  ;;
+ Limburgan-Limburger-Limburgish-Netherlands)
+  NewLocale="li_NL.utf8"
+  KeyMap="nl"
+  ;;
+ Lao)
+  NewLocale="lo_LA.utf8"
+  KeyMap="la"
+  ;;
+ Lithuanian)
+  NewLocale="li_NL.utf8"
+  KeyMap="nl"
+  ;;
+ Latvian)
+  NewLocale="lv_LV.utf8"
+  KeyMap="lv"
+  ;;
+ Maithili)
+  NewLocale="mai_IN.utf8"
+  KeyMap="in"
+  ;;
+ Malagasy)
+  NewLocale="mg_MG.utf8"
+  KeyMap="mg"
+  ;;
+ Macedonian)
+  NewLocale="mk_MK.utf8"
+  KeyMap="mk"
+  ;;
+ Malayalam)
+  NewLocale="ml_IN.utf8"
+  KeyMap="in"
+  ;;
+ Mongolian)
+  NewLocale="mn_MN.utf8"
+  KeyMap="mn"
+  ;;
+ Marathi)
+  NewLocale="mr_IN.utf8"
+  KeyMap="in"
+  ;;
+ Maylay)
+  NewLocale="ms_MY.utf8"
+  KeyMap="my"
+  ;;
+ Maltese)
+  NewLocale="mt_MT.utf8"
+  KeyMap="mt"
+  ;;
+ Chinese-Min-Nan)
+  NewLocale="nan_TW.utf8@latin"
+  KeyMap=
+  ;;
+ Bokmål-Norwegian-Norwegian-Bokmål)
+  NewLocale="nb_NO.utf8"
+  KeyMap="no"
+  ;;
+ Geman-Low-Germany)
+  NewLocale="nds_DE.utf8"
+  KeyMap="de"
+  ;;
+ Geman-Low-Netherlands)
+  NewLocale="nds_NL.utf8"
+  KeyMap="nl"
+  ;;
+ Nepali)
+  NewLocale="ne_NP.utf8"
+  KeyMap="np"
+  ;;
+ Dutch-Flemish-Aruba)
+  NewLocale="nl_AW.utf8"
+  KeyMap="nl"
+  ;;
+ Dutch-Flemish-Belgium)
+  NewLocale="nl_BE@euro"
+  KeyMap="nl"
+  ;;
+ Dutch-Flemish-Netherlands)
+  NewLocale="nl_NL@euro"
+  KeyMap="nl"
+  ;;
+ Norwegian-Nynorsk)
+  NewLocale="nn_NO.utf8"
+  KeyMap="no"
+  ;;
+ Sotho-Northern)
+  NewLocale="nso_ZA.utf8"
+  KeyMap="za"
+  ;;
+ Occitan)
+  NewLocale="oc_FR.utf8"
+  KeyMap="fr"
+  ;;
+ Oromo-Ethiopia)
+  NewLocale="om_ET.utf8"
+  KeyMap="om"
+  ;;
+ Oromo-Kenya)
+  NewLocale="om_KE.utf8"
+  KeyMap="om"
+  ;;
+ Oriya)
+  NewLocale="or_IN.utf8"
+  KeyMap="in"
+  ;;
+ Panjabi-Punjabi)
+  NewLocale="pa_IN.utf8"
+  KeyMap="in"
+  ;;
+ Papiamento)
+  NewLocale="pap_AN.utf8"
+  KeyMap="an"
+  ;;
+ Polish)
+  NewLocale="pl_PL.utf8"
+  KeyMap="pl"
+  ;;
+ Portuguese-Brazil)
+  NewLocale="pt_BR.utf8"
+  KeyMap="pt"
+  ;;
+ Portuguese-Portugal)
+  NewLocale="pt_PT@euro"
+  KeyMap="pt"
+  ;;
+ Romanian)
+  NewLocale="ro_RO.utf8"
+  KeyMap="ro"
+  ;;
+ Russian-Russia)
+  NewLocale="ru_RU.utf8"
+  KeyMap="ru"
+  ;;
+ Russian-Ukraine)
+  NewLocale="ru_UA.utf8"
+  KeyMap="ua"
+  ;;
+ Kinyarwanda)
+  NewLocale="rw_RW.utf8"
+  KeyMap="rw"
+  ;;
+ Sanskrit)
+  NewLocale="sa_IN.utf8"
+  KeyMap="in"
+  ;;
+ Sardinian)
+  NewLocale="sc_IT.utf8"
+  KeyMap="it"
+  ;;
+ Sindhi)
+  NewLocale="sd_IN.utf8"
+  KeyMap="in"
+  ;;
+ Northern-Sami)
+  NewLocale="se_NO.utf8"
+  KeyMap="no"
+  ;;
+ Shuswap)
+  NewLocale="shs_CA.utf8"
+  KeyMap="ca"
+  ;;
+ Slovak)
+  NewLocale="sk_SK.utf8"
+  KeyMap="sk"
+  ;;
+ Slovenian)
+  NewLocale="sl_SI.utf8"
+  KeyMap="si"
+  ;;
+ Somali)
+  NewLocale="so_SO.utf8"
+  KeyMap="ar"
+  ;;
+ Albanian)
+  NewLocale="sq_AL.utf8"
+  KeyMap="al"
+  ;;
+ Serbian)
+  NewLocale="sr_RS.utf8"
+  KeyMap="sr"
+  ;;
+ Sotho-Southern)
+  NewLocale="st_ZA.utf8"
+  KeyMap="za"
+  ;;
+ Swedish-Finland)
+  NewLocale="sv_FI@euro"
+  KeyMap="se"
+  ;;
+ Swedish-Sweden)
+  NewLocale="sv_SE.utf8"
+  KeyMap="se"
+  ;;
+ Tamil)
+  NewLocale="ta_IN.utf8"
+  KeyMap="in"
+  ;;
+ Telugu)
+  NewLocale="te_IN.utf8"
+  KeyMap="in"
+  ;;
+ Tajik)
+  NewLocale="tg_TJ.utf8"
+  KeyMap="tj"
+  ;;
+ Thai)
+  NewLocale="th_TH.utf8"
+  KeyMap="th"
+  ;;
+ Tigrinya-Eritrea)
+  NewLocale="ti_ER.utf8"
+  KeyMap="ti"
+  ;;
+ Tigrinya-Ethiopia)
+  NewLocale="ti_ET.utf8"
+  KeyMap="ti"
+  ;;
+ Turkmen)
+  NewLocale="tk_TM.utf8"
+  KeyMap="tm"
+  ;;
+ Tagalog)
+  NewLocale="tl_PH.utf8"
+  KeyMap="ph"
+  ;;
+ Turkish-Turkey)
+  NewLocale="tr_TR.utf8"
+  KeyMap="tr"
+  ;;
+ Turkish-Cyprus)
+  NewLocale="tr_CY.utf8"
+  KeyMap="tr"
+  ;;
+ Tsonga)
+  NewLocale="ts_ZA.utf8"
+  KeyMap="za"
+  ;;
+ Tartar)
+  NewLocale="tr_TR.utf8"
+  KeyMap="tr"
+  ;;
+ Uighur-Uyghur)
+  NewLocale="ug_CN.utf8"
+  KeyMap="cn"
+  ;;
+ Ukrainian)
+  NewLocale="uk_UA.utf8"
+  KeyMap="ua"
+  ;;
+ Urdu)
+  NewLocale="ur_PK.utf8"
+  KeyMap="pk"
+  ;;
+ Uzbek)
+  NewLocale="uz_PK.utf8"
+  KeyMap="pk"
+  ;;
+ Venda)
+  NewLocale="ve_ZA.utf8"
+  KeyMap="za"
+  ;;
+ Vietnamese)
+  NewLocale="vi_VN.utf8"
+  KeyMap="vn"
+  ;;
+ Walloon)
+  NewLocale="wa_BE@euro"
+  KeyMap="be"
+  ;;
+ Wolof)
+  NewLocale="wo_SN.utf8"
+  KeyMap="sn"
+  ;;
+ Xhosa)
+  NewLocale="xh_ZA.utf8"
+  KeyMap="za"
+  ;;
+ Yiddish)
+  NewLocale="yi_US.utf8"
+  KeyMap="yi"
+  ;;
+ Yoruba)
+  NewLocale="yo_NG.utf8"
+  KeyMap="ng"
+  ;;
+ Chinese-China)
+  NewLocale="zh_CN.utf8"
+  KeyMap="cn"
+  ;;
+ Chinese-Hong-Kong)
+  NewLocale="zh_HK.utf8"
+  KeyMap="cn"
+  ;;
+ Chinese-Singapore)
+  NewLocale="zh_SG.utf8"
+  KeyMap="cn"
+  ;;
+ Chinese-Taiwan)
+  NewLocale="zh_TW.utf8"
+  KeyMap="cn"
+  ;;
+ Zulu)
+  NewLocale="zu_ZA.utf8"
+  KeyMap="za"
+  ;;
+esac
+
+## Aren't you glad you didn't just sit and write a case statement 215 entries long? 
+## As an asside what the hell is that bright ball in the sky?!?!?
+
+## Now that we got variables set lets do stuff with them. YAY stuff!
+## Remove old configuration, to prevent issues.
+update-locale --no-checks LANG
+
+## Set default system wide LANG variable
+## Currently requires a reboot before it takes effect.
+## Don't think there is a way to do this without killing the X server.
+## We could do a single command, kill the X server, relogin using the default user in the live envoirnment and continue on with the install.
+## But, it's probably best not to poke the Xorg beast with a stick, he bites and I am a meaty morsel.
+update-locale "LANG=$NewLocale"
+
+## UserManual support, this used to use wget, now translated manuals are shipped on the images. 
+
+## Remove the country from the locale name for displaying to user on progress dialog. 
+## This is just cleaner and nicer looking.
+BareLang=$(echo "$Language" | awk -F "-" '{print $1}')
+
+if [ -f "/etc/user-manuals/$BareLang/UserManual.pdf" ]; then
+ if [ -f /etc/skel/Desktop/UserManual.pdf ]; then
+  mv /etc/skel/Desktop/UserManual.pdf /etc/skel/Desktop/UserManual-English.pdf
+ fi
+ cp "/etc/user-manuals/$BareLang/UserManual.pdf" "/etc/skel/Desktop/UserManual-$BareLang.pdf"
+ for i in $(ls /home); do
+  if [ -f "/home/$i/Desktop/UserManual.pdf" ]; then
+   mv "/home/$i/Desktop/UserManual.pdf" "/home/$i/Desktop/UserManual-English.pdf"
+  fi
+  cp /etc/skel/Desktop/UserManual-$BareLang.pdf /home/$i/Desktop
+ done
+sleep 1
+
+yad --title="Localizesys" $Icon --width="250" --wrap --text="You can now find a translated user manual on the desktop, named UserManual-$BareLang.pdf" --button=$"gtk-ok:1"
+
+## Update the desktop for Xfce so they can see the new manual
+if [  -x /usr/bin/xfdesktop ]; then
+ xfdesktop --reload
+fi
+
+fi
+
+
+## Parse the two letter language code from the newlocale. 
+AptCode=$(echo $NewLocale | awk -F "_" '{print $1}')
+
+## Some of these elif statements shouldn't be needed as there is only one country for the language, but for some reason they randomly append the country to the end in the package name.
+
+if [ $AptCode = de ]; then
+  MySpell="myspell-$AptCode-de myspell-$AptCode-ch myspell-$AptCode-at"
+elif [ $AptCode = pt ]; then
+  MySpell="myspell-$AptCode-br myspell-$AptCode-pt myspell-pt"
+elif [ $AptCode = fr ]; then
+  MySpell="myspell-$AptCode myspell-$AptCode-gut"
+elif [ $AptCode = en ]; then
+  MySpell="myspell-$AptCode-au myspell-$AptCode-gb myspell-$AptCode-za"
+else
+  MySpell="myspell-$AptCode"
+fi
+
+if [ -x /usr/bin/lowriter ]; then 
+  if [ $AptCode = be ]; then
+   LOffice="libreoffice-l10n-$AptCode-by"
+ elif [ $AptCode = en ]; then
+   LOffice="libreoffice-l10n-$AptCode-gb libreoffice-help-$AptCode-gb libreoffice-help-$AptCode-za" 
+  elif [ $AptCode = pt ]; then
+   LOffice="libreoffice-l10n-$AptCode-br libreoffice-help-$AptCode-br openoffice.org-l10n-$AptCode libreoffice-help-$AptCode"
+  elif [ $AptCode = zh ]; then
+   LOffice="libreoffice-l10n-$AptCode-cn libreoffice-help-$AptCode-cn libreoffice-l10n-$AptCode-tw libreoffice-help-$AptCode-tw"
+  else
+   LOffice="libreoffice-l10n-$AptCode libreoffice-help-$AptCode"
+  fi
+else
+ LOffice=""
+fi
+
+if [ -x /usr/bin/icedove ]; then
+ if [ $AptCode = fy ]; then
+  IceDove="icedove-l10n-$AptCode-nl"
+ elif [ $AptCode = bn ]; then
+  IceDove="icedove-l10n-$AptCode-bd"
+ elif [ $AptCode = ta ]; then
+  IceDove="icedove-l10n-$AptCode-lk"
+ elif [ $AptCode = es ]; then
+  IceDove="icedove-l10n-$AptCode-es icedove-l10n-$AptCode-ar"
+ elif [ $AptCode = en ]; then
+  IceDove="icedove-l10n-$AptCode-gb"
+ elif [ $AptCode = ga ]; then
+  IceDove="icedove-l10n-$AptCode-ie"
+ elif [ $AptCode = nb ]; then
+  IceDove="icedove-l10n-$AptCode-no"
+ elif [ $AptCode = nn ]; then
+  IceDove="icedove-l10n-$AptCode-no"
+ elif [ $AptCode = pa ]; then
+  IceDove="icedove-l10n-$AptCode-in"
+ elif [ $AptCode = pt ]; then
+  IceDove="icedove-l10n-$AptCode-pt icedove-l10n-$AptCode-br"
+ elif [ $AptCode = sv ]; then
+  IceDove="icedove-l10n-$AptCode-se"
+ elif [ $AptCode = zh ]; then
+  IceDove="icedove-l10n-$AptCode-cn icedove-l10n-$AptCode-tw"
+ else
+  IceDove="icedove-l10n-$AptCode"
+ fi
+else
+ IceDove=""
+fi
+
+if [ -x /usr/bin/iceweasel ]; then
+ if [ $AptCode = fy ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-nl"
+ elif [ $AptCode = dz ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-bt"
+ elif [ $AptCode = fa ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-ir"
+ elif [ $AptCode = fur ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-it"
+ elif [ $AptCode = bn ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-bd iceweasel-l10n-$AptCode-in"
+ elif [ $AptCode = es ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-cl iceweasel-l10n-$AptCode-mx iceweasel-l10n-$AptCode-ar iceweasel-l10n-$AptCode-es"
+ elif [ $AptCode = en ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-gb"
+ elif [ $AptCode = hi ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-in"
+ elif [ $AptCode = ga ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-ie"
+ elif [ $AptCode = gu ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-in"
+ elif [ $AptCode = nb ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-no"
+ elif [ $AptCode = ne ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-np"
+ elif [ $AptCode = nn ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-no"
+ elif [ $AptCode = pa ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-br iceweasel-l10n-$AptCode-pt"
+ elif [ $AptCode = sv ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-se"
+ elif [ $AptCode = ta ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-lk"
+ elif [ $AptCode = zh ]; then
+  Iceweasel="iceweasel-l10n-$AptCode-cn iceweasel-l10n-$AptCode-tw"
+ else
+  Iceweasel="iceweasel-l10n-$AptCode"
+ fi
+else
+ Iceweasel=""
+fi
+
+if [ "$Input" != "Installer" ]; then
+ /usr/bin/packagekit-url "pkg-kit://$MySpell $IceDove $Iceweasel $LOffice/"
+else
+ echo -n "$MySpell $IceDove $Iceweasel $LOffice">>/tmp/localizesys-output
+fi
+
+## Set keyboard layout. This will take effect immediately.
+## We will allow the user to test this in a minute, if it works we will add the command to rc.local.
+## If it's wrong we have a contingency plan below.
+setxkbmap $KeyMap
+
+## Dear Mr or Mrs User this is the score, I violated your machine while you weren't looking and I don't know if it liked it, here have a box.
+
+TestLayout () {
+yad --form --field=":TXT" --title="Localizesys" $Icon --text="Your keyboard layout has now been set based on your language selection.\n\nPlease use the text box below to test.\n\n" --button=$"Keyboard Layout Is Wrong:3" --button=$"Keyboard Layout Is Correct:5"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ TestLayout
+ exit 0
+elif [ "$ret" = "3" ]; then
+ setxkbmap us
+ dpkg-reconfigure -f gnome keyboard-configuration
+elif [ "$ret" = "5" ]; then
+ OldLayout="$(grep -B 0  "XKBLAYOUT=" /etc/default/keyboard)"
+ sed -i -e "s/$OldLayout/XKBLAYOUT=\"$KeyMap\"/g" /etc/default/keyboard
+RCLOCAL="setupcon \n\
+exit 0"
+
+sed -i /etc/rc.local -e "s|^exit 0|\n${RCLOCAL}|"
+
+fi
+
+}
+
+TestLayout
+
+exit 0
