@@ -232,9 +232,9 @@ elif [ "$ret" = "9" ]; then
   exit 0
  fi
 if [ -a /dev/cdrom ]; then
-kvm  -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97  -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -cdrom /dev/cdrom
+kvm  -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97  -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -cdrom /dev/cdrom
 else
-kvm -boot order=dc -m $RamSize -sdl -smp maxcpus=maxcpus -soundhw ac97 -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk
+kvm -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97 -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk
 fi
  
 
