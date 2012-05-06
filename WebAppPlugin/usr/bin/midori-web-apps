@@ -286,7 +286,7 @@ load-on-startup=MIDORI_STARTUP_BLANK_PAGE
 homepage=file:///usr/share/doc/midori/faq.html
 text-editor=mousepad %f
 news-aggregator=icedove %u
-location-entry-search=https://duckduckgo.com/?q=%s
+location-entry-search=https://duckduckgo.com/?q=%s&t=saline
 $Html5
 $Html5More
 $OfflineCache

@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=/usr/bin/Clean
+Name=Disk Cleanup
+Icon=stock_script
+TryExec=/usr/bin/procurator
+Categories=System;
+
