@@ -79,8 +79,8 @@ fi
 
 if [ "$Operation" = "install" ]; then
 $Question --text="This will install $Package.\n\nContinue with installation?"
-  if [ $? = 0 ]; then
-   pkcon -p -y install $Package>>/tmp/packagekit-url-tmp &
+  if [ "$?" = "0" ]; then
+   pkcon -p -y install "$Package">>/tmp/packagekit-url-tmp &
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
@@ -101,8 +101,8 @@ done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --tex
   fi
 elif [ "$Operation" = "" ]; then
 $Question --text="This will install $Package.\n\nContinue with installation?"
-  if [ $? = 0 ]; then
-   pkcon -p -y install $Package>>/tmp/packagekit-url-tmp &
+  if [ "$?" = "0" ]; then
+   pkcon -p -y install "$Package">>/tmp/packagekit-url-tmp &
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
@@ -123,8 +123,8 @@ done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --tex
   fi
 elif [ "$Operation" = "remove" ]; then
  $Question --text="This will remove $Package.\n\nContinue with removal?"
-  if [ $? = 0 ]; then
-pkcon -p -y remove $Package>>/tmp/packagekit-url-tmp &
+  if [ "$?" = "0" ]; then
+pkcon -p -y remove "$Package">>/tmp/packagekit-url-tmp &
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
