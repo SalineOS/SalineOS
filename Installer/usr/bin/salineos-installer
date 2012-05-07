@@ -1224,6 +1224,11 @@ exit 0
 ## Tell the user that there are instructions in the user manual 
 Instruction (){ 
 
+## Allow Magix to start on any installed systems
+if [ -f /etc/magix-driver-installer/dont-run ]; then
+ rm /etc/magix-driver-installer/dont-run
+fi
+
 $Info --text="Complete installation instructions are included\nin the user manual if needed." '--button=gtk-ok:1'
 
 
