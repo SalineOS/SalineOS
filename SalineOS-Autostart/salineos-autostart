@@ -1,0 +1,22 @@
+#!/bin/bash
+
+## Make sure X doesn't handle power management on the display.
+xset s off
+xset s noblank
+
+## Check for Xv Support for Parole
+
+TestXv=$(xvinfo | grep "no adaptors present")
+
+if [ "$TestXv" = "" ]; then 
+ parole --xv true
+else
+ parole --xv false
+fi
+
+## Start Magix 
+if [ ! -f /etc/magix-driver-installer/dont-run ]; then
+ /usr/bin/magix-launcher
+fi
+
+exit
