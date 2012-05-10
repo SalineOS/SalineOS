@@ -1,0 +1,9 @@
+Package: sos-firewall
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, iptables
+Section: system
+Priority: optional
+Description: SalineOS firewall utility.

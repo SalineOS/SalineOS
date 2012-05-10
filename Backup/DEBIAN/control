@@ -1,0 +1,9 @@
+Package: salineos-backup
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux, grub-pc, squashfs-tools 
+Section: system
+Priority: optional
+Description: SalineOS backup suite.

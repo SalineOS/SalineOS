@@ -1,12 +1,9 @@
 Package: grub-doctor
-Version: 2.00
+Version: 2.0-0
 Architecture: all
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Installed-Size: 93
-Depends: coreutils, findutils, bash, sed, syslinux, util-linux, yad, grub-pc 
-Suggests:
-Replaces:
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux, grub-pc
 Section: system
 Priority: optional
-Description: Boot loader restoration utility. 
-
+Description: Boot loader restoration utility.

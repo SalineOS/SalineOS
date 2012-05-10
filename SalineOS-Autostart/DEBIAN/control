@@ -1,0 +1,9 @@
+Package: salineos-autostart
+Version: 2.0-1
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux 
+Section: system
+Priority: optional
+Description: Handle misc items on Xfce startup. 
