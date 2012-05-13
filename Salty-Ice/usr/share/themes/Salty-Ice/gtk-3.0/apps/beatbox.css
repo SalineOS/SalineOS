@@ -1,0 +1,10 @@
+/* beatbox */
+BeatBoxStatusBar {
+    padding: 1px;
+
+    -unico-inner-stroke-gradient: -gtk-gradient (linear, left top, right top,
+                                           from (shade (@theme_bg_color, 0.74)),
+                                           to (shade (@theme_bg_color, 0.74)));
+
+    -unico-inner-stroke-width: 1px;
+}

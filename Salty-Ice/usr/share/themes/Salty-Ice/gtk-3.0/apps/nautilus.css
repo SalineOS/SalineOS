@@ -1,0 +1,162 @@
+NautilusWindow * {
+    -GtkPaned-handle-size: 1px;
+}
+
+.nautilus-canvas-item {
+    border-radius: 2px;
+}
+
+/* desktop mode */
+.nautilus-desktop.nautilus-canvas-item {
+    color: #ffffff;
+    text-shadow: 1 1 alpha (#000000, 0.8);
+}
+
+.nautilus-desktop.nautilus-canvas-item:active {
+    background-image: none;
+    background-color: alpha (@theme_bg_color, 0.84);
+    border-radius: 2px;
+
+    color: @theme_fg_color;
+}
+
+.nautilus-desktop.nautilus-canvas-item:selected {
+    background-image: none;
+    background-color: alpha (@selected_bg_color, 0.84);
+
+    color: @theme_selected_fg_color;
+}
+
+.nautilus-desktop.nautilus-canvas-item:active,
+.nautilus-desktop.nautilus-canvas-item:prelight,
+.nautilus-desktop.nautilus-canvas-item:selected {
+    text-shadow: none;
+}
+
+/* browser window */
+NautilusTrashBar.info,
+NautilusXContentBar.info,
+NautilusSearchBar.info,
+NautilusQueryEditor.info {
+    background-image: -gtk-gradient (linear, left top, left bottom,
+                                     from (shade (@info_bg_color, 1.02)),
+                                     to (shade (@info_bg_color, 0.98)));
+    background-color: @info_bg_color;
+    border-bottom-color: shade (@info_bg_color, 0.92);
+    border-radius: 0;
+    border-style: solid;
+    border-width: 0px 0px 1px 0px;
+
+    -unico-border-gradient: none;
+    -unico-inner-stroke-gradient: -gtk-gradient (linear, left top, left bottom,
+                                                 from (shade (@info_bg_color, 1.04)),
+                                                 to (shade (@info_bg_color, 1.01)));
+}
+
+NautilusTrashBar.info:backdrop,
+NautilusXContentBar.info:backdrop,
+NautilusSearchBar.info:backdrop,
+NautilusQueryEditor.info:backdrop {
+    background-image: -gtk-gradient (linear, left top, left bottom,
+                                     from (shade (@info_bg_color, 1.01)),
+                                     to (shade (@info_bg_color, 0.99)));
+    background-color: @info_bg_color;
+    border-bottom-color: shade (@info_bg_color, 0.92);
+
+    -unico-inner-stroke-gradient: -gtk-gradient (linear, left top, left bottom,
+                                                 from (shade (@info_bg_color, 1.02)),
+                                                 to (shade (@info_bg_color, 1.0)));
+}
+
+NautilusSearchBar .entry {
+}
+
+.nautilus-cluebar-label {
+    font: bold;
+    color: @theme_base_color;
+}
+
+.nautilus-cluebar-label:backdrop {
+    color: mix (@theme_fg_color, @info_bg_color, 0.2);
+}
+
+#nautilus-search-button *:active,
+#nautilus-search-button *:active:prelight {
+    color: @theme_fg_color;
+}
+
+NautilusFloatingBar {
+    background-color: @theme_bg_color;
+    border-radius: 2px 2px 0 0;
+    border-style: solid;
+    border-width: 1px;
+    border-color: darker (@theme_bg_color);
+    color: @theme_fg_color;
+
+    -unico-border-gradient: none;
+}
+
+NautilusFloatingBar .button {
+    -GtkButton-image-spacing: 0;
+    -GtkButton-inner-border: 0;
+}
+
+/* notebook */
+NautilusWindow .view {
+    background-color: @theme_base_color;
+}
+
+NautilusWindow .view:selected,
+NautilusWindow .view:selected:focused {
+    background-color: alpha (@theme_selected_bg_color, 0.9);
+
+    color: @theme_selected_fg_color;
+}
+
+NautilusWindow .notebook,
+NautilusWindow .notebook:backdrop {
+    background-color: @theme_base_color;
+}
+
+NautilusWindow .notebook tab:active,
+NautilusWindow .notebook tab:active:backdrop {
+    background-image: -gtk-gradient (linear, left top, left bottom,
+                                     from (shade (@theme_base_color, 1.0)),
+                                     to (shade (@theme_base_color, 1.0)));
+}
+
+/* sidebar */
+NautilusWindow .sidebar,
+NautilusWindow .sidebar .view {
+    background-color: @theme_bg_color;
+    color: mix (@theme_fg_color, @theme_bg_color, 0.3);
+}
+
+NautilusWindow .sidebar:backdrop,
+NautilusWindow .sidebar .view:backdrop {
+    color: mix (@theme_fg_color, @theme_bg_color, 0.6);
+}
+
+NautilusWindow .sidebar row:selected {
+    color: @theme_selected_fg_color;
+}
+
+NautilusWindow .sidebar row:selected:backdrop {
+    background-image: -gtk-gradient (linear, left top, left bottom,
+                                     from (shade (@theme_bg_color, 0.94)),
+                                     to (shade (@theme_bg_color, 0.86)));
+    border-top-color: shade (@theme_bg_color, 0.88);
+
+    color: @theme_fg_color;
+}
+
+NautilusWindow .sidebar .frame {
+}
+
+NautilusWindow .pane-separator {
+}
+
+NautilusWindow .pane-separator:backdrop {
+    background-color: shade (@theme_bg_color, 0.9);
+}
+

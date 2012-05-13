@@ -1,0 +1,43 @@
+GeditWindow .pane-separator,
+GeditWindow .pane-separator:hover {
+}
+
+GeditPanel.title GtkLabel {
+}
+
+GeditPanel .toolbar {
+    border-style: none;
+    background-color: transparent;
+}
+
+GeditDocumentsPanel .view {
+}
+
+GeditDocumentsPanel .view:backdrop {
+}
+
+GeditWindow .notebook {
+    padding: 1px;
+    border-radius: 2px;
+}
+
+GeditPanel .notebook {
+    border-radius: 2px;
+}
+
+GeditPanel .notebook tab,
+GeditWindow .notebook tab {
+    border-radius: 2px;
+}
+
+GeditWindow .notebook tab:active {
+    background-image: -gtk-gradient (linear, left top, left bottom,
+                                     from (shade (@theme_base_color, 1.0)),
+                                     to (shade (@theme_base_color, 1.0)));
+}
+
+GeditWindow .notebook tab:backdrop {
+    background-image: -gtk-gradient (linear, left top, left bottom,
+                                     from (mix (@theme_base_color, @theme_bg_color, 0.4)),
+                                     to (mix (@theme_base_color, @theme_bg_color, 0.4)));
+}

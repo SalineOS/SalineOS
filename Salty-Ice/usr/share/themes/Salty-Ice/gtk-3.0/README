@@ -1,0 +1,42 @@
+The gtk 3.0 part of Salty-Ice was forked off the Orion theme on 05/12/2012 by Anthony Nordquist.
+For a complete list of changes refer to https://github.com/SalineOS/SalineOS.git
+
+
+Orion is a modern light theme for Gnome. It supports Gnome Shell, Unity, XFCE and Openbox. The theme is compatible with the latest GTK 3.4 and uses the Unico engine. It also includes a GTK 2.0 theme using Murrine engine.
+
+---
+
+Ubuntu users can install Orion from our themes PPA using the following commands,
+
+sudo add-apt-repository ppa:satyajit-happy/themes
+sudo apt-get update && sudo apt-get install orion-gtk-theme
+
+---
+
+Installation Instructions for other distros:
+
+Extract the zip file to the themes directory i.e. "~/.themes/" or "/usr/share/themes/"
+
+Use Gnome Tweak tool to choose the themes, or run the following commands in Terminal,
+
+gconftool-2 -s --type string /apps/metacity/general/theme "Orion"
+
+gsettings set org.gnome.desktop.interface gtk-theme "Orion"
+
+---
+
+Note:
+
+If you use Gnome 3.2, download the theme from launchpad https://launchpad.net/~satyajit-happy/+archive/themes/+files/orion-gtk-theme_2012.02.03-0~satya164~oneiric.tar.gz
+
+This theme is not compatible with old Gnome 3.0.
+
+---
+
+Credits: ghogaru http://ghogaru.deviantart.com for giving permission to use the metacity buttons from Boomerang http://ghogaru.deviantart.com/art/Boomerang-189180645.
+
+---
+
+License: GPL
+
+
