@@ -11,7 +11,8 @@ cp -f ./convert-img-iso-ca /usr/bin
 cp -f ./convert-nrg-iso-ca /usr/bin
 cp -f ./mount-backup-ca /usr/bin
 cp -f ./sync-folder-ca /usr/bin
-cp -f ./create-playlist-ca /usr/bin
+cp -f ./create-playlist-relative-ca /usr/bin
+cp -f ./create-playlist-full-ca /usr/bin
 
 chmod +x /usr/bin/convert-image-ca
 chmod +x /usr/bin/resize-image-ca
@@ -24,7 +25,8 @@ chmod +x /usr/bin/convert-img-iso-ca
 chmod +x /usr/bin/convert-nrg-iso-ca
 chmod +x /usr/bin/mount-backup-ca
 chmod +x /usr/bin/sync-folder-ca
-chmod +x /usr/bin/create-playlist-ca
+chmod +x /usr/bin/create-playlist-relative-ca
+chmod +x /usr/bin/create-playlist-full-ca
 
 for i in $(ls /home); do
  cp -f ./uca.xml /home/$i/.config/Thunar
