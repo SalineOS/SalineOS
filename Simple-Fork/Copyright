@@ -2,17 +2,11 @@ Icon theme downloaded from http://www.gnome-look.org
 
 Most icons in this theme are distributed under the terms of the GPL or LGPL licenses.  See the Authors file for all Authors of this theme. 
 
-This theme was modified for use on the SalineOS system on 03/01/2012 by Anthony Nordquist
-
-system-log-out.svg was replaced with a modified version from the Tango Icon theme and is a public domain work. 
-
-utilities-terminal.png utilities-terminal.svg user-desktop.png and user-desktop.svg were added and is a derivitive work of the iceberg-png file. See the iceberg-copyright file for exact terms of use. 
-
-Removed Terminal icons that were included 
-
-Removed OpenOffice.org icons
+This theme was forked for use on the SalineOS system on 03/01/2012 by Anthony Nordquist 
 
 All changes are tracked in git at http://www.github.com/SalineOS/SalineOS
+
+Original theme is named Simple the fork is named Simple-Fork since nobody wants to eat with a complicated fork :)
 
 Xfce4-Menu icon is a derived from the Debian logo
 
