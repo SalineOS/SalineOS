@@ -21,6 +21,9 @@
 ## Not needed but I like it this way.
 Input="$@"
 
+## Not sure pkcon supports this but I hope so.
+export DEBIAN_FRONTEND='gnome'
+
 ## Set a variable of YAD options for questions, just cleaner this way.
 Question='yad --on-top --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=PackageKit-URL'
 
