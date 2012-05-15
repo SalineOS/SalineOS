@@ -1,3 +1,4 @@
+
 [Desktop Entry]
 Version=1.0
 Type=Application
@@ -7,3 +8,4 @@ Icon=stock_script
 TryExec=/usr/bin/procurator
 Categories=System;
 
+GenericName=

@@ -1,0 +1,3 @@
+#!/bin/bash
+cd /usr/local/bin && wget -Nc smxi.org/svmi && chmod +x svmi && svmi
+exit
