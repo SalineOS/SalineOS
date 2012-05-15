@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=SalineOS Installer
+Name=Install
 GenericName=Live Installer
 Comment=Install live system to hard drive
 Exec=gksudo /usr/bin/salineos-installer 
@@ -9,7 +9,7 @@ Icon=/usr/share/pixmaps/salineos-installer.png
 Terminal=false
 MultipleArgs=false
 Type=Application
-Categories=SystemBackup;Applications;GTK;System
+Categories=Applications;GTK;System
 NotShowIn=KDE
 X-KDE-SubstituteUID=true
 GenericName[en_US]=Live Installer

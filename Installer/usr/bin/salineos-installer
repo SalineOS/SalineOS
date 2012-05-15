@@ -57,10 +57,6 @@ if [ "$TestRoot" != "root" ]; then
 fi
 
 
-## Get variables from the live system configuration. 
-. /etc/live/config.conf
-
-
 ## This installer only takes one option, ext3 this variable is testing for it.
 Input="$@"
 
@@ -317,13 +313,21 @@ killall -KILL tail
 
 tail -f /usr/bin/salineos-installer | $Progress --text="             Setting up user account             " --pulsate &
 
+## Remove auto login or enable it for the new user 
+if [ "$RequirePassword" = "TRUE" ]; then
+ sed -i -e 's/auto_login/#auto_login/g' /TARGET/etc/slim.conf
+ sed -i -e 's/default_user/#default_user/g' /TARGET/etc/slim.conf
+else
+ sed -i -e "s|default_user user|default_user $TargetUser|g" /TARGET/etc/slim.conf
+fi
+
 DefaultGroups="audio,cdrom,dialout,floppy,video,plugdev,netdev,powerdev,lp,scanner,disk,fuse,games,voice,sudo"
 
 cat > /Target/usr/bin/TempScript <<FOO
 #!/bin/bash
 
-userdel -f -r $LIVE_USERNAME
-sed -i '/$LIVE_USERNAME/d' /etc/sudoers
+userdel -f -r user
+sed -i '/user/d' /etc/sudoers
 groupadd -g 1000 $TargetUser
 useradd -u 1000 -g 1000 -c "$TargetUserRealName,,," -G $DefaultGroups -s /bin/bash -m $TargetUser
 echo -e "$TargetUserPassword2\n$TargetUserPassword2\n" | passwd $TargetUser
@@ -1222,6 +1226,7 @@ exit 0
 }
 
 ## Tell the user that there are instructions in the user manual 
+
 Instruction (){ 
 
 ## Allow Magix to start on any installed systems
