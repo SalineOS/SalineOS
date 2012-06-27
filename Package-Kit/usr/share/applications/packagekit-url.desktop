@@ -1,0 +1,6 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=gksudo /usr/bin/packagekit-url %u
+StartupNotify=false
+Terminal=false

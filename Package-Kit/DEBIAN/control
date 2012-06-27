@@ -1,0 +1,9 @@
+Package: packagekit-url
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, util-linux, packagekit
+Section: system
+Priority: optional
+Description: Handles apt and pkgkit links via pkcon.

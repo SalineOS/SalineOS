@@ -1,0 +1,9 @@
+Package: clean
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 93
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux, grub-pc, aptitude
+Section: system
+Priority: optional
+Description: Boot loader restoration utility.
