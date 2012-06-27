@@ -1,0 +1,9 @@
+Package: salty-ice-gtk-theme
+Version: 2.0-1
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 343
+Depends: coreutils
+Section: system
+Priority: optional
+Description: Default GTK theme for SalineOS.

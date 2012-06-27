@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Exec=/usr/bin/salineos-system-utilities
+Name=SalineOS Utilities
+Icon=system
+TryExec=/usr/bin/salineos-system-utilities
+Categories=System;
+GenericName=SalineOS Utils

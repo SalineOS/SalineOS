@@ -1,0 +1,9 @@
+Package: salineos-installer
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux, grub-pc, squashfs-tools, rsync, localizesys 
+Section: system
+Priority: optional
+Description: Allows installing the SalineOS live environment to disk.

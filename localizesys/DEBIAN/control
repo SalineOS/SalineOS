@@ -1,0 +1,9 @@
+Package: localizesys
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, util-linux, locales-all
+Section: system
+Priority: optional
+Description: Allows setting the system language through a small series of dialogs.
