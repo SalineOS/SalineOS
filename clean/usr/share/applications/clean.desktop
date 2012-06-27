@@ -4,8 +4,7 @@ Version=1.0
 Type=Application
 Exec=/usr/bin/Clean
 Name=Disk Cleanup
-Icon=stock_script
-TryExec=/usr/bin/procurator
+Icon=/usr/share/pixmaps/clean.png
+TryExec=/usr/bin/Clean
 Categories=System;
-
-GenericName=
+GenericName=Disk Cleanup

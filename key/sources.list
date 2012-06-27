@@ -1,0 +1,25 @@
+# Squeeze Security Updates
+deb http://security.debian.org/ wheezy/updates main
+#deb-src http://security.debian.org/ wheezy/updates main
+
+# Debian Squeeze
+#deb http://ftp.debian.org/debian/ wheezy main contrib non-free
+#deb-src http://ftp.debian.org/debian/ wheezy main contrib non-free
+
+# Debian US mirror:
+deb ftp://ftp.us.debian.org/debian/ wheezy main contrib non-free
+#deb-src ftp://ftp.us.debian.org/debian/ wheezy main contrib non-free
+
+
+# Squeeze Backports
+deb http://backports.debian.org/debian-backports wheezy-backports main contrib non-free
+
+# Remastersys Squeeze
+#deb http://www.geekconnection.org/remastersys/repository wheezy/
+
+# SalineOS 
+deb http://www.salineos.com/Repo salineos main
+
+
+# Marillat For info visit http://www.debian-multimedia.org
+deb http://www.debian-multimedia.org wheezy main non-free
