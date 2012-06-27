@@ -38,7 +38,7 @@ fi
 
 $Question --width=200 --text="This is a boot-loader restoration utility (GRUB2). Would you like to restore the system boot-loader?"
 
-if [ $? != 0 ]; then
+if [ "$?" != "0" ]; then
  exit 0
 fi
 
@@ -70,6 +70,8 @@ if [ "$PartDriveSize" != "1" ]; then
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 fi
 if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then

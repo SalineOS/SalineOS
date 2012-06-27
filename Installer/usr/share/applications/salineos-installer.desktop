@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.0
 Encoding=UTF-8
-Name=Install
+Name=Install To Disk
 GenericName=Live Installer
 Comment=Install live system to hard drive
 Exec=gksudo /usr/bin/salineos-installer 

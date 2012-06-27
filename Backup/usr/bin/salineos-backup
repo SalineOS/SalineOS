@@ -762,7 +762,10 @@ if [ "$PartDriveSize" != "1" ]; then
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 fi
+
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then
   if [ "$HomePartMenu" = "" ]; then
@@ -849,6 +852,8 @@ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{prin
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
  if [ "$SwapPartMenu" = "" ]; then
@@ -979,7 +984,10 @@ if [ "$PartDriveSize" != "1" ]; then
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 fi
+
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then
   if [ "$PartDriveMenu" = "" ]; then
@@ -1067,6 +1075,8 @@ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{prin
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 
 if [ "$(echo "$i" | grep [0-9] )" = "" ]; then
  if [ "$PartDriveMenu" = "" ]; then
@@ -1577,6 +1587,8 @@ DriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 
 if [ "$USBDriveMenu" = "" ]; then
  USBDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
@@ -1660,7 +1672,10 @@ if [ "$PartDriveSize" != "1" ]; then
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 fi
+
 if [ "$(echo "$i" | grep [0-9])" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then
   if [ "$PartDriveMenu" = "" ]; then
@@ -1912,7 +1927,10 @@ if [ "$PartDriveSize" != "1" ]; then
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=(($SizeInGB + 1))
 fi
+
 if [ "$(echo "$i" | grep [0-9])" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then
   if [ "$PartDriveMenu" = "" ]; then
