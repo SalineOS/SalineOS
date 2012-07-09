@@ -1,0 +1,9 @@
+Package: salineos-custom-actions
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 93
+Depends: yet-another-dialog, coreutils, findutils, bash, sed, util-linux, imagemagick, nrg2iso, dmg2img, ccd2iso, mdf2iso, unoconv, kvm, gtkhash, fuseiso, procurator
+Section: system
+Priority: optional
+Description: Boot loader restoration utility.

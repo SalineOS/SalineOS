@@ -1,8 +1,8 @@
-# Squeeze Security Updates
+# Wheezy Security Updates
 deb http://security.debian.org/ wheezy/updates main
 #deb-src http://security.debian.org/ wheezy/updates main
 
-# Debian Squeeze
+# Debian Wheezy
 #deb http://ftp.debian.org/debian/ wheezy main contrib non-free
 #deb-src http://ftp.debian.org/debian/ wheezy main contrib non-free
 
@@ -11,7 +11,7 @@ deb ftp://ftp.us.debian.org/debian/ wheezy main contrib non-free
 #deb-src ftp://ftp.us.debian.org/debian/ wheezy main contrib non-free
 
 
-# Squeeze Backports
+# Wheezy Backports
 deb http://backports.debian.org/debian-backports wheezy-backports main contrib non-free
 
 # Remastersys Squeeze

@@ -1,0 +1,9 @@
+Package: midori-app-menu
+Version: 2.0-1
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 93
+Depends: coreutils, findutils, bash, sed, util-linux, yet-another-dialog, midori
+Section: system
+Priority: optional
+Description: Menu for customized Midori Web Applications.

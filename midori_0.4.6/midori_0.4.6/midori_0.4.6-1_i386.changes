@@ -1,0 +1,32 @@
+Format: 1.8
+Date: Sun, 01 July 2012 19:24:02 -0400
+Source: midori
+Binary: midori
+Architecture: source i386
+Version: 0.4.6-1
+Distribution: UNRELEASED
+Urgency: low
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Changed-By: AnthonyNordquist <salinelinux@gmail.com>
+Description: 
+ midori     - Web browser based  on webkit, that uses the Xfce libraries.
+Closes: 0
+Changes: 
+ midori (0.4.6-1) UNRELEASED; urgency=low
+ .
+   * New upstream release. (Closes: #0)
+Checksums-Sha1: 
+ 0b5d6685c144c2c742266928912488200ea3e316 832 midori_0.4.6-1.dsc
+ 46791d438f2dd5c075fe40aa41a6b17fb8d5c2bf 1472297 midori_0.4.6.orig.tar.gz
+ e35002f328e600edd885c533eb8f5ef3c4790269 10312 midori_0.4.6-1.debian.tar.gz
+ b8e249a4dcfa957b459b93fd69fe2e69cc46e28b 1240662 midori_0.4.6-1_i386.deb
+Checksums-Sha256: 
+ cda8825c1117a9fc1c46771432c6a0e7d359275b9b16820a226cbf65ad442ddb 832 midori_0.4.6-1.dsc
+ 5f92bdf71282d7b8c556a9d05f32675913ae6c8c23577037259fc367ddd83a0b 1472297 midori_0.4.6.orig.tar.gz
+ e98b43f2c431872650ef11801d12ee16b7a79ffd76b3aa5f7a0bd5587210bb80 10312 midori_0.4.6-1.debian.tar.gz
+ bc53d34ea60e4c1e84ee7d83426a53fa09dd2dcaf9c632e723c0464cd99c70a2 1240662 midori_0.4.6-1_i386.deb
+Files: 
+ c6c91ce2cd8bbfe093a202aa78555016 832 misc optional midori_0.4.6-1.dsc
+ 2e5d5d1e9327d1ca6aaf9d515393b6b1 1472297 misc optional midori_0.4.6.orig.tar.gz
+ 8cd41106bec7bd009af4c9a61e39100d 10312 misc optional midori_0.4.6-1.debian.tar.gz
+ d6ca15d72a1b14b4482062e28ca56b52 1240662 misc optional midori_0.4.6-1_i386.deb

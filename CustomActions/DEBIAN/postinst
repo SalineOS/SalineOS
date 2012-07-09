@@ -1,0 +1,13 @@
+#!/bin/sh
+#
+# see: dh_installdeb(1)
+
+set -e
+
+for i in $(ls /home); do
+ cp -f /etc/custom-actions/uca.xml /home/$i/.config/Thunar
+done
+
+exit 0
+
+

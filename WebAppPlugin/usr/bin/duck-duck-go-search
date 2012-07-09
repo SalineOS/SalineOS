@@ -32,5 +32,5 @@ SearchTerms=$(echo "$Input" | sed 's| |+|g')
 
 
 
-exec midori "https://duckduckgo.com/?q=$SearchTerms\&t=saline" &
+exec midori "https://duckduckgo.com/?q=$SearchTerms&t=saline" &
 exit 0

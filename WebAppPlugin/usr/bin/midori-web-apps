@@ -163,7 +163,7 @@ else
 fi
 if [ "$ClearPrivateData" = "TRUE" ]; then
  PrivateData="clear-private-data=32"
- DataArray=("FALSE" "page-icons" "Page Icons" "FALSE" "formhistory" "Form History" "FALSE" "web-cookies" "Web Cookies" "FALSE" "flash-cookies" "Flash Cookies" "FALSE" "html5-databases" "HTML5 Databases" "FALSE" "web-cache" "Website Cache" "FALSE" "offline-appcache" "Offline Application Cache")
+ DataArray=("FALSE" "page-icons" "Page Icons" "FALSE" "formhistory" "Form History" "FALSE" "web-cookies" "Web Cookies" "FALSE" "web-cache" "Website Cache" "FALSE" "page-icons" "Web Page Icons")
  ToClear=$(yad --title='     ' --window-icon="midori" --width=300 --height=275 --list --checklist --multiple --no-headers  --column=' ' --column=' ' --column=' '  --print-column=2 --hide-column=2 --text="Select the private data you want cleared on exit." --button=$"gtk-cancel:3" --button=$"gtk-ok:2" "${DataArray[@]}")
 
 ret="$?"
@@ -239,7 +239,6 @@ ExtensionsArray=(\
  "FALSE" "Statusbar Features" "Toggle features on web pages on and off" "libstatusbar-features.so=true"\
  "FALSE" "Statusbar Clock" "Show time and date in the statusbar" "libstatus-clock.so=true"\
  "FALSE" "Keyboard Shortcuts" "View and edit Midori keyboard shortcuts" "libshortcuts.so=true"\
- "FALSE" "Tab Panel" "Show tabs in a vertical panel" "libtab-panel.so=true"\
  "FALSE" "Icons Only" "Show only icons on tabs" "libtabs-minimized.so=true"\
  "FALSE" "Toolbar Editor" "Easily edit the toolbar (Navigationbar) layout" "libtoolbar-editor.so=true")
 
@@ -271,6 +270,7 @@ cat > "$HOME/.webapps/$Name2/config/config" <<FOO
 [settings]
 default-encoding=ISO-8859-1
 enable-site-specific-quirks=true
+enable-webgl=true
 last-window-width=800
 last-window-height=600
 last-window-state=MIDORI_WINDOW_MAXIMIZED

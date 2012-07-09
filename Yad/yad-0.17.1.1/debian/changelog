@@ -1,5 +1,5 @@
-yad (0.17.1.1) UNRELEASED; urgency=low
+yet-another-dialog (0.17.1.1) UNRELEASED; urgency=low
 
-  * Initial release.
+  * New upstream release.
 
- -- Anthony Nordquist <salinelinux@gmail.com>  Sat, 31 Mar 2012 18:20:54 -0400
+ -- Anthony Nordquist <salinelinux@gmail.com>  Sun, 08 July 2012 18:20:54 -0400

@@ -1,0 +1,31 @@
+Format: 1.8
+Date: Sat, 31 Mar 2012 18:20:54 -0400
+Source: yet-another-dialog
+Binary: yad
+Architecture: source i386
+Version: 0.17.1.1
+Distribution: UNRELEASED
+Urgency: low
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Changed-By: Anthony Nordquist <salinelinux@gmail.com>
+Description: 
+ yad        - Yet another dialog
+Changes: 
+ yet-another-dialog (0.17.1.1) UNRELEASED; urgency=low
+ .
+   * New upstream release.
+Checksums-Sha1: 
+ d9048e09fc9c95c1951e8f7f5b917f4897f227be 891 yet-another-dialog_0.17.1.1.dsc
+ bdcb2f2dfcc10a904a3605dd7b59c2f7e8f6f7fc 288277 yet-another-dialog_0.17.1.1.orig.tar.gz
+ 743f3b6a94317b5c42369666fa6f1bd6889b0abe 1168 yet-another-dialog_0.17.1.1.debian.tar.gz
+ a03c1610885260bda46f089e8858f4e0ed53d8b0 142926 yad_0.17.1.1_i386.deb
+Checksums-Sha256: 
+ 216049cba8dbad6a85edbec4374c5650f2a8f7700067890f3c7e3a110da10110 891 yet-another-dialog_0.17.1.1.dsc
+ 3fc07adc968e3356253b7f7030de446d00c0d6c9f3232ae85237f6c370e30bdb 288277 yet-another-dialog_0.17.1.1.orig.tar.gz
+ d42dc9320c39a06c2d2de10e796b1b29cd255266cdfff7f60aff22ca2d980c1a 1168 yet-another-dialog_0.17.1.1.debian.tar.gz
+ ad0a9438ad102dae976c2a646529486785cd1f4bd294e7cc5d43be32c99885d5 142926 yad_0.17.1.1_i386.deb
+Files: 
+ 56e4d1d4e43af05c1a2c8ab85e788761 891 misc optional yet-another-dialog_0.17.1.1.dsc
+ ae5e9581934db8d089d2004caf0f09f8 288277 misc optional yet-another-dialog_0.17.1.1.orig.tar.gz
+ a8b4d9207174ba100893c9a49261ec22 1168 misc optional yet-another-dialog_0.17.1.1.debian.tar.gz
+ ec438d7312b0eab3e29b433f46fc8dec 142926 misc optional yad_0.17.1.1_i386.deb
