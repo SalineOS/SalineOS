@@ -129,6 +129,10 @@ rm -rf /Target/lost+found
 
 killall -KILL tail
 
+if [ "$TargetHomePart" = "" ]; then
+ TargetHomePart="root"
+fi
+
 if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "True" ]; then
   tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
@@ -782,7 +786,7 @@ if [ "$PartDriveSize" != "1" ]; then
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 fi
 
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
@@ -873,7 +877,7 @@ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{prin
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
  if [ "$SwapPartMenu" = "" ]; then
@@ -1008,7 +1012,7 @@ if [ "$PartDriveSize" != "1" ]; then
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 fi
 
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
@@ -1089,7 +1093,7 @@ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{prin
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 
 if [ "$(echo "$i" | grep [0-9] )" = "" ]; then
  if [ "$PartDriveMenu" = "" ]; then

@@ -85,6 +85,8 @@ DriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
  SizeInMB=$(($SizeInKB / 1024))
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
+## Round up on Gigabytes
+ SizeInGB=$(($SizeInGB + 1))
 
 if [ "$USBDriveMenu" = "" ]; then
  USBDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")

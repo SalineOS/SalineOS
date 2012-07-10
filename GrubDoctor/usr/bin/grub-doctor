@@ -71,7 +71,7 @@ if [ "$PartDriveSize" != "1" ]; then
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 fi
 if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
  if [ "$PartDriveSize" != "1" ]; then

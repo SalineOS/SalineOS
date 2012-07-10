@@ -349,6 +349,10 @@ rm -rf /Target/lost+found
 
 killall -KILL tail
 
+if [ "$TargetHomePart" = "" ]; then
+ TargetHomePart="root"
+fi
+
 if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "True" ]; then
   tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
@@ -763,7 +767,7 @@ if [ "$PartDriveSize" != "1" ]; then
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 fi
 
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
@@ -853,7 +857,7 @@ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{prin
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
  if [ "$SwapPartMenu" = "" ]; then
@@ -985,7 +989,7 @@ if [ "$PartDriveSize" != "1" ]; then
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 fi
 
 if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
@@ -1076,7 +1080,7 @@ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{prin
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 
 if [ "$(echo "$i" | grep [0-9] )" = "" ]; then
  if [ "$PartDriveMenu" = "" ]; then
@@ -1588,7 +1592,7 @@ DriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 
 if [ "$USBDriveMenu" = "" ]; then
  USBDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
@@ -1673,7 +1677,7 @@ if [ "$PartDriveSize" != "1" ]; then
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 fi
 
 if [ "$(echo "$i" | grep [0-9])" != "" ]; then
@@ -1928,7 +1932,7 @@ if [ "$PartDriveSize" != "1" ]; then
 ## Divide Megabytes by 1024 to get Gigabytes
  SizeInGB=$(($SizeInMB / 1024))
 ## Bash always removes the decimels causing it to round down, this makes it round up.
- SizeInGB=(($SizeInGB + 1))
+ SizeInGB=$(($SizeInGB + 1))
 fi
 
 if [ "$(echo "$i" | grep [0-9])" != "" ]; then
@@ -2267,10 +2271,655 @@ fi
 
 }
 
+
+## Start Clone to partition code #######################################################################################
+
+StartPartClone () {
+
+Selection=""
+Excludes=""
+NewExclude=""
+CurrentExcludes=""
+
+mkdir -p /etc/salineos-backup
+
+if [ -f /etc/salineos-backup/excludes ]; then
+ Excludes=$(cat /etc/salineos-backup/excludes)
+fi
+
+CurrentExcludes=$(echo -n "$Excludes" | yad --always-print-result --text-info --height=350 --editable --title="SalineOS Backup" --wrap --width=400 --text="If desired you can exclude select files or folders from being included on the cloned system. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog." --button=$"gtk-cancel:3" --button=$"Add New:5" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "5" ]; then
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+ NewExclude=$(yad --file-selection --title="SalineOS Backup" --height=450 --width=600 --directory --text="\n                     Select the file or folder you wish to exclude\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ ret="$?"
+
+ if [ "$ret" = "252" ]; then
+  StartPartClone
+  exit 0
+ elif [ "$ret" = "3" ]; then
+  exit 0
+ else
+  echo "$NewExclude">>/etc/salineos-backup/excludes
+  StartPartClone
+  exit 0
+ fi
+else
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+fi
+
+
+Excludes=$(cat /etc/salineos-backup/excludes)
+
+SelectClonePart
+
+exit 0
+
+
+}
+
+SelectClonePart () {
+
+TargetPart=""
+PartDriveMenu=("")
+
+## Don't display the current root partition as an option
+## Don't display the current /home partition as an option
+CurrentRootDir=$(mount | grep -B 0 ' / ' | awk '{print $1}')
+CurrentHomeDir=$(mount | grep -B 0 ' /home ' | awk '{print $1}')
+
+if [ "$CurrentHomeDir" = "" ]; then
+ CurrentHomeDir='No way in hell this will be found'
+fi
+
+Partitions=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{print $4}' | grep -v 'p1' | grep -v "$CurrentRootDir" | grep -v "$CurrentHomeDir")
+
+for i in $Partitions; do
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=$(($SizeInGB + 1))
+
+fi
+
+if [ "$(echo "$i" | grep [0-9])" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  if [ "$PartDriveMenu" = "" ]; then
+   PartDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   PartDriveMenu=("${PartDriveMenu[@]}" "$i" "$Label" "$SizeInGB" "$SizeInMB")
+   fi
+ fi
+fi
+
+done
+
+
+TargetPart=$($Menu --height=300 --width=575 --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" --text="                             Please select a partition to clone to.\n" "${PartDriveMenu[@]}" )
+
+ret=$?
+
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$TargetPart" = "" ]; then
+ $Info --button=$"gtk-ok:1" --text="     You must select a partition before continuing.     \n"
+ SelectClonePart
+ exit 0
+fi
+
+TargetPart=$(echo "$TargetPart" | awk -F '|' '{print $1}')
+
+SwapFileClonePart
+exit 0
+
+}
+
+
+SwapFileClonePart () {
+
+SwapFileSize=""
+
+
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ UseSwapFile="False"
+ SelectSwapClonePart
+ exit 0
+elif [ "$ret" = "252" ]; then
+ SwapFileClonePart
+ exit 0 
+elif [ "$SwapFileSize" = "" ]; then
+ SwapFileClonePart
+ exit 0
+else
+ UseSwapFile="True"
+ SwapFileSize=$(echo "$SwapFileSize" | awk -F '|' '{print $1}') 
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap" | grep -v "$CurrentRootDir" | grep -v "$CurrentHomeDir")"
+ if [ "$HomePartTest" != "" ]; then
+  SelectHomeClonePart
+  exit 0
+ fi
+fi
+
+RunClonePart
+
+exit 0
+
+}
+
+
+SelectSwapClonePart () {
+
+SwapPartMenu=""
+Swap=""
+BlockSize=""
+
+## Find swap partitions and find out which to use.
+TargetSwap=$(fdisk -l | grep "swap" | cut -d " " -f1)
+TargetSwap=$(echo "$TargetSwap" | sed -r "s/\/dev\///g")
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+
+for i in $TargetSwap; do
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=$(($SizeInGB + 1))
+
+if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
+ if [ "$SwapPartMenu" = "" ]; then
+  SwapPartMenu=("$i" "$SizeInGB" "$SizeInMB")
+ else
+  SwapPartMenu=("${SwapPartMenu[@]}" "$i" "$SizeInGB" "$SizeInMB")
+ fi
+fi
+
+done
+
+
+Swap=$($Menu --width=415 --height=250 --text="            Please select the partition to use for swap            \n" --column="Name" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" "${SwapPartMenu[@]}")
+
+ret="$?"
+
+
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the restoration?"
+  if [ "$?" = "0" ]; then
+   exit 1
+  else
+   SelectSwapClonePart
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ SelectSwapClonePart
+ exit 0 
+elif [ "$ret" = "5" ]; then
+ SwapFileClonePart
+ exit 0
+elif [ "$Swap" = "" ]; then
+ SelectSwapClonePart
+ exit 0
+else
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap" | grep -v "$CurrentRootDir" | grep -v "$CurrentHomeDir")"
+ if [ "$HomePartTest" != "" ]; then
+  Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
+  SelectHomeClonePart
+  exit 0
+ fi
+ Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
+ RunClonePart
+ exit 0
+fi
+
+}
+
+SelectHomeClonePart () {
+
+HomePartMenu=""
+Partitions=""
+
+Partitions="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "swap" | grep -v 'p1' | grep -v "extended" | grep -v "Hidden" | grep -v "$CurrentRootDir" | grep -v "$CurrentHomeDir" | cut -d " " -f1 | sed 's|/dev/||g')"
+
+for i in $Partitions; do
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=$(($SizeInGB + 1))
+
+fi
+
+if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  if [ "$HomePartMenu" = "" ]; then
+   HomePartMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   HomePartMenu=("${HomePartMenu[@]}" "$i" "$Label" "$SizeInGB" "$SizeInMB")
+  fi
+ fi
+fi
+
+done
+
+HomePart=$($Menu --width="575" --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column="Name" --column="Partition Label" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" "${HomePartMenu[@]}")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ SelectHomeClonePart
+ exit 0
+elif [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to abort the installation?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   SelectHomeClonePart
+   exit 0
+  fi
+elif [ "$ret" = "5" ]; then
+ TargetHomePart="root"
+ RunClonePart
+ exit 0
+elif [ "$HomePart" = "" ]; then
+ SelectHomeClonePart
+ exit 0
+else
+ TargetHomePart=$(echo "$HomePart" | awk -F '|' '{print $1}')
+  $Question --text="Format (Erase all data) on the target home partition, $TargetHomePart?"
+  if [ "$?" = "0" ]; then
+   FormatHome="True"
+  else
+   FormatHome="False"
+  fi
+fi
+
+RunClonePart
+
+}
+
+RunClonePart () {
+
+if [ "$UseSwapFile" = "True" ]; then
+ FinalSwap="A $SwapFileSize swap file will be created.          \n"
+else
+ FinalSwap="$Swap will be formatted and used for swap.          \n"
+fi
+
+FinalTargetPart="$TargetPart will be formatted and used for the root system.          \n"
+
+if [ "$TargetHomePart" = "" ]; then
+ TargetHomePart="root"
+fi
+
+if [ "$TargetHomePart" != "root" ]; then
+ if [ "$FormatHome" = "True" ]; then
+  FinalHomePart="$TargetHomePart will be formatted and used for /home.          \n"
+ else
+  FinalHomePart="$TargetHomePart will not be formatted but still used for /home.          \n"
+ fi
+else
+ FinalHomePart="/home will be placed on the root partition $TargetPart.          \n"
+fi
+
+yad --title="SalineOS Backup" --window-icon="/usr/share/salineos-backup.png" --text="$FinalTargetPart\n$FinalSwap\n$FinalHomePart\nContinue with operation?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5" 
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "252" ]; then
+ RunClonePart
+ exit 0
+fi
+
+$Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-cancel:3" --button=$"gtk-ok:1"
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+fi
+
+## Start the actual meat and potatoes cloning
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Preparing disk and partitions           " &
+
+if [ "$(mount | grep $TargetPart)" != "" ]; then
+ umount /dev/$TargetPart
+ umount -l /dev/$TargetPart
+ sleep 3
+fi
+
+## Perserve labels set by users in GParted
+if [ "$(ls /dev/disk/by-label)" != "" ]; then
+ LabelRoot=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$TargetPart" | awk '{print $1}' | sed -e 's|\\x20| |g')
+fi
+sleep 2
+mke2fs -t $FilesystemType /dev/$TargetPart
+
+sleep 2
+
+if [ "$LabelRoot" != "" ]; then
+ tune2fs -L "$LabelRoot" /dev/$TargetPart
+fi
+
+mkdir -p /Target
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="                   Mounting $TargetPart                   " &
+
+mount /dev/$TargetPart /Target -o rw
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="Configure the filesystem to be checked\nevery 35 mounts" &
+
+tune2fs -c 35 -i 0 /dev/$TargetPart
+
+sleep 3
+
+rm -rf /Target/lost+found
+
+killall -KILL tail
+
+if [ "$TargetHomePart" = "" ]; then
+ TargetHomePart="root"
+fi
+
+if [ "$TargetHomePart" != "root" ]; then
+ if [ "$FormatHome" = "True" ]; then
+  tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
+  umount /dev/$TargetHomePart
+  umount -l /dev/$TargetHomePart
+  sleep 2
+ ## Perserve labels set by users in GParted
+ if [ "$(ls /dev/disk/by-label)" != "" ]; then
+  LabelHome=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$TargetHomePart" | awk '{print $1}' | sed -e 's|\\x20| |g')
+ fi
+  sleep 2
+  mke2fs -t $FilesystemType /dev/$TargetHomePart
+  sleep 3
+  if [ "$LabelHome" != "" ]; then
+   tune2fs -L "$LabelHome" /dev/$TargetHomePart
+  fi
+  killall -KILL tail
+ fi
+
+ tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="              Mounting $TargetHomePart              " &
+
+ mkdir -p /Target/home
+
+ mount /dev/$TargetHomePart /Target/home -o rw
+
+ tune2fs -c 35 -i 0 /dev/$TargetHomePart
+
+ rm -rf /Target/home/lost+found
+
+ TargetHomeUUID=$(blkid /dev/$TargetHomePart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+
+ ## Get fs type for the home partition in case the user chose not to format it
+ HomeFilesystemType=$(mount | grep "/dev/$TargetHomePart" | awk '{print $5}' | awk -F ' ' '{print $1}')
+
+ killall -KILL tail
+fi
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="               Generating UUID values for fstab               " &
+
+TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+TargetCDRom="/dev/cdrom"
+
+sleep 3
+
+killall -KILL tail
+
+## Copy the backup image contents to $Target
+tail -f /usr/bin/salineos-backup | $Progress --text="                   Copying files to $TargetPart                   " --pulsate &
+
+
+## Excludes is a bit tricky with rsync this is some vodoo magic
+cp -f /etc/salineos-backup/excludes /tmp/backup-excludes
+sed -i -e 's| |\ |g' /tmp/backup-excludes
+
+## Rsync
+rsync -a / /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media,swap} --exclude-from=tmp/backup-excludes
+
+## Update the home folders of users if need be
+
+if [ "$TargetHomePart" != "root" ]; then
+if [ "$FormatHome" != "True" ]; then
+ for i in $(ls /home); do
+  cp -rf /home/"$i" /Target/home/
+ done
+fi
+fi
+
+sleep 3
+
+
+## Make needed aditional folders on the system.
+mkdir -p /Target/{proc,dev,mnt,sys,tmp,media/cdrom}
+mkdir -p /Target/var/run
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --text="                    Setting up swap space                    " --pulsate &
+
+
+if [ "$UseSwapFile" = "True" ]; then
+ mkdir -p /Target/swap
+ fallocate --l "$SwapFileSize"m /Target/swap/salineos-swap
+ sleep 2
+ mkswap /Target/swap/salineos-swap
+ SwapFstab="/swap/salineos-swap"
+else
+ mkswap "$Swap"
+ sleep 2
+ blkid
+ sleep 2
+ TargetSwapUUID=$(blkid /dev/$Swap | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+ SwapFstab="UUID=$TargetSwapUUID"
+fi
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --text="Changing configuration files on installed system" --pulsate &
+
+## Make sure all directories are present 
+mkdir -p /Target/etc
+mkdir -p /Target/usr
+mkdir -p /Target/proc
+mkdir -p /Target/tmp
+mkdir -p /Target/selinux
+mkdir -p /Target/home
+mkdir -p /Target/bin
+mkdir -p /Target/include
+mkdir -p /Target/lib
+mkdir -p /Target/opt
+mkdir -p /Target/srv
+mkdir -p /Target/media
+mkdir -p /Target/mnt
+mkdir -p /Target/dev
+mkdir -p /Target/sys
+mkdir -p /Target/boot
+mkdir -p /Target/sbin
+mkdir -p /Target/var
+
+## Remove old fstab file
+rm -rf /Target/etc/fstab
+
+## Create a new fstab file for the system
+
+
+if [ "$TargetHomePart" = "root" ]; then
+cat > /Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+# Swap space created during install
+$SwapFstab none swap sw 0 0
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+
+FOO
+
+else
+
+cat > /Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+# /dev/$TargetHomePart home
+UUID=$TargetHomeUUID /home $HomeFilesystemType relatime 0 0
+# Swap space created during install
+$SwapFstab none swap sw 0 0
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+
+FOO
+
+fi
+
+## Make the users on the system own their home folders
+for i in $(ls /Target/home); do
+ chown -R "$i" /Target/home/"$i"
+ chmod og+rw /Target/home/"$i"
+done
+
+## Fix permissions on /tmp
+chmod og+rw /Target/tmp
+
+sleep 3
+
+killall -KILL tail
+
+
+## Update GRUB2
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="               Updating GRUB2               \n"
+
+update-grub
+
+sleep 3
+
+killall -KILL tail
+
+## Unmount the target partition  
+tail -f /usr/bin/salineos-backup | $Progress --text="                  Unmounting $TargetPart                  " --pulsate &
+
+sleep 2
+
+umount -l /Target
+
+killall -KILL tail
+
+$Info --wrap --width=250 --text="            Cloning of system is complete.            \n" --button=$"gtk-ok:1" 
+
+exit 0
+
+
+}
+
+## End Clone to partition code #########################################################################################
+
 MainMenu () {
 
 MainMenuArray=("")
-MainMenuArray=(  "Create Backup Image" "Create a new .backup file" "Restore Backup Image" "Restore a .backup file to a partition(s)" "Create USB Restore Drive" "Turn a USB drive  into a bootable restore drive" "Update USB Restore Drive" "Update a select restore drive with a new .backup file" "Create Restore Partition" "Format a partition and make it a restore partition" "Update Restore Partition" "Update a restore partition with a new .backup file" )
+
+
+## Some features in this array are disabled/abandoned for the time being.
+## MainMenuArray=( "Clone To Partition" "Create a direct copy of the system on a partition(s)" "Clone To USB" "Create a direct copy of the system on a USB drive" "Create Backup Image" "Create a new .backup file" "Restore Backup Image" "Restore a .backup file to a partition(s)" "Create USB Restore Drive" "Turn a USB drive  into a bootable restore drive" "Update USB Restore Drive" "Update a select restore drive with a new .backup file" "Create Restore Partition" "Format a partition and make it a restore partition" "Update Restore Partition" "Update a restore partition with a new .backup file" )
+
+MainMenuArray=( "Clone To Partition" "Create a direct copy of the system on a partition(s)" "Clone To USB" "Create a direct copy of the system on a USB drive" "Create Backup Image" "Create a new .backup file" "Restore Backup Image" "Restore a .backup file to a partition(s)" )
 
 Action=$(yad --list --title="SalineOS Backup" --column="Action" --column="Description" --print-column="1" --wrap  --width=650 --height=300 --text="Welcome to the SalineOS backup utility. For complete usage information please refer to the SalineOS backup section in the user manual." --button=$"gtk-quit:5" --button=$"gtk-ok:2" "${MainMenuArray[@]}")
 
@@ -2281,6 +2930,12 @@ Action=$(echo "$Action" | awk -F '|' '{print $1}')
 if [ "$ret" = "252" ]; then
  exit 0
 elif [ "$ret" = "5" ]; then
+ exit 0
+elif [ "$Action" = "Clone To Partition" ]; then
+ StartPartClone
+ exit 0
+elif [ "$Action" = "Clone To USB" ]; then
+ StartUSBClone
  exit 0
 elif [ "$Action" = "Create Backup Image" ]; then
  BackupPart="root"
