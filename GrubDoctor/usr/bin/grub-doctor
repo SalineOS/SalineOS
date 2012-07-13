@@ -93,7 +93,7 @@ GetRootPart () {
 
 RootPart=""
 
-RootPart=$(yad --height="300" --list  --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"Exit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS, or another GRUB2 based distribution." "${PartDriveMenu[@]}")
+RootPart=$(yad --height="300" --list  --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="Please select the root partition of SalineOS, or another GRUB2 based distribution." "${PartDriveMenu[@]}")
 
 ret="$?"
 
@@ -128,7 +128,7 @@ GetGrubLocation (){
 GrubLocation=""
 
 
-GrubLocation=$(yad --list --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"Exit:3" --button=$"gtk-ok:2" --text="   Please select where to install grub.   \n" "${GrubMenu[@]}")
+GrubLocation=$(yad --list --window-icon="/usr/share/pixmaps/grub-doctor.png" --title="Grub Doctor" --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="   Please select where to install grub.   \n" "${GrubMenu[@]}")
 
 ret="$?"
 
