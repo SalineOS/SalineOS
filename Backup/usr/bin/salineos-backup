@@ -2444,7 +2444,7 @@ else
  fi
 fi
 
-RunClonePart
+GrubClonePart
 
 exit 0
 
@@ -2519,7 +2519,7 @@ else
   exit 0
  fi
  Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
- RunClonePart
+ GrubClonePart
  exit 0
 fi
 
@@ -2589,7 +2589,7 @@ elif [ "$ret" = "3" ]; then
   fi
 elif [ "$ret" = "5" ]; then
  TargetHomePart="root"
- RunClonePart
+ GrubClonePart
  exit 0
 elif [ "$HomePart" = "" ]; then
  SelectHomeClonePart
@@ -2604,11 +2604,71 @@ else
   fi
 fi
 
+GrubClonePart
+
+}
+
+
+
+GrubClonePart () {
+
+## Need to get the root partition from the user.
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}')
+
+for i in $Drives; do
+PartDrive="$i"
+if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
+ GrubMenu=("${GrubMenu[@]}" "$PartDrive" "Master boot record of disk")
+fi
+done
+
+GrubMenu=("${GrubMenu[@]}" "root" "Root Partition (Advanced)")
+
+GrubLocation=""
+
+
+GrubLocation=$(yad --list --window-icon="/usr/share/pixmaps/salineos-backup.png" --title="Grub Doctor" --column="Name" --column="Description" --height="300" --width="275" --wrap --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="   Please select where to install grub.   \n" "${GrubMenu[@]}")
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the cloning?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GrubClonePart
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+  $Question --text="Are you sure you want to cancel the cloning?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GrubClonePart
+   exit 0
+  fi
+elif [ "$GrubLocation" = "" ]; then
+ $Info --text="No location selected, please retry." --button=$"gtk-ok:1"
+ GrubClonePart
+ exit 0
+fi
+
+GrubLocation=$(echo "$GrubLocation" | awk -F '|' '{print $1}')
+
+if [ "$GrubLocation" = "root" ]; then
+ GrubLocation="/dev/$TargetPart"
+else
+ GrubLocation="/dev/$GrubLocation"
+fi
+
 RunClonePart
 
 }
 
 RunClonePart () {
+
+FinalGrub="Grub will be installed to $GrubLocation.\n"
 
 if [ "$UseSwapFile" = "True" ]; then
  FinalSwap="A $SwapFileSize swap file will be created.          \n"
@@ -2626,13 +2686,14 @@ if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "True" ]; then
   FinalHomePart="$TargetHomePart will be formatted and used for /home.          \n"
  else
-  FinalHomePart="$TargetHomePart will not be formatted but still used for /home.          \n"
+  FinalHomePart="$TargetHomePart will not be formatted but still used for /home.          \n\
+WARNING: Any user folders on $TargetHomePart with the same name as one on SalineOS will be overwritten.    \n"
  fi
 else
  FinalHomePart="/home will be placed on the root partition $TargetPart.          \n"
 fi
 
-yad --title="SalineOS Backup" --window-icon="/usr/share/salineos-backup.png" --text="$FinalTargetPart\n$FinalSwap\n$FinalHomePart\nContinue with operation?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5" 
+yad --title="SalineOS Backup" --window-icon="/usr/share/salineos-backup.png" --text="$FinalTargetPart\n$FinalSwap\n$FinalHomePart\n$FinalGrub\nContinue with operation?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5" 
 
 ret="$?"
 
@@ -2668,7 +2729,7 @@ if [ "$(ls /dev/disk/by-label)" != "" ]; then
  LabelRoot=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$TargetPart" | awk '{print $1}' | sed -e 's|\\x20| |g')
 fi
 sleep 2
-mke2fs -t $FilesystemType /dev/$TargetPart
+mke2fs -t ext4 /dev/$TargetPart
 
 sleep 2
 
@@ -2755,28 +2816,49 @@ tail -f /usr/bin/salineos-backup | $Progress --text="                   Copying 
 
 
 ## Excludes is a bit tricky with rsync this is some vodoo magic
-cp -f /etc/salineos-backup/excludes /tmp/backup-excludes
-sed -i -e 's| |\ |g' /tmp/backup-excludes
+if [ -f /etc/salineos-backup/excludes ]; then
+ if [ "$(cat /etc/salineos-backup/excludes)" != "" ]; then
+  cp -f /etc/salineos-backup/excludes /tmp/backup-excludes
+  sed -i -e 's| |\ |g' /tmp/backup-excludes
+ else
+  touch /tmp/backup-excludes
+ fi
+fi
+
+
+## Add some things to exclude 
+
+echo '/var/run'>>/tmp/backup-excludes
+echo '/boot/grub'>>/tmp/backup-excludes
+echo '/var/lock'>>/tmp/backup-excludes
+echo '/media'>>/tmp/backup-excludes
+echo '/mnt'>>/tmp/backup-excludes
+echo '/proc'>>/tmp/backup-excludes
+echo '/swap'>>/tmp/backup-excludes
+echo '/sys'>>/tmp/backup-excludes
+echo '/tmp'>>/tmp/backup-excludes
+
+for i in $(ls /home); do
+ echo "/home/$i/local/share/gvfs-metadata">>/tmp/backup-excludes
+ echo "/home/$i/.cache">>/tmp/backup-excludes
+ echo "/home/$i/.dbus">>/tmp/backup-excludes
+ echo "/home/$i/.gvfs">>/tmp/backup-excludes
+done
 
 ## Rsync
-rsync -a / /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media,swap} --exclude-from=tmp/backup-excludes
+rsync -a / /Target --ignore-existing --exclude-from=/tmp/backup-excludes
 
 ## Update the home folders of users if need be
 
 if [ "$TargetHomePart" != "root" ]; then
 if [ "$FormatHome" != "True" ]; then
  for i in $(ls /home); do
-  cp -rf /home/"$i" /Target/home/
+  if [ "$(grep "$i$" /tmp/backup-excludes)" = "" ]; then
+   cp -rf /home/"$i" /Target/home
+  fi
  done
 fi
 fi
-
-sleep 3
-
-
-## Make needed aditional folders on the system.
-mkdir -p /Target/{proc,dev,mnt,sys,tmp,media/cdrom}
-mkdir -p /Target/var/run
 
 sleep 3
 
@@ -2805,6 +2887,7 @@ killall -KILL tail
 tail -f /usr/bin/salineos-backup | $Progress --text="Changing configuration files on installed system" --pulsate &
 
 ## Make sure all directories are present 
+mkdir -p /var/lock
 mkdir -p /Target/etc
 mkdir -p /Target/usr
 mkdir -p /Target/proc
@@ -2822,10 +2905,14 @@ mkdir -p /Target/dev
 mkdir -p /Target/sys
 mkdir -p /Target/boot
 mkdir -p /Target/sbin
-mkdir -p /Target/var
+mkdir -p /Target/var/run
 
 ## Remove old fstab file
 rm -rf /Target/etc/fstab
+
+if [ -f /Target/lost+found ]; then
+ rm -rf /Target/lost+found
+fi
 
 ## Create a new fstab file for the system
 
@@ -2838,7 +2925,7 @@ cat > /Target/etc/fstab <<FOO
 
 proc /proc proc defaults 0 0
 # Root was on /dev/$TargetPart during install
-UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+UUID=$TargetPartUUID / ext4 relatime,errors=remount-ro 0 1
 # Swap space created during install
 $SwapFstab none swap sw 0 0
 # cdrom
@@ -2856,7 +2943,7 @@ cat > /Target/etc/fstab <<FOO
 
 proc /proc proc defaults 0 0
 # Root was on /dev/$TargetPart during install
-UUID=$TargetPartUUID / $FilesystemType relatime,errors=remount-ro 0 1
+UUID=$TargetPartUUID / ext4 relatime,errors=remount-ro 0 1
 # /dev/$TargetHomePart home
 UUID=$TargetHomeUUID /home $HomeFilesystemType relatime 0 0
 # Swap space created during install
@@ -2869,7 +2956,7 @@ FOO
 
 fi
 
-## Make the users on the system own their home folders
+## Make the users on the system own their home folders and fix permissions.
 for i in $(ls /Target/home); do
  chown -R "$i" /Target/home/"$i"
  chmod og+rw /Target/home/"$i"
@@ -2885,22 +2972,43 @@ killall -KILL tail
 
 ## Update GRUB2
 
-tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="               Updating GRUB2               \n"
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="               Updating GRUB2               \n" &
+
+## Prepare a chroot envoirnment for post install changes
+
+mount -o bind /proc /Target/proc
+mount -o bind /dev /Target/dev
+mount -o bind /sys /Target/sys
+
+chroot /Target chmod -x /etc/grub.d/20_memtest86+
+sleep 2
+chroot /Target grub-install --force --no-floppy "$GrubLocation"
+sleep 2
+chroot /Target update-grub
+sleep 2
+update-grub
+sleep 2
+umount /Target/home
+sleep 2
+umount /Target/proc
+sleep 2
+umount /Target/dev
+sleep 2
+umount /Target/sys
+sleep 2
 
 update-grub
-
-sleep 3
-
-killall -KILL tail
-
-## Unmount the target partition  
-tail -f /usr/bin/salineos-backup | $Progress --text="                  Unmounting $TargetPart                  " --pulsate &
 
 sleep 2
 
 umount -l /Target
 
+sleep 2
+
+
 killall -KILL tail
+
+
 
 $Info --wrap --width=250 --text="            Cloning of system is complete.            \n" --button=$"gtk-ok:1" 
 
