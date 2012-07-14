@@ -2986,8 +2986,6 @@ chroot /Target grub-install --force --no-floppy "$GrubLocation"
 sleep 2
 chroot /Target update-grub
 sleep 2
-update-grub
-sleep 2
 umount /Target/home
 sleep 2
 umount /Target/proc
@@ -2997,14 +2995,17 @@ sleep 2
 umount /Target/sys
 sleep 2
 
-update-grub
-
-sleep 2
-
 umount -l /Target
 
 sleep 2
 
+grub-install --force --no-floppy "$GrubLocation"
+
+sleep 2
+
+update-grub
+
+sleep 2
 
 killall -KILL tail
 
