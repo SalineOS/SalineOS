@@ -3047,6 +3047,459 @@ exit 0
 
 ## End Clone to partition code #########################################################################################
 
+
+
+
+## Start Clone to USB code #########################################################################################
+
+
+
+StartUSBClone () {
+
+USBDrives=""
+
+## Check to make sure that is at least one USB drive connected to the system.
+## Without this code the user will be displayed something REALLY ugly
+## Pay no mind to the man behind the curtain :)
+
+USBDrives=""
+if [ "$(ls /dev/disk/by-path | grep 'usb')" != "" ]; then
+ USBDriveTemp=$(find /dev/disk/by-path/* -printf %f" "%l\\n | grep -v part | grep "usb" | awk '{print $2}' | sed -e 's|../../||g')
+
+for i in $USBDriveTemp; do 
+ DriveTest=$(cat /var/log/messages | grep "$i" | grep "removable disk" | tail -1)
+ DriveTestTwo=$(grep "$i" /proc/partitions)
+ 
+ if [ "$DriveTest" != "" ]; then
+ if [ "$DriveTestTwo" != "" ]; then
+  if [ "$USBDrives" = "" ]; then
+   USBDrives="$i"
+  else
+   USBDrives="$USBDrives $i"
+  fi
+ fi
+ fi
+
+done
+fi
+
+## Error out if no USB drive is found
+if [ "$USBDrives" = "" ]; then
+ yad --window-icon="/usr/share/pixmaps/salineos-backup.png" --title="SalineOS Backup" --text="      No USB drives found.      \n" --width=250 --button=$"gtk-ok:1"
+ exit 0 
+fi
+
+USBDriveMenu=""
+
+for i in $USBDrives; do
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$i" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+DriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+ BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($DriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+## Round up on Gigabytes
+ SizeInGB=$(($SizeInGB + 1))
+
+if [ "$USBDriveMenu" = "" ]; then
+ USBDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB")
+else
+ USBDriveMenu=("$i" "$Label" "$SizeInGB" "$SizeInMB" "${USBDriveMenu[@]}")
+fi
+
+done
+
+
+UseDrive=$(yad --height="350" --list  --window-icon="/usr/share/pixmaps/salineos-backup.png" --title="SalineOS Backup" --column="Name" --column="Associated Label(s)" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="                            Please select the drive to clone the system to.                            \n" "${USBDriveMenu[@]}")
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0 
+elif [ "$UseDrive" = "" ]; then
+ yad --window-icon="/usr/share/pixmaps/salineos-backup.png" --title="SalineOS Backup" --text="No USB drive selected, please retry." --button=$"gtk-ok:1"
+ StartUSBClone
+ exit 0
+fi
+
+UseDrive=$(echo "$UseDrive" | awk -F '|' '{print $1}')
+
+ExcludesUSBClone
+
+exit 0
+
+}
+
+ExcludesUSBClone () {
+
+Selection=""
+Excludes=""
+NewExclude=""
+CurrentExcludes=""
+
+mkdir -p /etc/salineos-backup
+
+if [ -f /etc/salineos-backup/excludes ]; then
+ Excludes=$(cat /etc/salineos-backup/excludes)
+fi
+
+CurrentExcludes=$(echo -n "$Excludes" | yad --always-print-result --text-info --height=350 --editable --title="SalineOS Backup" --wrap --width=400 --text="If desired you can exclude select files or folders from being included on the cloned system. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog." --button=$"gtk-cancel:3" --button=$"Add New:5" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "5" ]; then
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+ NewExclude=$(yad --file-selection --title="SalineOS Backup" --height=450 --width=600 --directory --text="\n                     Select the file or folder you wish to exclude\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ ret="$?"
+
+ if [ "$ret" = "252" ]; then
+  ExcludesUSBClone
+  exit 0
+ elif [ "$ret" = "3" ]; then
+  exit 0
+ else
+  echo "$NewExclude">>/etc/salineos-backup/excludes
+  ExcludesUSBClone
+  exit 0
+ fi
+else
+ if [ -f /etc/salineos-backup/excludes ]; then
+  rm /etc/salineos-backup/excludes
+ fi
+ echo "$CurrentExcludes">>/etc/salineos-backup/excludes
+fi
+
+
+Excludes=$(cat /etc/salineos-backup/excludes)
+
+SwapFileUSBClone
+
+exit 0
+
+
+}
+
+
+SwapFileUSBClone() {
+
+SwapFileSize=""
+
+
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the swap file to be created.\n"  --button=$"gtk-ok:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+
+
+ret="$?"
+
+
+if [ "$ret" = "252" ]; then
+ SwapFileUSBClone
+ exit 0 
+elif [ "$SwapFileSize" = "" ]; then
+ SwapFileUSBClone
+ exit 0
+else
+ UseSwapFile="True"
+ SwapFileSize=$(echo "$SwapFileSize" | awk -F '|' '{print $1}') 
+fi
+
+ConfirmUSBClone
+
+exit 0
+
+}
+
+ConfirmUSBClone () {
+
+yad --title="SalineOS Backup" --wrap --width="250" --window-icon="/usr/share/pixmaps/salineos-backup.png" --text="WARNING! This operation will erase all information on $UseDrive and replace it with an exact copy of this system. Are you sure you with to continue?" --button=$"gtk-no:3" --button=$"gtk-yes:5"
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "252" ]; then 
+ MainMenu
+ exit 0
+fi
+
+RunUSBClone
+
+exit 0
+
+}
+
+RunUSBClone () {
+
+$Info --text="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed." --wrap --width=250 --button=$"gtk-cancel:3" --button=$"gtk-ok:1"
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+fi
+
+
+## Start the actual meat and potatoes cloning
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Preparing disk and partitions           " &
+
+parted --script --align optimal /dev/$UseDrive mklabel msdos
+parted --script --align optimal /dev/$UseDrive mkpart primary 1 -- -1
+parted --script --align optimal /dev/$UseDrive set 1 boot on
+TargetHomePart="root"
+TargetPart="$UseDrive"1
+
+## Unmount all partitions on the disk
+
+MountedPartitions="$(mount | grep "$UseDrive" | awk '{print $1}')"
+
+for i in $MountedPartitions; do
+ umount /dev/$i
+ umount -l /dev/$i
+ sleep 3
+done
+
+sleep 2
+mke2fs -t ext4 /dev/$TargetPart
+
+sleep 2
+
+mkdir -p /Target
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="                   Mounting $TargetPart                   " &
+
+mount /dev/$TargetPart /Target -o rw
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="Configure the filesystem to be checked\nevery 35 mounts" &
+
+tune2fs -c 35 -i 0 /dev/$TargetPart
+
+sleep 3
+
+rm -rf /Target/lost+found
+
+killall -KILL tail
+
+## Make sure TargetHomePart is set
+if [ "$TargetHomePart" = "" ]; then
+ TargetHomePart="root"
+fi
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="               Generating UUID values for fstab               " &
+
+TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+TargetCDRom="/dev/cdrom"
+
+sleep 3
+
+killall -KILL tail
+
+## Make a more accurate progress bar
+ProgressText="            Copying files to $UseDrive now            \n."
+
+## Start the progress bar for copying files
+
+tail -f /usr/bin/salineos-backup | $Progress --text="$ProgressText" --pulsate &
+
+
+## Excludes is a bit tricky with rsync this is some vodoo magic
+if [ -f /etc/salineos-backup/excludes ]; then
+ if [ "$(cat /etc/salineos-backup/excludes)" != "" ]; then
+  cp -f /etc/salineos-backup/excludes /tmp/backup-excludes
+  sed -i -e 's| |\ |g' /tmp/backup-excludes
+ else
+  touch /tmp/backup-excludes
+ fi
+fi
+
+
+## Add some things to exclude 
+
+echo '/var/run'>>/tmp/backup-excludes
+echo '/boot/grub'>>/tmp/backup-excludes
+echo '/var/lock'>>/tmp/backup-excludes
+echo '/media'>>/tmp/backup-excludes
+echo '/mnt'>>/tmp/backup-excludes
+echo '/proc'>>/tmp/backup-excludes
+echo '/swap'>>/tmp/backup-excludes
+echo '/sys'>>/tmp/backup-excludes
+echo '/tmp'>>/tmp/backup-excludes
+
+for i in $(ls /home); do
+ echo "/home/$i/local/share/gvfs-metadata">>/tmp/backup-excludes
+ echo "/home/$i/.cache">>/tmp/backup-excludes
+ echo "/home/$i/.dbus">>/tmp/backup-excludes
+ echo "/home/$i/.gvfs">>/tmp/backup-excludes
+done
+
+
+
+## Rsync
+rsync -a / /Target --ignore-existing --exclude-from=/tmp/backup-excludes
+
+
+
+sleep 3
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --text="                    Setting up swap space                    " --pulsate &
+
+## Create a swap file
+mkdir -p /Target/swap
+fallocate --l "$SwapFileSize"m /Target/swap/salineos-swap
+sleep 2
+mkswap /Target/swap/salineos-swap
+SwapFstab="/swap/salineos-swap"
+
+
+killall -KILL tail
+
+tail -f /usr/bin/salineos-backup | $Progress --text="Changing configuration files on installed system" --pulsate &
+
+## Make sure all directories are present
+mkdir -p /var/lock
+mkdir -p /Target/etc
+mkdir -p /Target/usr
+mkdir -p /Target/proc
+mkdir -p /Target/tmp
+mkdir -p /Target/selinux
+mkdir -p /Target/home
+mkdir -p /Target/bin
+mkdir -p /Target/lib
+mkdir -p /Target/opt
+mkdir -p /Target/srv
+mkdir -p /Target/media
+mkdir -p /Target/mnt
+mkdir -p /Target/dev
+mkdir -p /Target/sys
+mkdir -p /Target/boot
+mkdir -p /Target/sbin
+mkdir -p /Target/var/run
+
+## Remove old fstab file
+rm -rf /Target/etc/fstab
+
+if [ -f /Target/lost+found ]; then
+ rm -rf /Target/lost+found
+fi
+
+## Create a new fstab file for the system
+
+
+cat > /Target/etc/fstab <<FOO
+# /etc/fstab: static file system information.
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+
+proc /proc proc defaults 0 0
+# Root was on /dev/$TargetPart during install
+UUID=$TargetPartUUID / ext4 relatime,errors=remount-ro 0 1
+# Swap space created during install
+$SwapFstab none swap sw 0 0
+# cdrom
+$TargetCDRom /media/cdrom udf,iso9660 user,noauto,exec,utf8 0 0
+
+
+FOO
+
+## Make the users on the system own their home folders and fix permissions.
+for i in $(ls /Target/home); do
+ chown -R "$i" /Target/home/"$i"
+ chmod og+rw /Target/home/"$i"
+done
+
+## Fix permissions on /tmp
+chmod og+rw /Target/tmp
+
+sleep 3
+
+killall -KILL tail
+
+
+## Update GRUB2
+
+tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="               Updating GRUB2               \n" &
+
+## Prepare a chroot envoirnment for post install changes
+
+mount -o bind /proc /Target/proc
+mount -o bind /dev /Target/dev
+mount -o bind /sys /Target/sys
+
+chroot /Target chmod -x /etc/grub.d/20_memtest86+
+sleep 2
+chroot /Target grub-install --force --no-floppy "/dev/$UseDrive"
+sleep 2
+chroot /Target update-grub
+sleep 2
+umount /Target/home
+sleep 2
+umount /Target/proc
+sleep 2
+umount /Target/dev
+sleep 2
+umount /Target/sys
+sleep 2
+
+umount -l /Target
+
+
+sleep 2
+
+killall -KILL tail
+
+
+
+$Info --wrap --width=250 --text="            Cloning of system is complete.            \n" --button=$"gtk-ok:1" 
+
+MainMenu
+
+exit 0
+
+}
+
+## End Clone to USB code ###########################################################################################
+
 MainMenu () {
 
 MainMenuArray=("")
