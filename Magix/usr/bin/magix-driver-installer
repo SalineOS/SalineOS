@@ -1,0 +1,380 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 2012
+## Copyright 2012 Anthony Nordquist
+
+
+## Check for root and cry like a little girl if we don't have it.
+
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ yad --title="Magix Driver Installer" --window-icon="jockey" --text="Magix must be run as root, will now exit."
+ exit 0
+fi
+
+## Test for an internet connection
+InternetTest () {
+
+tail -f /usr/bin/magix-driver-installer | yad --no-buttons --progress --pulsate --text="   Checking for an active internet connection.   \n" &
+
+TestInternet="$(httping -g http://www.google.com -c 1 -t 15)"
+Internet="$(echo "$TestInternet" | grep "0.00% failed")"
+
+
+sleep 4
+killall -KILL tail
+
+if [ "$Internet" = "" ]; then 
+ yad --title="Magix" --text="No internet connection found." --button=$"gtk-quit:3" --button=$"Retry:5"
+ ret="$?"
+
+ if [ "$ret" = "3" ]; then
+  exit 0
+ else
+  InternetTest
+  exit 0
+ fi
+else
+ TestCards
+ exit 0
+fi
+
+
+}
+
+
+TestCards () {
+
+## Make sure our temp file is empty
+if [ -f /tmp/magix-driver-installer ]; then
+ rm -rf /tmp/magix-driver-installer
+fi
+
+
+## Test for an nVidia card
+lspci &>> /tmp/magix-driver-installer
+Nvidia=$(grep -B 0  "VGA compatible controller: nVidia" /tmp/magix-driver-installer)
+
+##################################################### Start nVidia
+
+if [ "$Nvidia" != "" ]; then
+ NvidiaCard="yes"
+else
+ NvidiaCard="no"
+fi
+
+## Test if a legacy card is present.
+if [ "$NividiaCard" = "yes" ]; then
+ 
+Legacy=$(echo $Nvidia | awk -F ' ' '{print $7}')
+
+if [ "$Legacy" = NV4 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV5M64 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV5 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV6 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV10 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV10DDR ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV15 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV15DDR ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV15BR ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV10GL ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV15GL ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV11 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV20 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV18 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV25 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV28 ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV17GL ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV20DCC ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV18GL ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV25GL ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV28GL ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV28GLM ]; then
+  Driver="Too old"
+elif [ "$Legacy" = NV34 ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV31 ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = "NV36.2" ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = "NV36.1" ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV36 ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = "NV36.4" ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV30 ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV35 ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV38 ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV34M ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV34GLM ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV31M ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV37GL ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV34GL ]; then 
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV35GL ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV30GL ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV36GL ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV38GL ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV31GL ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV31GLM ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = "NV36.5" ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV36M ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV36GLM ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = "NV36M" ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = "NV31GLM" ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = "NV31M" ]; then
+  Driver="173xx Legacy Nvidia"
+elif [ "$Legacy" = NV36MAP ]; then
+  Driver="173xx Legacy Nvidia"
+else
+ Driver="Current"
+fi
+
+
+ if [ "$Driver" = "Too old" ]; then
+  yad --title="Magix" --width="250" --wrap --window-icon="jockey" --text="Your chipset is no longer supported by Nvidia. You will have to continue using the provided open source driver." --button=$"gtk-quit:1"
+  touch $HOME/.magix-dont-run
+  exit 0
+ else
+  InstallNvidia
+ fi
+fi
+
+}
+
+InstallNvidia () { 
+
+## Update package cache and purge the old driver
+tail -f /usr/bin/magix-driver-installer | yad --progress --pulsate --title="Magix Driver Installer" --window-icon="jockey" --text="               Updating package cache               \n"
+aptitude update
+sleep 1
+aptitude purge -y xserver-xorg-video-nouveau
+sleep 1
+killall -KILL tail
+
+## Legacy driver support
+if [ "$Driver" != "Current" ]; then
+
+## Install ia32 packages if this is a 64 bit system
+
+CurrentKernel=$(uname -r)
+
+if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
+Packages="dkms nvidia-glx-legacy-173xx nvidia-glx-legacy-173xx-ia32 nvidia-kernel-legacy-173xx-dkms nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx libgl1-nvidia-legacy-173xx-glx-ia32 nvidia-kernel-common"
+else
+Packages="dkms nvidia-glx-legacy-173xx nvidia-kernel-legacy-173xx-dkms nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx nvidia-kernel-common"
+fi
+
+
+pkcon -p -y install "$Packages">>/tmp/magix-installing &
+(while [ "$(pidof pkcon)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
+echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
+done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="             Installing Nvidia proprietary driver             \n"
+   if [ "$(grep -B 0  "Failed" /tmp/magix-installing)" != "" ]; then
+   if [ ! -f /tmp/magix-tried-once ]; then
+    InstallNvidia
+    exit 0
+   else
+    yad --width="275" --wrap --title="Magix Driver Installer" --window-icon="jockey" --text="Installation has failed, please try again later, if this problem persists please report to the SalineOS forums." --button=$"gtk-quit:1"
+    exit 0
+   fi
+   fi
+## Configure Xorg
+nvidia-xconfig
+
+## Inform the user and reboot the machine
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 15'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 14'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 13'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 12'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 11'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 10'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 9'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 8'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 7'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 6'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 5'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 4'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 3'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 2'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 1'
+sleep 1
+
+reboot now
+
+fi
+
+## Current Driver support
+## Legacy driver support
+if [ "$Driver" != "Current" ]; then
+
+## Install ia32 packages if this is a 64 bit system
+
+CurrentKernel=$(uname -r)
+
+if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
+Packages="dkms libvdpau1 lib32vdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-libvdpau1 nvidia-glx-ia32 nvidia-glx libgl1-nvidia-glx libgl1-nvidia-glx-ia32 nvidia-kernel-common nvidia-xconfig nvidia-settings nvidia-vdpau-driver-ia32 nvidia-kernel-dkms"
+else
+Packages="dkms libvdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-libvdpau1 nvidia-glx libgl1-nvidia-glx  nvidia-kernel-common nvidia-xconfig nvidia-settings nvidia-kernel-dkms"
+fi
+
+
+pkcon -p -y install "$Packages">>/tmp/magix-installing &
+(while [ "$(pidof pkcon)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
+echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
+done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="             Installing Nvidia proprietary driver             \n"
+   if [ "$(grep -B 0  "Failed" /tmp/magix-installing)" != "" ]; then
+   if [ ! -f /tmp/magix-tried-once ]; then
+    InstallNvidia
+    exit 0
+   else
+    yad --width="275" --wrap --title="Magix Driver Installer" --window-icon="jockey" --text="Installation has failed, please try again later, if this problem persists please report to the SalineOS forums." --button=$"gtk-quit:1"
+    exit 0
+   fi
+   fi
+## Configure Xorg
+nvidia-xconfig
+
+## Inform the user and reboot the machine
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 15'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 14'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 13'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 12'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 11'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 10'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 9'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 8'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 7'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 6'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 5'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 4'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 3'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 2'
+sleep 1
+notify-send -u normal -i jockey -t 1000 'Installation Complete
+Rebooting in 1'
+sleep 1
+
+reboot now
+fi
+
+}
+
+InternetTest
+
+
+
