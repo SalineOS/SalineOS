@@ -29,6 +29,7 @@ if [ "$Name" != "" ]; then
  rm -rf "$HOME/.webapps/$Name"
 fi
 
+MainMenu
 
 exit 0
 }
@@ -276,6 +277,7 @@ last-window-height=600
 last-window-state=MIDORI_WINDOW_MAXIMIZED
 last-panel-position=167
 last-panel-page=2
+download-folder=$HOME/Downloads
 $MenuBar
 $NavigationBar
 $BookMarkBar
@@ -351,7 +353,7 @@ DesktopName=$(echo "$NewURL" | sed 's|/||g')
 cp -f "$HOME/.webapps/desktopfiles/template" "$HOME/.local/share/applications/$DesktopName.desktop"
 mv -f "$HOME/.webapps/desktopfiles/template" "$HOME/.webapps/desktopfiles/$DesktopName.desktop"
 
-
+MainMenu
 exit 0
 
 }

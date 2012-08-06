@@ -42,7 +42,7 @@ fi
 fi
 
 if [ -f /tmp/magix-ati-card ]; then
- yad --title="Magix Launcher" --window-icon="jockey" --width="300" --wrap --text="ATI graphics chipset detected. ATI provides a proprietary closed source driver for  models X1950 and above. This driver will provide better 3D acceleration, if this is not required, it is recommended to continue to use the provided open source driver. This program can automatically download and install this closed source driver for you if desired. Installation of the proprietary driver will reboot the machine when finished.\n" --button=$"Don't Ask Again:1" --button=$"Not Now:3" --button=$"Install:5"
+ yad --title="Magix Launcher" --window-icon="jockey" --width="300" --wrap --text="ATI graphics chipset detected. ATI provides a proprietary closed source driver for  models newer than X1950. This driver will provide better 3D acceleration, if this is not required, it is recommended to continue to use the provided open source driver. This program can automatically download and install this closed source driver for you if desired. Installation of the proprietary driver will reboot the machine when finished.\n" --button=$"Don't Ask Again:1" --button=$"Not Now:3" --button=$"Install:5"
 
 ret="$?"
 

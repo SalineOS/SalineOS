@@ -330,6 +330,9 @@ DefaultGroups="audio,cdrom,dialout,floppy,video,plugdev,netdev,powerdev,lp,scann
 cat > /Target/usr/bin/TempScript <<FOO
 #!/bin/bash
 
+sed -i -e "s|download-folder=/home/user/Downloads|download-folder=/home/$TargetUser/Downloads|g" /etc/skel/.config/midori/config
+
+
 userdel -f -r user
 sed -i '/user/d' /etc/sudoers
 groupadd -g 1000 $TargetUser
@@ -339,7 +342,10 @@ dpkg-divert --remove --rename --quiet /usr/lib/update-notifier/apt-check
 dpkg-divert --remove --rename --quiet /usr/sbin/update-initramfs
 dpkg-divert --remove --rename --quiet /usr/sbin/anacron
 update-initramfs -t -c -k $(/bin/uname -r)
+
 shadowconfig on
+
+sed -i -e "s|download-folder=/home/$TargetUser/Downloads||g" /etc/skel/.config/midori/config
 
 FOO
 
