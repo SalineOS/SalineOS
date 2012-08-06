@@ -24,7 +24,6 @@ Icon="--window-icon=folder-copy"
 
 Destination=$(yad $Icon --file-selection --height="450" --directory --text="                                   Please select the folder to copy to                                   \n" --title="Sync Folder" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
-echo "$Destination"
 
 ret="$?"
 
@@ -65,7 +64,7 @@ elif [ "$ret" = "3" ]; then
 fi
 
 progressbar () {
-tail -f /usr/bin/convert-image-ca |  yad $Icon --no-buttons --progress --pulsate --auto-close --title="Sync Folder" --text="$@"
+tail -f /usr/bin/sync-folder-ca |  yad $Icon --no-buttons --progress --pulsate --auto-close --title="Sync Folder" --text="$@"
 }
 
 
@@ -82,5 +81,9 @@ else
  sleep 5
  killall -KILL tail
 fi
+
+notify-send -u normal -i folder -t 15000 '
+Folder Sync Completed'
+
 exit
 

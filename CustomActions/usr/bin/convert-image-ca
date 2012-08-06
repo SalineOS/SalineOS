@@ -53,6 +53,7 @@ sleep 5
 
 killall -KILL tail
 
-yad $Icon --title="Image(s) Conversion" --text="            Conversion Complete            \n" --button=$"gtk-ok:1"
+notify-send -u normal -i image-x-generic -t 15000 '
+Convert Image(s) Complete'
 
 exit

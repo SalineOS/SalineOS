@@ -49,6 +49,7 @@ sleep 5
 
 killall -KILL tail
 
-yad $Icon --info --title="Rotate Image(s)" --text="          Rotation completed.          \n" --button=$"gtk-ok:1"
+notify-send -u normal -i image-x-generic -t 15000 '
+Rotate Image(s) Complete'
 
 exit

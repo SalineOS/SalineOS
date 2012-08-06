@@ -66,6 +66,7 @@ sleep 5
 
 killall -KILL tail
 
-yad $Icon --title="Scale Image(s)" --text="          Scaling operation completed.          \n" --button=$"gtk-ok:1"
+notify-send -u normal -i image-x-generic -t 15000 '
+Scale Image(s) Complete'
 
 exit

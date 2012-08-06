@@ -51,6 +51,7 @@ sleep 5
 
 killall -KILL tail
 
-yad $Icon --title="Resize Image(s)" --text="          Resize operation completed.          \n" --button=$"gtk-ok:1"
+notify-send -u normal -i image-x-generic -t 15000 '
+Resize Image(s) Complete'
 
 exit

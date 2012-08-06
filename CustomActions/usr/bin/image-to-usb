@@ -142,7 +142,8 @@ sync
 
 killall -KILL tail
 
-yad $Icon --title="Image to USB" --text="          Copying of image complete.          \n" --button=$"gtk-ok:1"
+notify-send -u normal -i drive-removable-media-usb -t 20000 "
+$DisplayName to USB completed"
 
 exit 0
 
