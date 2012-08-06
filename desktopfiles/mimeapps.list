@@ -7,7 +7,7 @@ x-scheme-handler/file=exo-file-manager.desktop
 x-scheme-handler/trash=exo-file-manager.desktop
 x-scheme-handler/pkgkit=packagekit-url.desktop
 x-scheme-handler/apt=packagekit-url.desktop
-image/png=ristretto.desktop;inkscape.desktop;gimp.desktop;
+image/png=ristretto.desktop;gimp.desktop;
 audio/mpeg=exaile.desktop;
 
 [Default Applications]
@@ -15,4 +15,4 @@ image/png=ristretto.desktop
 audio/mpeg=exaile.desktop
 image/jpeg=ristretto.desktop
 text/plain=mousepad.desktop
-application/pdf=epdfview.desktop
+application/pdf=evince.desktop
