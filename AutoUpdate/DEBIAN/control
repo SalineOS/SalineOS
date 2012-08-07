@@ -1,5 +1,5 @@
-Package: salineos-backup
-Version: 2.0-2
+Package: salineos-autoupdate
+Version: 2.0-0
 Architecture: all
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Installed-Size: 94
