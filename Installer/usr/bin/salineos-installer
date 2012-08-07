@@ -325,6 +325,7 @@ else
  sed -i -e "s|default_user user|default_user $TargetUser|g" /TARGET/etc/slim.conf
 fi
 
+
 DefaultGroups="audio,cdrom,dialout,floppy,video,plugdev,netdev,powerdev,lp,scanner,disk,fuse,games,voice,sudo"
 
 cat > /Target/usr/bin/TempScript <<FOO
@@ -1298,6 +1299,8 @@ tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Checking for a
 TestInternet="$(httping -g http://www.google.com -c 1 -t 15)"
 Internet="$(echo "$TestInternet" | grep "0.00% failed")"
 
+## Remove installer icon from desktop
+rm -rf /etc/skel/Desktop/salineos-installer.desktop
 
 sleep 4
 killall -KILL tail
