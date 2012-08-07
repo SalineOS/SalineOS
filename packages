@@ -45,7 +45,7 @@ xserver-xorg-video-sis xserver-xorg-video-sisusb xserver-xorg-video-tdfx \
 xserver-xorg-video-tga xserver-xorg-video-trident xserver-xorg-video-tseng \
 xserver-xorg-video-vmware xserver-xorg-video-voodoo xserver-xorg-input-synaptics \
 file-roller xserver-xorg-video-modesetting libnotify-bin salineos-autoupdate \
-remastersys
+remastersys browser-plugin-parole
 
 
 CurrentKernel=$(uname -r)
