@@ -98,9 +98,9 @@ if [ "$(echo "$Operation" | grep Thumbnails)" != "" ]; then
  mkdir -p $HOME/.thumbnails
 fi
 if [ "$(echo "$Operation" | grep Packages)" != "" ]; then
- DialogText="$(apt-get -s autoremove | grep '  ')"
- yad $Icon --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:0"
- if [ "$?" = "0" ]; then
+ DialogText="$(apt-get -y -s autoremove | grep '  ')"
+ yad $Icon --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:3"
+ if [ "$?" = "3" ]; then
   gksudo apt-get -y autoremove
  fi
 fi

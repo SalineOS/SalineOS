@@ -44,7 +44,7 @@ RamSize=$(($SystemRam / 2))
 
 NameDisk () {
 
-NewDiskName=$(yad --entry --width=250 --wrap --title="Procurator" --text="Enter the desired name of the virtual disk, do not use spaces or special characters." --button=$"gtk-ok:2")
+NewDiskName=$(yad --entry --window-icon=kvm --width=250 --wrap --title="Procurator" --text="Enter the desired name of the virtual disk, do not use spaces or special characters." --button=$"gtk-ok:2")
 
 ret="$?"
 
@@ -65,7 +65,7 @@ if [ -f "$HOME/.procurator/disk/$NewDiskName" ]; then
 fi
 
 
-NewDiskNotes=$(yad --entry --width=250 --wrap --title="Procurator" --text="If desired, enter some notes to be associated with this disk." --button=$"gtk-ok:2")
+NewDiskNotes=$(yad --entry --width=250 --wrap --window-icon=kvm --title="Procurator" --text="If desired, enter some notes to be associated with this disk." --button=$"gtk-ok:2")
 
 if [ -f "$HOME/.procurator/notes/$NewDiskName" ]; then
  rm -rf "$HOME/.procurator/notes/$NewDiskName"
@@ -106,7 +106,7 @@ elif [ "$ret" = "3" ]; then
  MainMenu
  exit 0
 elif [ "$NewDiskSize" = "Custom" ]; then
- NewDiskSize=$(yad --entry --width=250 --wrap --title="Procurator" --text="Enter the desired size of the virtual disk in gigabytes." --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
+ NewDiskSize=$(yad --entry --width=250 --window-icon=kvm --wrap --title="Procurator" --text="Enter the desired size of the virtual disk in gigabytes." --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
 
  ret="$?"
 
