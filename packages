@@ -7,6 +7,8 @@ aptitude -y dist-upgrade
 
 aptitude -y purge lightdm
 
+apt-get -y --no-install-recommends install gnome-packagekit
+
 aptitude install -y system-config-printer libsdl-mixer1.2 \
 libsdl-1.2debian-alsa exaile xfburn parole osmo icedove\
  pidgin pidgin-microblog pidgin-themes pidgin-privacy-please\
@@ -40,7 +42,9 @@ xserver-xorg-video-s3virge xserver-xorg-video-savage xserver-xorg-video-siliconm
 xserver-xorg-video-sis xserver-xorg-video-sisusb xserver-xorg-video-tdfx \
 xserver-xorg-video-tga xserver-xorg-video-trident xserver-xorg-video-tseng \
 xserver-xorg-video-vmware xserver-xorg-video-voodoo xserver-xorg-input-synaptics \
-xserver-xorg-video-modesetting libnotify-bin file-roller
+file-roller xserver-xorg-video-modesetting libnotify-bin salineos-autoupdate \
+remastersys
+
 
 CurrentKernel=$(uname -r)
 
@@ -50,7 +54,6 @@ else
  aptitude install -y linux-headers-amd64
 fi
 
-apt-get -y --no-install-recommends install gnome-packagekit
 
 aptitude -y purge kexec-tools apt-listchanges brasero exfalso gedit baobab telnet nautilus ssh \
 yelp squeeze vlc transmission gigolo xscreensaver gnome-utils-common epdfview \
