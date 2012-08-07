@@ -1,4 +1,6 @@
 #!/bin/bash
+mkdir -p /etc/magix-driver-installer
+touch /etc/magix-driver-installer/dont-run
 aptitude update
 apt-get -y remove task-xfce-desktop xfce4-goodies
 aptitude keep-all
