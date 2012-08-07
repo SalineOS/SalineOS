@@ -13,3 +13,4 @@ Categories=System;Application
 OnlyShowIn=KDE
 X-KDE-SubstituteUID=true
 GenericName[en_US]=Grub Restore
+NoDisplay=true

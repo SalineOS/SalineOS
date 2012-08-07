@@ -13,3 +13,4 @@ Categories=SystemBackup;System;Application
 OnlyShowIn=KDE
 X-KDE-SubstituteUID=true
 GenericName[en_US]=System Backup
+NoDisplay=true

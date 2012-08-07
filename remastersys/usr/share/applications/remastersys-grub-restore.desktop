@@ -13,3 +13,4 @@ Categories=Applications;GTK;System;Settings
 NotShowIn=KDE
 X-KDE-SubstituteUID=true
 GenericName[en_US]=Grub Restore
+NoDisplay=true

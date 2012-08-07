@@ -234,17 +234,22 @@ fi
 
 if [ -f /etc/X11/default-display-manager ]; then
 
-echo "Copying Install Icon to Desktop for live user"
+ echo "Copying Install Icon to Desktop for live user"
 
-if [ ! -d $WORKDIR/dummysys/etc/skel/Desktop ]; then
-mkdir -p $WORKDIR/dummysys/etc/skel/Desktop
-fi
+ if [ ! -d $WORKDIR/dummysys/etc/skel/Desktop ]; then 
+  mkdir -p $WORKDIR/dummysys/etc/skel/Desktop
+ fi
 
-if [ "`grep kdm /etc/X11/default-display-manager`" = "" ]; then
-cp /usr/share/applications/remastersys-installer.desktop $WORKDIR/dummysys/etc/skel/Desktop/
-else
-cp /usr/share/applications/remastersys-installer-kde.desktop $WORKDIR/dummysys/etc/skel/Desktop/
-fi
+
+ if [ "$(echo "$@" | grep "salineos")" = "" ]; then
+  if [ "`grep kdm /etc/X11/default-display-manager`" = "" ]; then
+   cp /usr/share/applications/remastersys-installer.desktop $WORKDIR/dummysys/etc/skel/Desktop/
+  else
+   cp /usr/share/applications/remastersys-installer-kde.desktop $WORKDIR/dummysys/etc/skel/Desktop/
+  fi
+ else
+  cp -f /usr/share/applications/salineos-installer.desktop $WORKDIR/dummysys/etc/skel/Desktop/
+ fi
 
 fi
 

@@ -13,3 +13,4 @@ Categories=SystemBackup;Applications;GTK;System;Settings
 NotShowIn=KDE
 X-KDE-SubstituteUID=true
 GenericName[en_US]=System Backup
+NoDisplay=true
