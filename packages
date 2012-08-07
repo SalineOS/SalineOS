@@ -1,6 +1,6 @@
 #!/bin/bash
 aptitude update
-apt-get -y remove task-xfce-desktop 
+apt-get -y remove task-xfce-desktop xfce4-goodies
 aptitude keep-all
 
 aptitude -y dist-upgrade
@@ -40,7 +40,7 @@ xserver-xorg-video-s3virge xserver-xorg-video-savage xserver-xorg-video-siliconm
 xserver-xorg-video-sis xserver-xorg-video-sisusb xserver-xorg-video-tdfx \
 xserver-xorg-video-tga xserver-xorg-video-trident xserver-xorg-video-tseng \
 xserver-xorg-video-vmware xserver-xorg-video-voodoo xserver-xorg-input-synaptics \
-xserver-xorg-video-modesetting libnotify-bin
+xserver-xorg-video-modesetting libnotify-bin file-roller
 
 CurrentKernel=$(uname -r)
 
@@ -53,5 +53,5 @@ fi
 apt-get -y --no-install-recommends install gnome-packagekit
 
 aptitude -y purge kexec-tools apt-listchanges brasero exfalso gedit baobab telnet nautilus ssh \
-yelp vlc transmission gigolo xscreensaver gnome-utils-common epdfview \
+yelp squeeze vlc transmission gigolo xscreensaver gnome-utils-common epdfview \
 
