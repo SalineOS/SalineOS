@@ -187,10 +187,22 @@ if [ "$Internet" != "Continue" ]; then
  fi
  
  if [ "$InstallCodec" != "FALSE" ]; then
-  CodecPackages="flashplugin-nonfree gstreamer0.10-ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-x264 gstreamer0.10-plugins-really-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 gstreamer0.10-lame unrar libavcodec52 libdvdread4 libdvdcss2"
+  echo "# Debian Multimedia">>/etc/apt/sources.list
+  echo "deb http://www.deb-multimedia.org wheezy main non-free">>/etc/apt/sources.list
+  CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2"
  fi
 
-pkcon -p -y install "$LanguagePackages $CodecPackages">>/tmp/packagekit-url-tmp &
+tail -f /usr/bin/salineos-installer | yad --progress --no-buttons --pulsate --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer.png" --text="               Updating package cache               \n" &
+
+aptitude update
+
+sleep 1
+
+killall -KILL tail
+
+pkcon -p -y install $LanguagePackages $CodecPackages>>/tmp/packagekit-url-tmp &
+
+sleep 2
 
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
@@ -319,14 +331,14 @@ tail -f /usr/bin/salineos-installer | $Progress --text="             Setting up 
 
 ## Remove auto login or enable it for the new user 
 if [ "$RequirePassword" = "TRUE" ]; then
- sed -i -e 's/auto_login/#auto_login/g' /TARGET/etc/slim.conf
- sed -i -e 's/default_user/#default_user/g' /TARGET/etc/slim.conf
+ sed -i -e 's/auto_login/#auto_login/g' /Target/etc/slim.conf
+ sed -i -e 's/default_user/#default_user/g' /Target/etc/slim.conf
 else
- sed -i -e "s|default_user user|default_user $TargetUser|g" /TARGET/etc/slim.conf
+ sed -i -e "s|default_user user|default_user $TargetUser|g" /Target/etc/slim.conf
 fi
 
 
-DefaultGroups="audio,cdrom,dialout,floppy,video,plugdev,netdev,powerdev,lp,scanner,disk,fuse,games,voice,sudo"
+DefaultGroups="audio,cdrom,dialout,floppy,video,plugdev,netdev,lp,scanner,disk,fuse,games,voice,sudo"
 
 cat > /Target/usr/bin/TempScript <<FOO
 #!/bin/bash
@@ -372,8 +384,6 @@ sleep 2
 chroot /Target update-grub
 sleep 2
 
-## Remove Installer icon
-chroot /Target rm "/home/$TargetUser./SalineOS Installer.desktop"
 
 killall -KILL tail
 
