@@ -192,7 +192,7 @@ if [ "$Internet" != "Continue" ]; then
   CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2"
  fi
 
-tail -f /usr/bin/salineos-installer | yad --progress --no-buttons --pulsate --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer.png" --text="               Updating package cache               \n" &
+tail -f /usr/bin/salineos-installer | yad --progress --auto-close --no-buttons --pulsate --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer.png" --text="               Updating package cache               \n" &
 
 aptitude update
 
@@ -200,7 +200,10 @@ sleep 1
 
 killall -KILL tail
 
-pkcon -p -y install $LanguagePackages $CodecPackages>>/tmp/packagekit-url-tmp &
+## Codecs
+for i in $CodecPackages; do
+
+pkcon -p -y install $i>>/tmp/packagekit-url-tmp &
 
 sleep 2
 
@@ -210,6 +213,28 @@ echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
 done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          Installing Optional Packages          \n"
 
 rm /tmp/packagekit-url-tmp
+
+sleep 2
+
+done
+
+## Language packages
+for i in $LanguagePackages; do
+
+pkcon -p -y install $i>>/tmp/packagekit-url-tmp &
+
+sleep 2
+
+(while [ "$(pidof pkcon)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
+echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
+done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          Installing Optional Packages          \n"
+
+rm /tmp/packagekit-url-tmp
+
+sleep 2
+
+done
 
 fi
 ## End installation section #######################################################################################
@@ -1205,7 +1230,7 @@ RestrictedMultimedia () {
 
 InstallCodec=""
 
-yad --wrap --height=300 --width=500 --center --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:7" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright). In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
+yad --wrap --height=300 --width=500 --center --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:9" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright). In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
 
 ret="$?"
 
@@ -1227,7 +1252,7 @@ elif [ "$ret" = "3" ]; then
  yad --list --column='   ' --on-top --title="Adobe EULA" --window-icon=/usr/share/pixmaps/salineos-installer.png --height="550" --width=700 --wrap --button=$"gtk-ok:5" "$(cat /etc/salineos-installer/adobeEULA)"
  RestrictedMultimedia
  exit 0
-elif [ "$ret" = "7" ]; then
+elif [ "$ret" = "9" ]; then
  if [ -f /tmp/Finished-Menu ]; then
   InstallCodec="TRUE"
   FinishedMenu
