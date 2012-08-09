@@ -90,11 +90,17 @@ elif [ "$Operation" = "Change System Language" ]; then
 elif [ "$Operation" = "Install Restricted Multimedia" ]; then
  InfoText="Support for a variety of media formats are possibly under patent protection in some jurisdictions. This script will download and install codecs for decoding most every video and audio format commonly used. Use of these codecs without paying for a license may violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright), depending on your country of residence. You can purchase the licenses for these codecs at http://www.fluendo.com. This action does exactly the same thing the installer offers to do during install."
 elif [ "$Operation" = "Install Wine" ]; then
- InfoText="Installs Wine Is Not an Emulator a compatibility layer that allows Linux based systems run Windows .exe files. This will also install WineTricks, a simple program that automates the install of Windows components and a small selection of popular Windows applications."
+ InfoText="Installs Wine Is Not an Emulator a compatibility layer that allows Linux based systems to run some Windows .exe files. This will also install WineTricks, a simple program that automates the install of Windows components and a small selection of popular Windows applications."
 elif [ "$Operation" = "Install LAMP" ]; then
- InfoText="Install a traditional Linux Apache MySQL PHP server stack; L.A.M.P is one of the most popular server stacks ever constructed. This will install everything you need to test webpages locally, or host your own webpage. If you wish to allow others to connect to your machine's new web server you must open port 22 in your current firewall (Default is SOS Firewall) and if your computer is behind a router, you must ensure that port 22 is forwarded to your machine."
+ InfoText="Install a traditional Linux Apache MySQL PHP server stack; L.A.M.P is one of the most popular server stacks ever constructed. This will install everything you need to test webpages locally, or host your own webpage. If you wish to allow others to connect to your machine's new web server you must open port 80 in your current firewall (Default is SOS Firewall) and if your computer is behind a router, you must ensure that port 80 is forwarded to your machine."
 elif [ "$Operation" = "Local DNS" ]; then
  InfoText="DNS or Domain Name System is the system that gets the machine readible IP addresses from human readible web addresses (Such as http://www.salineos.com). This action will setup a local cache of all the IP addresses of web pages you visit.  This will slightly speed up web browsing for web sites you visit more than once, but will create a local record of your browsing activity."
+elif [ "$Operation" = "Import Key" ]; then
+ InfoText="If you add a repository to your /etc/apt/sources.list then you will most likely also have to add its' gpg key.  This gpg key is a security measure, you should never add a key from a source you do not absolutely trust."
+elif [ "$Operation" = "Resize Swap" ]; then
+ InfoText="Allows you to resize the SalineOS swap file."
+elif [ "$Operation" = "Set Clock" ]; then
+ InfoText="Set the system clock. SalineOS includes ntp which should keep your clock synced to a remote server. This option is most useful on machines without internet access."
 fi
 
 yad --title="SalineOS System Utilities" --width="300" --wrap --text="$InfoText" --button=$"gtk-ok:1"
