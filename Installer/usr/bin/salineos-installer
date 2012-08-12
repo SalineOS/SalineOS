@@ -187,10 +187,15 @@ if [ "$Internet" != "Continue" ]; then
  fi
  
  if [ "$InstallCodec" != "FALSE" ]; then
+ if [ "$(grep '# Debian Multimedia' /etc/apt/sources.list)" = "" ]; then
   echo "# Debian Multimedia">>/etc/apt/sources.list
   echo "deb http://www.deb-multimedia.org wheezy main non-free">>/etc/apt/sources.list
-  CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2"
  fi
+ fi
+
+if [ "$InstallCodec" != "FALSE" ]; then
+   CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2" 
+fi 
 
 tail -f /usr/bin/salineos-installer | yad --progress --auto-close --no-buttons --pulsate --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer.png" --text="               Updating package cache               \n" &
 
@@ -212,9 +217,12 @@ CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
 done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          Installing Optional Packages          \n"
 
+## Show debugging output
+cat /tmp/packagekit-url-tmp
+
+## Remove temp file between installs
 rm /tmp/packagekit-url-tmp
 
-sleep 2
 
 done
 

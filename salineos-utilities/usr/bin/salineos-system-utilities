@@ -43,12 +43,14 @@ else
  touch /tmp/packagekit-url-lock-file
 fi
 
-Test=$(grep "http://www.debian-multimedia.org" /etc/apt/sources.list)
+Test=$(grep "http://www.deb-multimedia.org" /etc/apt/sources.list)
 
 if [ "$Test" = "" ]; then
- echo "# Marillat For info visit http://www.debian-multimedia.org" >> /etc/apt/sources.list
- echo "deb http://www.debian-multimedia.org wheezy main non-free" >> /etc/apt/sources.list
+ echo "# Marillat For info visit http://www.deb-multimedia.org" >> /etc/apt/sources.list
+ echo "deb http://www.deb-multimedia.org wheezy main non-free" >> /etc/apt/sources.list
 fi
+
+CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2"
 
 tail -f /usr/bin/salineos-system-utilities | yad --progress --pulsate --title='  ' --no-buttons --text="     Updating package cache, please wait.     \n" 
 
@@ -57,11 +59,23 @@ apt-get update
 sleep 1
 killall -KILL tail
 
-pkcon -p -y install flashplugin-nonfree gstreamer0.10-ffmpeg gstreamer0.10-plugins-bad gstreamer0.10-x264 gstreamer0.10-plugins-really-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 gstreamer0.10-lame unrar libavcodec52 libdvdread4 libdvdcss2>>/tmp/packagekit-url-tmp &
+## Codecs
+for i in $CodecPackages; do
+
+pkcon -p -y install $i>>/tmp/packagekit-url-tmp &
+
+sleep 2
+
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         Installing $Package                         \n"
+done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          Installing Optional Packages          \n"
+
+## Show debugging output
+cat /tmp/packagekit-url-tmp
+
+
+done
 
 if [ "$(grep -B 0  "Installed" /tmp/packagekit-url-tmp)" = "" ]; then
  Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage" | grep -v "Package:" | grep -v "Downloaded")"
@@ -143,7 +157,7 @@ elif [ "$ret" = "5" ]; then
  MoreInfo
  exit 0
 elif [ "$Operation" = "Install LAMP" ]; then
- gksudo exec /usr/bin/xfce4-terminal -x /usr/bin/salineos-system-utilities-LAMP
+ gksudo 'exec /usr/bin/xfce4-terminal -x /usr/bin/salineos-system-utilities-LAMP'
  MainMenu
  exit 0
 elif [ "$Operation" = "Clean" ]; then
@@ -183,7 +197,7 @@ elif [ "$Operation" = "Import Key" ]; then
   exit 0
  fi
 
- gksudo exec /usr/bin/xfce4-terminal -x /usr/bin/gpgimport "$Key"
+ gksudo "exec /usr/bin/xfce4-terminal -x /usr/bin/gpgimport $Key"
  MainMenu
  exit 0
 elif [ "$Operation" = "Resize Swap" ]; then

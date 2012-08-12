@@ -111,6 +111,14 @@ if [ "$(echo "$Operation" | grep Packages)" != "" ]; then
  fi
 fi
 
+
+if [ "$Operation" != "" ]; then
+notify-send -u normal -i /usr/share/pixmaps/clean.png -t 15000 '
+Disk Cleanup Complete'
+
 exit 
 
 }
+
+MainMenu
+exit o

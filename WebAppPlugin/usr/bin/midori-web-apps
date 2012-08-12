@@ -29,8 +29,6 @@ if [ "$Name" != "" ]; then
  rm -rf "$HOME/.webapps/$Name"
 fi
 
-MainMenu
-
 exit 0
 }
 
@@ -327,14 +325,19 @@ sleep 1
 
 $Run &
 
-yad --window-icon="midori" --on-top  --title='     ' --text="Please allow the page to fully load and\nthen press ok to finish installation." --button=$"gtk-ok:1"
+yad --window-icon="midori" --width="260" --wrap --on-top  --title='     ' --text="Please allow the page to fully load and then press ok to finish creation." --button=$"gtk-ok:1"
 
 ## Remove the duck duck go icon, just in case :)
 if [ -f $HOME/.webapps/$Name2/cache/midori/icons/69579f75125a3d95fc9f8ba97dcb2b32.ico ]; then
  rm "$HOME/.webapps/$Name2/cache/midori/icons/69579f75125a3d95fc9f8ba97dcb2b32.ico"
 fi
 
-HashedIconName=$(ls -m $HOME/.webapps/$Name2/cache/midori/icons | awk -F ',' '{print $1}')
+for $i in $(ls $HOME/.webapps/$Name2/cache/midori/web); do
+ file /$HOME/.webapps/$Name2/cache/midori/web/$i>>/tmp/midori-menu-create
+done
+
+
+HashedIconName=$(grep "MS Windows icon resource" | awk -F ':' '{print $1}' | awk -F '/' '{print $2}')
 
 NewIcon="$HOME/.webapps/$Name2/cache/midori/icons/$HashedIconName"
 
@@ -353,7 +356,6 @@ DesktopName=$(echo "$NewURL" | sed 's|/||g')
 cp -f "$HOME/.webapps/desktopfiles/template" "$HOME/.local/share/applications/$DesktopName.desktop"
 mv -f "$HOME/.webapps/desktopfiles/template" "$HOME/.webapps/desktopfiles/$DesktopName.desktop"
 
-MainMenu
 exit 0
 
 }

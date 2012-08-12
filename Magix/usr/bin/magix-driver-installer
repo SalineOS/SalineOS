@@ -216,39 +216,28 @@ if [ "$Driver" != "Current" ]; then
 CurrentKernel=$(uname -r)
 
 if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
-Packages="dkms nvidia-glx-legacy-173xx nvidia-glx-legacy-173xx-ia32 nvidia-kernel-legacy-173xx-dkms nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx libgl1-nvidia-legacy-173xx-glx-ia32 nvidia-kernel-common"
+Packages="dkms nvidia-kernel-legacy-173xx-dkms nvidia-glx-legacy-173xx nvidia-glx-legacy-173xx-ia32 nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx libgl1-nvidia-legacy-173xx-glx-ia32 nvidia-kernel-common"
 else
-Packages="dkms nvidia-glx-legacy-173xx nvidia-kernel-legacy-173xx-dkms nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx nvidia-kernel-common"
+Packages="dkms nvidia-kernel-legacy-173xx-dkms nvidia-glx-legacy-173xx nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx nvidia-kernel-common"
 fi
 
+for i in $Packages; do
 
-pkcon -p -y install "$Packages">>/tmp/magix-installing &
+pkcon -p -y install "$i">>/tmp/magix-installing &
+
+sleep 2
+
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
 done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="             Installing Nvidia proprietary driver             \n"
-   if [ "$(grep -B 0  "Failed" /tmp/magix-installing)" != "" ]; then
-   if [ ! -f /tmp/magix-tried-once ]; then
-    rm -rf /tmp/magix-installing
-    InstallNvidia
-    exit 0
-   else
-    yad --width="275" --wrap --title="Magix Driver Installer" --window-icon="jockey" --text="Installation has failed, please try again later, if this problem persists please report it to the SalineOS forums." --button=$"gtk-quit:1"
-    rm -rf /tmp/magix-installing
-    exit 0
-   fi
-   fi
-   if [ "$(grep -B 0  "Error" /tmp/magix-installing)" != "" ]; then
-   if [ ! -f /tmp/magix-tried-once ]; then
-    rm -rf /tmp/magix-installing
-    InstallNvidia
-    exit 0
-   else
-    yad --width="275" --wrap --title="Magix Driver Installer" --window-icon="jockey" --text="Installation has failed, please try again later, if this problem persists please report it to the SalineOS forums." --button=$"gtk-quit:1"
-    exit 0
-    rm -rf /tmp/magix-installing
-   fi
-   fi
+
+## Add debugging
+cat /tmp/magix-installing
+
+rm -rf /tmp/magix-installing
+
+done
 
 ## Configure Xorg
 nvidia-xconfig
@@ -312,39 +301,31 @@ if [ "$Driver" = "Current" ]; then
 CurrentKernel=$(uname -r)
 
 if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
-Packages="dkms libvdpau1 lib32vdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx-ia32 nvidia-glx libgl1-nvidia-glx libgl1-nvidia-glx-ia32 nvidia-kernel-common nvidia-xconfig nvidia-settings nvidia-vdpau-driver-ia32 nvidia-kernel-dkms"
+Packages="dkms nvidia-kernel-dkms libvdpau1 lib32vdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx-ia32 nvidia-glx libgl1-nvidia-glx libgl1-nvidia-glx-ia32 nvidia-kernel-common nvidia-xconfig nvidia-settings nvidia-vdpau-driver-ia32"
 else
-Packages="dkms libvdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx libgl1-nvidia-glx  nvidia-kernel-common nvidia-xconfig nvidia-settings nvidia-kernel-dkms"
+Packages="dkms nvidia-kernel-dkms libvdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx libgl1-nvidia-glx  nvidia-kernel-common nvidia-xconfig nvidia-settings"
 fi
 
 
-pkcon -p -y install "$Packages">>/tmp/magix-installing &
+for i in $Packages; do
+
+pkcon -p -y install "$i">>/tmp/magix-installing &
+
+sleep 2
+
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
 done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="             Installing Nvidia proprietary driver             \n"
-   if [ "$(grep -B 0  "Failed" /tmp/magix-installing)" != "" ]; then
-   if [ ! -f /tmp/magix-tried-once ]; then
-    rm -rf /tmp/magix-installing
-    InstallNvidia
-    exit 0
-   else
-    yad --width="275" --wrap --title="Magix Driver Installer" --window-icon="jockey" --text="Installation has failed, please try again later, if this problem persists please report to the SalineOS forums." --button=$"gtk-quit:1"
-    rm -rf /tmp/magix-installing
-    exit 0
-   fi
-   fi
-   if [ "$(grep -B 0  "Error" /tmp/magix-installing)" != "" ]; then
-   if [ ! -f /tmp/magix-tried-once ]; then
-    rm -rf /tmp/magix-installing
-    InstallNvidia
-    exit 0
-   else
-    yad --width="275" --wrap --title="Magix Driver Installer" --window-icon="jockey" --text="Installation has failed, please try again later, if this problem persists please report to the SalineOS forums." --button=$"gtk-quit:1"
-    rm -rf /tmp/magix-installing
-    exit 0
-   fi
-   fi
+
+## Add debugging
+cat /tmp/magix-installing
+
+rm -rf /tmp/magix-installing
+
+done
+
+
 ## Configure Xorg
 nvidia-xconfig
 
