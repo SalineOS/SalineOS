@@ -189,7 +189,7 @@ fi
 
  if [ "$Driver" = "Too old" ]; then
   yad --title="Magix" --width="250" --wrap --window-icon="jockey" --text="Your chipset is no longer supported by Nvidia. You will have to continue using the provided open source driver." --button=$"gtk-quit:1"
-  touch $HOME/.magix-dont-run
+  touch /etc/magix-driver-installer/dont-run
   exit 0
  else
   InstallNvidia
@@ -289,6 +289,10 @@ notify-send -u normal -i jockey -t 1000 'Installation Complete
 Rebooting in 1'
 sleep 1
 
+touch /etc/magix-driver-installer/dont-run
+
+sleep 1
+
 reboot now
 
 fi
@@ -374,6 +378,10 @@ Rebooting in 2'
 sleep 1
 notify-send -u normal -i jockey -t 1000 'Installation Complete
 Rebooting in 1'
+sleep 1
+
+touch /etc/magix-driver-installer/dont-run
+
 sleep 1
 
 reboot now
