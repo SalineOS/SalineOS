@@ -71,9 +71,6 @@ CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
 done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          Installing Optional Packages          \n"
 
-## Show debugging output
-cat /tmp/packagekit-url-tmp
-
 
 done
 
