@@ -433,7 +433,7 @@ rm -rf /mnt/Super-Happy-Mount-Point
 
 ## Make needed aditional folders on the system.
 mkdir -p /Target/{proc,dev,mnt,sys,tmp,media/cdrom}
-mkdir -p /Target/var/run
+mkdir -p /Target/run
 
 sleep 3
 
@@ -2850,9 +2850,9 @@ fi
 
 ## Add some things to exclude 
 
-echo '/var/run'>>/tmp/backup-excludes
+echo '/run'>>/tmp/backup-excludes
 echo '/boot/grub'>>/tmp/backup-excludes
-echo '/var/lock'>>/tmp/backup-excludes
+echo '/run/lock'>>/tmp/backup-excludes
 echo '/media'>>/tmp/backup-excludes
 echo '/mnt'>>/tmp/backup-excludes
 echo '/proc'>>/tmp/backup-excludes
@@ -2914,7 +2914,7 @@ killall -KILL tail
 tail -f /usr/bin/salineos-backup | $Progress --text="Changing configuration files on installed system" --pulsate &
 
 ## Make sure all directories are present
-mkdir -p /var/lock
+mkdir -p /run/lock
 mkdir -p /Target/etc
 mkdir -p /Target/usr
 mkdir -p /Target/proc
@@ -2932,7 +2932,7 @@ mkdir -p /Target/dev
 mkdir -p /Target/sys
 mkdir -p /Target/boot
 mkdir -p /Target/sbin
-mkdir -p /Target/var/run
+mkdir -p /Target/run
 
 ## Remove old fstab file
 rm -rf /Target/etc/fstab
@@ -3354,9 +3354,9 @@ fi
 
 ## Add some things to exclude 
 
-echo '/var/run'>>/tmp/backup-excludes
+echo '/run'>>/tmp/backup-excludes
 echo '/boot/grub'>>/tmp/backup-excludes
-echo '/var/lock'>>/tmp/backup-excludes
+echo '/run/lock'>>/tmp/backup-excludes
 echo '/media'>>/tmp/backup-excludes
 echo '/mnt'>>/tmp/backup-excludes
 echo '/proc'>>/tmp/backup-excludes
@@ -3397,7 +3397,7 @@ killall -KILL tail
 tail -f /usr/bin/salineos-backup | $Progress --text="Changing configuration files on installed system" --pulsate &
 
 ## Make sure all directories are present
-mkdir -p /var/lock
+mkdir -p /run/lock
 mkdir -p /Target/etc
 mkdir -p /Target/usr
 mkdir -p /Target/proc
@@ -3414,7 +3414,7 @@ mkdir -p /Target/dev
 mkdir -p /Target/sys
 mkdir -p /Target/boot
 mkdir -p /Target/sbin
-mkdir -p /Target/var/run
+mkdir -p /Target/run
 
 ## Remove old fstab file
 rm -rf /Target/etc/fstab
