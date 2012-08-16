@@ -230,7 +230,7 @@ sleep 2
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="             Installing Nvidia proprietary driver             \n"
+done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="                       Installing Nvidia proprietary driver                       \n"
 
 ## Add debugging
 cat /tmp/magix-installing
