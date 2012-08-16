@@ -471,6 +471,12 @@ RootPartition="Root-Partition"
 
 HomePartFinished="Home"
 
+## Make sure TargetHomePart is set
+
+if [ "$TargetHomePart" = "" ]; then
+ TargetHomePart="root"
+fi
+
  if [ "$TargetHomePart" = "root" ]; then
   HomePartFinished2="The home folder will be placed on the root partition"
  else
