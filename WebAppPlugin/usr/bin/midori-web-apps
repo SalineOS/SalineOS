@@ -332,14 +332,17 @@ if [ -f $HOME/.webapps/$Name2/cache/midori/icons/69579f75125a3d95fc9f8ba97dcb2b3
  rm "$HOME/.webapps/$Name2/cache/midori/icons/69579f75125a3d95fc9f8ba97dcb2b32.ico"
 fi
 
-for $i in $(ls $HOME/.webapps/$Name2/cache/midori/web); do
- file /$HOME/.webapps/$Name2/cache/midori/web/$i>>/tmp/midori-menu-create
+for i in $(ls $HOME/.webapps/$Name2/cache/midori/web); do
+ file $HOME/.webapps/$Name2/cache/midori/web/$i>>/tmp/midori-menu-create
 done
 
 
-HashedIconName=$(grep "MS Windows icon resource" | awk -F ':' '{print $1}' | awk -F '/' '{print $2}')
+HashedIconName=$(grep "MS Windows icon resource" /tmp/midori-menu-create | awk -F ':' '{print $1}' | awk -F '/' '{print $NF}')
 
-NewIcon="$HOME/.webapps/$Name2/cache/midori/icons/$HashedIconName"
+## Make sure to remove tmp file, in case user is making multiple entries.
+rm -rf /tmp/midori-menu-create
+
+NewIcon="$HOME/.webapps/$Name2/cache/midori/web/$HashedIconName"
 
 if [ "$HashedIconName" != "" ]; then
  cp -f "$NewIcon" "$HOME/.webapps/$Name2"
