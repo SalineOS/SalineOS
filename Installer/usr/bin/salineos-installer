@@ -1220,7 +1220,7 @@ fi
 ## Ask the user if they wish to use automatic partitioning.
 
 AutoPartitioning () {
-$Info --width=400 --wrap --text="You will need at least one partition in order to install SalineOS.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
+$Info --width=400 --wrap --text="You will need at least one partition in order to install SalineOS.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk.\n" --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
 
 ret="$?"
 
