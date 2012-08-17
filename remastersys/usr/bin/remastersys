@@ -429,7 +429,7 @@ fi
 echo "Creating filesystem.squashfs   ... this will take a while so be patient"
 
 if [ "$SQUASHFSOPTS" = "" ]; then
-SQUASHFSOPTS="-no-recovery -always-use-fragments -b 1M"
+SQUASHFSOPTS="-no-recovery -always-use-fragments -b 1M -comp xz"
 fi
 
 echo "Adding stage 1 files/folders that the livecd requires."

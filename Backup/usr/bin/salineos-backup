@@ -195,7 +195,7 @@ E48=$(head -n 49 /etc/salineos-backup/excludes | tail -n 1)
 E49=$(head -n 50 /etc/salineos-backup/excludes | tail -n 1)
 E50=$(head -n 51 /etc/salineos-backup/excludes | tail -n 1)
 
-mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -no-duplicates -no-recovery  -e \
+mksquashfs "$UseRoot" "$SaveFolder/$ImageName.backup" -always-use-fragments -b 1M -comp xz -no-duplicates -no-recovery  -e \
 .bash_history \
 .cache \
 .thumbnails \

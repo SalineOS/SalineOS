@@ -2,9 +2,9 @@ Package: remastersys
 Priority: optional
 Section: system
 Installed-Size: 980
-Maintainer: Tony Brijeski <tb6517@yahoo.com>
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Architecture: all
-Version: 3.0.0-1
+Version: 3.0.0-2
 Depends: coreutils, dialog, memtest86+, mkisofs | genisoimage, findutils, grub-pc, os-prober, bash, passwd, sed, squashfs-tools, live-boot, live-config, live-config-sysvinit, live-boot-initramfs-tools, rsync, mount, laptop-detect, syslinux, util-linux, hwdata
 Suggests: gparted, xterm, yad, xdebconfigurator, read-edid, xresprobe
 Conffiles:
