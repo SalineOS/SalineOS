@@ -259,7 +259,7 @@ proc \
 swap \
 sys \
 tmp \
-var/run >>/tmp/salineos-backup-temp-file &
+run >>/tmp/salineos-backup-temp-file &
 
 sleep 1
 
@@ -480,6 +480,7 @@ mkdir -p /Target/sys
 mkdir -p /Target/boot
 mkdir -p /Target/sbin
 mkdir -p /Target/var
+mkdir -p /run/lock
 
 ## Prepare a chroot envoirnment for post install changes
 
@@ -1164,7 +1165,7 @@ fi
 ## Ask the user if they wish to use automatic partitioning.
 
 AutoPartitioning () {
-$Info --width=400 --wrap --text="You will need at least one partition in order to restore your backup image.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk." --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
+$Info --width=400 --wrap --text="You will need at least one partition in order to restore your backup image.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk.\n" --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
 
 ret="$?"
 
