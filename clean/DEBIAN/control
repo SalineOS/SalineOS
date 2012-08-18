@@ -1,9 +1,9 @@
 Package: clean
-Version: 2.0-3
+Version: 2.0-4
 Architecture: all
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Installed-Size: 93
-Depends: coreutils, findutils, bash, sed, syslinux, util-linux, grub-pc, aptitude
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux, aptitude
 Section: system
 Priority: optional
-Description: Boot loader restoration utility.
+Description: Simple disk cleanup utility written in bash and yet-another-dialog.
