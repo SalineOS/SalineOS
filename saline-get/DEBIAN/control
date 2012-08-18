@@ -1,0 +1,9 @@
+Package: saline-get
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, util-linux, apt
+Section: system
+Priority: optional
+Description: Wrapper for apt that causes it to use the GTK debconf interface.
