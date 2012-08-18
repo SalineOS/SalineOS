@@ -1,0 +1,9 @@
+Package: salineos-user-manual
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils
+Section: system
+Priority: optional
+Description: User manual for SalineOS.
