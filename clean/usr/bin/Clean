@@ -29,7 +29,6 @@ PackageCacheSize=$(du -chs --apparent-size /var/cache/apt/archives | grep 'total
 
 ## Calculate the size for removing the users xsession errors and rotated system logs.
 
-## Make sure to clear temp file
 rm -rf /tmp/Clean-Logs
 
 ls /var/log | grep [1-9] | grep -v "exim4">>/tmp/Clean-Logs
@@ -136,7 +135,6 @@ notify-send -u normal -i /usr/share/pixmaps/clean.png -t 15000 '
 Disk Cleanup Complete'
 fi
 
-## Make sure to clear temp file
 rm -rf /tmp/Clean-Logs
 
 exit 
