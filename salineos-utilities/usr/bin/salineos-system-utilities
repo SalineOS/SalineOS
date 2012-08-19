@@ -214,7 +214,7 @@ ret="$?"
   exit 0
  fi
 
-CurrentDate=$(echo "$CurrentDate" | awk -F '/' '{print $3$1$2}')
+CurrentDate=$(echo "$CurrentDate" | awk -F '/' '{print $1$2}')
 
 HourArray=( "12 AM (Midnight)" "00" "1 AM" "01" "2 AM" "02" "3 AM" "03" "4 AM" "04" "5 AM" "05" "6 AM" "06" "7 AM" "07" "8 AM" "08" "9 AM" "09" "10 AM" "10" "11 AM" "11" "12 PM" "12" "1 PM" "13" "2 PM" "14" "3 PM" "15" "4 PM" "16" "5 PM" "17" "6 PM" "18" "7 PM" "19" "8 PM" "20" "9 PM" "21" "10 PM" "22" "11 PM" "23" )
 
@@ -246,7 +246,27 @@ ret="$?"
 
 Minute=$(echo "$Minute" | awk -F '|' '{print $1}')
 
-gksudo date +%Y%m%d%T -s "$CurrentDate $Hour:$Minute"
+if [ "$Minute" = "1" ]; then
+ Minute="01"
+elif [ "$Minute" = "2" ]; then
+ Minute="02"
+elif [ "$Minute" = "3" ]; then
+ Minute="03"
+elif [ "$Minute" = "4" ]; then
+ Minute="04"
+elif [ "$Minute" = "5" ]; then
+ Minute="05"
+elif [ "$Minute" = "6" ]; then
+ Minute="06"
+elif [ "$Minute" = "7" ]; then
+ Minute="07"
+elif [ "$Minute" = "8" ]; then
+ Minute="08"
+elif [ "$Minute" = "9" ]; then
+ Minute="09"
+fi
+
+gksudo date "$CurrentDate$Hour$Minute"
 gksudo hwclock -w
  
 fi
