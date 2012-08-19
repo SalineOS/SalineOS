@@ -588,6 +588,9 @@ elif [ "$Change" = "Boot-Loader" ]; then
 elif [ "$Change" = "Use-Disk" ]; then
  ChooseDrive
  exit 0
+elif [ "$Change" = "Install-Plugins" ]; then
+ RestrictedMultimedia
+ exit 0
 elif [ "$Change" = "" ]; then
  $Info --text="No change selected" --button=$"gtk-ok:1"
  FinishedMenu
@@ -641,8 +644,13 @@ else
 fi
 
 if [ "$Internet" != "Continue" ]; then
- RestrictedMultimedia
- exit 0
+ if [ -f /tmp/Finished-Menu ]; then
+  FinishedMenu
+  exit 0
+ else
+  RestrictedMultimedia
+  exit 0
+ fi
 else
  touch /tmp/Finished-Menu
  FinishedMenu
