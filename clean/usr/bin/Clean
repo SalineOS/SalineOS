@@ -86,7 +86,7 @@ killall -KILL tail
 
 MainMenu () {
 
-Operation=$(yad $Icon --button=$"gtk-info:5" --button=$"Exit:3" --button=$"gtk-ok:2" --list --text="Please select the actions you wish to perform" --height="250" --checklist --multiple --on-top --column=' ' --column="Action" --column="Size" --title="Clean" --print-column="2" X Flash-Cookies "$FlashCookieSize" X Logs "$LogsSize" X Package-Cache "$PackageCacheSize" X Un-Needed-Packages "$FinalSize"M X Thumbnails "$ThumbnailsSize")
+Operation=$(yad $Icon --button=$"gtk-info:5" --button=$"gtk-quit:3" --button=$"gtk-ok:2" --list --text="Please select the actions you wish to perform" --height="250" --checklist --multiple --on-top --column=' ' --column="Action" --column="Size" --title="Clean" --print-column="2" X Flash-Cookies "$FlashCookieSize" X Logs "$LogsSize" X Package-Cache "$PackageCacheSize" X Un-Needed-Packages "$FinalSize"M X Thumbnails "$ThumbnailsSize")
 
 ret=$?
 
