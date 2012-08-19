@@ -70,7 +70,7 @@ fi
 
 ## Test for an nVidia card
 lspci &>> /tmp/magix-driver-installer
-Nvidia=$(grep -B 0  "VGA compatible controller: nVidia" /tmp/magix-driver-installer)
+Nvidia=$(grep -i -B 0  "VGA compatible controller: nVidia" /tmp/magix-driver-installer)
 
 ##################################################### Start nVidia
 
@@ -192,17 +192,31 @@ fi
   yad --title="Magix" --width="250" --wrap --window-icon="jockey" --text="Your chipset is no longer supported by Nvidia. You will have to continue using the provided open source driver." --button=$"gtk-quit:1"
   touch /etc/magix-driver-installer/dont-run
   exit 0
- else
-  InstallNvidia
  fi
+
+yad --title="Magix Driver Installer" --window-icon="jockey" --width="300" --wrap --text="Nvidia provides a closed source proprietary driver for your graphics chipset. This driver will provide better 3D performance than the currently used open source driver. This program can automatically download and install this driver for you if desired. Installation of the proprietary driver will requiring rebooting the machine when finished.\n" --button=$"gtk-quit:3" --button=$"Install:5"
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "252" ]; then 
+ exit 0
+elif [ "$ret" = "5" ]; then
+ InstallNvidia
+ exit 0
 fi
+
+
+fi
+## End Nvidia
+
+yad --title="Magix Driver Installer" --width="250" --wrap --window-icon="jockey" --button=$"gtk-quit:1" --text="This utility did not find any proprietary drivers available for your system.\n"
 
 }
 
 InstallNvidia () { 
 
 ## Update package cache and purge the old driver
-tail -f /usr/bin/magix-driver-installer | yad --progress --pulsate --title="Magix Driver Installer" --window-icon="jockey" --text="               Updating package cache               \n"
+tail -f /usr/bin/magix-driver-installer | yad --progress --auto-close --no-buttons --pulsate --title="Magix Driver Installer" --window-icon="jockey" --text="               Updating package cache               \n" &
 aptitude update
 sleep 1
 aptitude purge -y xserver-xorg-video-nouveau
@@ -217,9 +231,9 @@ if [ "$Driver" != "Current" ]; then
 CurrentKernel=$(uname -r)
 
 if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
-Packages="dkms nvidia-kernel-legacy-173xx-dkms nvidia-glx-legacy-173xx nvidia-glx-legacy-173xx-ia32 nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx libgl1-nvidia-legacy-173xx-glx-ia32 nvidia-kernel-common"
+Packages="dkms nvidia-kernel-legacy-173xx-dkms nvidia-glx-legacy-173xx nvidia-glx-legacy-173xx-ia32 nvidia-settings libgl1-nvidia-legacy-173xx-glx libgl1-nvidia-legacy-173xx-glx-ia32 nvidia-kernel-common"
 else
-Packages="dkms nvidia-kernel-legacy-173xx-dkms nvidia-glx-legacy-173xx nvidia-xconfig nvidia-settings libgl1-nvidia-legacy-173xx-glx nvidia-kernel-common"
+Packages="dkms nvidia-kernel-legacy-173xx-dkms nvidia-glx-legacy-173xx nvidia-settings libgl1-nvidia-legacy-173xx-glx nvidia-kernel-common"
 fi
 
 for i in $Packages; do
@@ -244,57 +258,8 @@ done
 nvidia-xconfig
 
 ## Inform the user and reboot the machine
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 15'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 14'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 13'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 12'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 11'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 10'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 9'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 8'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 7'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 6'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 5'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 4'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 3'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 2'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 1'
-sleep 1
-
-touch /etc/magix-driver-installer/dont-run
-
-sleep 1
-
-reboot now
+notify-send -u normal -i jockey -t 999999 'Installation Complete
+Please Reboot Your Machine.'
 
 fi
 
@@ -306,9 +271,9 @@ if [ "$Driver" = "Current" ]; then
 CurrentKernel=$(uname -r)
 
 if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
-Packages="dkms nvidia-kernel-dkms libvdpau1 lib32vdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx-ia32 nvidia-glx libgl1-nvidia-glx libgl1-nvidia-glx-ia32 nvidia-kernel-common nvidia-xconfig nvidia-settings nvidia-vdpau-driver-ia32"
+Packages="dkms nvidia-kernel-dkms libvdpau1 lib32vdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx-ia32 nvidia-glx libgl1-nvidia-glx libgl1-nvidia-glx-ia32 nvidia-kernel-common nvidia-settings nvidia-vdpau-driver-ia32"
 else
-Packages="dkms nvidia-kernel-dkms libvdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx libgl1-nvidia-glx  nvidia-kernel-common nvidia-xconfig nvidia-settings"
+Packages="dkms nvidia-kernel-dkms libvdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx libgl1-nvidia-glx  nvidia-kernel-common nvidia-settings"
 fi
 
 
@@ -335,57 +300,11 @@ done
 nvidia-xconfig
 
 ## Inform the user and reboot the machine
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 15'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 14'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 13'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 12'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 11'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 10'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 9'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 8'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 7'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 6'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 5'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 4'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 3'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 2'
-sleep 1
-notify-send -u normal -i jockey -t 1000 'Installation Complete
-Rebooting in 1'
-sleep 1
+## Inform the user and reboot the machine
+notify-send -u normal -i jockey -t 999999 'Installation Complete
+Please Reboot Your Machine.'
 
-touch /etc/magix-driver-installer/dont-run
 
-sleep 1
-
-reboot now
 fi
 
 }

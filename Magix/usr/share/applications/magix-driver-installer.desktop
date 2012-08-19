@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Name=Install Proprietary Drivers
+GenericName=Restore Bootloader
+Comment=Install proprietary drivers
+Exec=gksudo /usr/bin/magix-driver-installer
+Icon=jockey
+Terminal=false
+MultipleArgs=false
+Type=Application
+Categories=SystemBackup;Applications;GTK;System
+NotShowIn=KDE
+X-KDE-SubstituteUID=true
+GenericName[en_US]=Install Drivers
