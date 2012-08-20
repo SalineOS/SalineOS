@@ -388,6 +388,7 @@ dpkg-divert --remove --rename --quiet /usr/lib/update-notifier/apt-check
 dpkg-divert --remove --rename --quiet /usr/sbin/update-initramfs
 dpkg-divert --remove --rename --quiet /usr/sbin/anacron
 update-initramfs -t -c -k $(/bin/uname -r)
+ln -sf /usr/share/zoneinfo/$TimeZone /etc/localtime
 
 shadowconfig on
 
