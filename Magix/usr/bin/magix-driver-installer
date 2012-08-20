@@ -31,7 +31,7 @@ fi
 ## Test for an internet connection
 InternetTest () {
 
-tail -f /usr/bin/magix-driver-installer | yad --auto-close --title="Magix" --no-buttons --progress --pulsate --text="   Checking for an active internet connection.   \n" &
+tail -f /usr/bin/magix-driver-installer | yad --window-icon="jockey" --auto-close --title="Magix" --no-buttons --progress --pulsate --text="   Checking for an active internet connection.   \n" &
 
 TestInternet="$(httping -g http://www.google.com -c 1 -t 15)"
 Internet="$(echo "$TestInternet" | grep "0.00% failed")"
@@ -209,14 +209,14 @@ fi
 fi
 ## End Nvidia
 
-yad --title="Magix Driver Installer" --width="250" --wrap --window-icon="jockey" --button=$"gtk-quit:1" --text="This utility did not find any proprietary drivers available for your system.\n"
+yad --title="Magix Installer" --width="250" --wrap --window-icon="jockey" --button=$"gtk-quit:1" --text="This utility did not find any proprietary drivers available for your system.\n"
 
 }
 
 InstallNvidia () { 
 
 ## Update package cache and purge the old driver
-tail -f /usr/bin/magix-driver-installer | yad --progress --auto-close --no-buttons --pulsate --title="Magix Driver Installer" --window-icon="jockey" --text="               Updating package cache               \n" &
+tail -f /usr/bin/magix-driver-installer | yad --progress --auto-close --no-buttons --pulsate --title="Magix Installer" --window-icon="jockey" --text="               Updating package cache               \n" &
 aptitude update
 sleep 1
 aptitude purge -y xserver-xorg-video-nouveau
@@ -245,7 +245,7 @@ sleep 2
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="                       Installing Nvidia proprietary driver                       \n"
+done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Installer"  --text="                       Installing Nvidia proprietary driver                       \n"
 
 ## Add debugging
 cat /tmp/magix-installing
@@ -286,7 +286,7 @@ sleep 2
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Driver Installer"  --text="             Installing Nvidia proprietary driver             \n"
+done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Installer"  --text="             Installing Nvidia proprietary driver             \n"
 
 ## Add debugging
 cat /tmp/magix-installing

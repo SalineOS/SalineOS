@@ -112,6 +112,8 @@ elif [ "$Operation" = "Resize Swap" ]; then
  InfoText="Allows you to resize the SalineOS swap file."
 elif [ "$Operation" = "Set Clock" ]; then
  InfoText="Set the system clock. SalineOS includes ntp which should keep your clock synced to a remote server. This option is most useful on machines without internet access."
+elif [ "$Operation" = "Drivers" ]; then
+ InfoText="Starts an automated script to detect if there are any proprietary closed source drivers available for your system. If found, it will offer to install these drivers for you."
 fi
 
 yad --title="SalineOS System Utilities" --width="300" --wrap --text="$InfoText" --button=$"gtk-ok:1"
@@ -128,15 +130,15 @@ OperationArray=""
 
 if [ -f /swap/salineos-swap ]; then
 
-OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the system's time and date" "Resize Swap" "Resize the SalineOS swapfile")
+OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Drivers" "Check for and install proprietary graphics drivers" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the system's time and date" "Resize Swap" "Resize the SalineOS swapfile")
 
 else
 
-OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the system's time and date")
+OperationArray=( "Clean" "Launch the Clean utility to reclaim disk space" "Change System Language" "Change the system language with Localizesys" "Drivers" "Check for and install proprietary graphics drivers" "Import Key" "Have apt trust a repository by importing its' GPG key" "Install Restricted Multimedia" "Install potentially patent encumbered multimedia codecs" "Install Wine" "Install the Windows compatibility layer Wine, with extras" "Install LAMP" "Install a traditional Linux Apache MySQL PHP server stack." "Local DNS" "Setup local DNS server on this machine" "Set Clock" "Set the system's time and date")
 
 fi
 
-Operation=$(yad --wrap --width="675" --height="350" --list --title="SalineOS System Utilities" --window-icon="preferences-system" --always-print-result --print-column="1" --column="Action" --column="Description" --text="Welcome to SalineOS system utilities. This program allows you to tweak and manage your system with a set of straight forward and simple utilities. To view more detailed information about each action simply highlight it and press Info." --button=$"gtk-quit:3" --button=$"gtk-info:5" --button=$"gtk-ok:7" "${OperationArray[@]}")
+Operation=$(yad --wrap --width="700" --height="400" --list --title="SalineOS System Utilities" --window-icon="preferences-system" --always-print-result --print-column="1" --column="Action" --column="Description" --text="Welcome to SalineOS system utilities. This program allows you to tweak and manage your system with a set of straight forward and simple utilities. To view more detailed information about each action simply highlight it and press Info." --button=$"gtk-quit:3" --button=$"gtk-info:5" --button=$"gtk-ok:7" "${OperationArray[@]}")
 
 ret="$?"
 
@@ -164,6 +166,9 @@ elif [ "$Operation" = "Clean" ]; then
 elif [ "$Operation" = "Change System Language" ]; then
  gksudo /usr/bin/localizesys
  MainMenu
+ exit 0
+elif [ "$Operation" = "Drivers" ]; then
+ gksudo /usr/bin/magix-driver-installer
  exit 0
 elif [ "$Operation" = "Install Restricted Multimedia" ]; then
  Restricted
