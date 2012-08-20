@@ -199,7 +199,7 @@ elif [ "$Operation" = "Import Key" ]; then
   exit 0
  fi
 
- gksudo "exec /usr/bin/xfce4-terminal -x /usr/bin/gpgimport $Key"
+ gksudo exec "/usr/bin/xterm -hold -e /usr/bin/gpgimport $Key"
  MainMenu
  exit 0
 elif [ "$Operation" = "Resize Swap" ]; then
@@ -272,7 +272,7 @@ elif [ "$Minute" = "9" ]; then
 fi
 
 gksudo date "$CurrentDate$Hour$Minute"
-gksudo hwclock -w
+gksudo hwclock -w --localtime
  
 fi
 
