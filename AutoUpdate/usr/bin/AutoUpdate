@@ -18,11 +18,14 @@
 #  Copyright 2012 Under the GNU GPL2 License
 # Authored by Anthony Nordquist http://www.salineos.com salinelinux@gmail.com
 
-tail -f /usr/bin/AutoUpdate | yad --progress --pulsate --title="Auto Update" --no-buttons --text="             Checking for updates             \n"
+tail -f /usr/bin/AutoUpdate | yad --progress --auto-close --window-icon="system-software-update" --pulsate --title="Auto Update" --no-buttons --text="             Checking for updates             \n" &
 
 wget http://www.salineos.com/Repo/apt/2x/preferences -O /etc/apt/preferences
 
 aptitude update
+
+sleep 1
+killall -KILL tail
 
 gpk-update-viewer
 
