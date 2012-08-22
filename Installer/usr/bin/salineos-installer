@@ -1179,9 +1179,9 @@ done
 GrubMenu=("${GrubMenu[@]}" "root" "Root Partition (Advanced)")
 
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="               Please select a drive to erase and use.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
+PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="               Please select a drive to erase and use.               \n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
 else
-PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="                 Please select a drive to partition.\n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
+PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="                 Please select a drive to partition.               \n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
 fi
 
 ret="$?"
