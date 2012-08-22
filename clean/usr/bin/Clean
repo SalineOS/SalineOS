@@ -80,6 +80,19 @@ else
  done
 fi
 
+## Dirty but effective hax
+if [ "$PackageCacheSize" = "8.0K" ]; then
+ PackageCacheSize="0"
+fi
+
+if [ "$ThumbnailsSize" = "4.0K" ]; then
+ ThumbnailsSize="0"
+fi
+
+if [ "FlashCookieSize" = "8.0K" ]; then
+ FlashCookieSize="0"
+fi
+
 sleep 3
 
 killall -KILL tail
