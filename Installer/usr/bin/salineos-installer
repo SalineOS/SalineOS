@@ -188,6 +188,8 @@ if [ "$Internet" != "Continue" ]; then
  
  if [ "$InstallCodec" != "FALSE" ]; then
  if [ "$(grep '# Debian Multimedia' /etc/apt/sources.list)" = "" ]; then
+  echo ' ' >>/etc/apt/sources.list
+  echo ' ' >>/etc/apt/sources.list
   echo "# Debian Multimedia">>/etc/apt/sources.list
   echo "deb http://www.deb-multimedia.org wheezy main non-free">>/etc/apt/sources.list
  fi

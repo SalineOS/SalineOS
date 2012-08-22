@@ -46,11 +46,13 @@ fi
 Test=$(grep "http://www.deb-multimedia.org" /etc/apt/sources.list)
 
 if [ "$Test" = "" ]; then
+ echo ' ' >> /etc/apt/sources.list
+ echo ' ' >> /etc/apt/sources.list
  echo "# Marillat For info visit http://www.deb-multimedia.org" >> /etc/apt/sources.list
  echo "deb http://www.deb-multimedia.org wheezy main non-free" >> /etc/apt/sources.list
 fi
 
-CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2"
+CodecPackages="deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd flashplugin-nonfree gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2"
 
 tail -f /usr/bin/salineos-system-utilities | yad --progress --pulsate --title='  ' --no-buttons --text="     Updating package cache, please wait.     \n" 
 
