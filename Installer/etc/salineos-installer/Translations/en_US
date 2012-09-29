@@ -1,0 +1,123 @@
+export READADOBE="Read Adoble EULA"
+
+export DECLINE="Decline"
+
+export AGREEINSTALL="Agree and Install"
+
+export RESTRICTEDTEXT="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright). In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
+
+export PARTITIONINGTEXT="You will need at least one partition in order to install SalineOS.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk.\n"
+
+export MANUALPART="Parition disk manually"
+
+export AUTOPART="Erase and use an entire disk"
+
+export CANCELINSTALLTEXT="Are you sure you want to cancel the installation?"
+
+export ERASEANDUSE="Please select a drive to erase and use."
+
+export PARTDRIVE="Please select a drive to partition."
+
+export ROOTPART="Please select a partition to install the SalineOS root (Main) directory to.\n"
+
+export PARTLABEL="Partition Label"
+
+export NAME="Name"
+
+export SWAPFILETXT="Please select the size of the SalineOS swap file to be created.\n"
+
+export CONTINUEBUTTON="Continue"
+
+export REC="It is recommended to choose this setting"
+
+export USESWAPPART="Use Swap Partition (Advanced)"
+
+export CONTINUESWAP="Continue using swap file"
+
+export SELECTSWAPPART="Please select the partition to use for swap"
+
+export USFBUTTON="Use Swap File"
+
+export USBUTTON="Use Selected"
+
+export FORMATHOME="Format (Erase all data) on the target home partition"
+
+export SEPERATEHOME="Select a seperate partition for /home (User files) if desired"
+
+export PUTHOME="Put /home on the root partition"
+
+export PASSMATCH="Passwords do not match, please try again."
+
+export EMPTYPASS="User\'s Password cannot be blank, please try again."
+
+export UNBLANK="Username cannot be left blank, please try again."
+
+export REALNAMEBLANK="User\'s real name field cannot be left blank, please try again."
+
+export SETUPUSER="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks."
+
+export USERREALNAME="User's Real Name"
+
+export REQUIREPASS="Require the user's password to logon?"
+
+export SPECCHAR="The hostname cannot contain special characters."
+
+export BLANKHOST="The hostname cannot be blank."
+
+export ABOUTHOST="The system\'s hostname is used to identify the machine on a network,\nsuch as a local area network or the internet.\n\nFor PCs the hostname is used mostly for easing administration of devices\non LAN, such as switches, routers, and wireless access points."
+
+export HOSTNAMETEXT="Enter a hostname for the installed system. You can enter anything\nyou like here, except spaces and special characters"
+
+export TIMEZONEBLANK="The time zone cannot be blank, please select your time zone."
+
+export SELECTZONE="Select your time zone"
+
+export ABOUTHOSTBUTTON="About Hostname"
+
+export GRUBBLANK="The grub location cannot be blank, please choose where to install grub."
+
+export INSTALLGRUBTEXT="Please select where to install the grub boot loader"
+
+export LOCATION="Location"
+
+export NOCHANGE="No change selected"
+
+export REQUIREPASS2="Require a password to login as"
+
+export FINISHEDMENUTEXT="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n"
+
+export RUNBUTTON="Run Installation"
+
+export CHANGESELECTED="Change Selected"
+
+export FMUSER1="A user account will be created for"
+
+export FMUSER2="with the username"
+
+export FMAUTOLOG="Require password for login is"
+
+export FMHOSTNAME="The system hostname will be set to"
+
+export FMTIMEZONE="The system time zone will be set to"
+
+export FMGRUB="The GRUB2 boot loader will be installed to"
+
+export FMRESTRICTED2="Restricted multimedia plug-ins will be installed"
+
+export FMRESTRICTED1="Restricted multimedia plug-ins will not be installed"
+
+export FMROOT="will be erased and the entire disk used"
+
+export FMSWAP="swap file will be created"
+
+export FMHOMEPART3="will be used for /home without erasing data"
+
+export FMHOMEPART1="will be formated"
+
+export FMHOMEPART2="and used for"
+
+export FMHOMEPART4="The home folder will be placed on the root partition"
+
+export FMSWAP1="will be used as the swap partition"
+
+export LASTDIALOG="Installation is complete.  If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?"

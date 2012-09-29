@@ -443,7 +443,7 @@ sleep 2
 
 killall -KILL tail
 
-$Question --wrap --width=250 --text="Installation is complete.  If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?" 
+$Question --wrap --width=250 --text="$LASTDIALOG" 
 
 if [ "$?" = 0 ]; then
  reboot
@@ -461,18 +461,18 @@ Change=""
 if [ "$AutoPart" = "Manual" ]; then
  if [ "$UseSwapFile" = "True" ]; then
   SwapFinished='Swap-File'
-  SwapFinished2="A $SwapFileSize Megabytes swap file will be created"
+  SwapFinished2="A $SwapFileSize Megabytes $FMSWAP"
  else
   SwapFinished='Swap-Partition'
-  SwapFinished2="$Swap will be used as the swap partition"
+  SwapFinished2="$Swap $FMSWAP1"
  fi
 
 RootPartition="Root-Partition"
 
  if [ "$Input" = "ext3" ]; then
-  RootPartition2="$TargetPart will be formatted (erased) ext3 and used for root"
+  RootPartition2="$TargetPart $FMHOMEPART1 (erased) ext3 $FMHOMEPART2 root"
  else
-  RootPartition2="$TargetPart will be formatted (erased) ext4 and used for root"
+  RootPartition2="$TargetPart $FMHOMEPART1 (erased) ext4 $FMHOMEPART2 root"
  fi
 
 HomePartFinished="Home"
@@ -484,54 +484,54 @@ if [ "$TargetHomePart" = "" ]; then
 fi
 
  if [ "$TargetHomePart" = "root" ]; then
-  HomePartFinished2="The home folder will be placed on the root partition"
+  HomePartFinished2="$FMHOMEPART4"
  else
   if [ "$FormatHome" = "True" ]; then
    if [ "$Input" = "ext3" ]; then
-    HomePartFinished2="$TargetHomePart will be formated (erased) ext3 and used for /home"
+    HomePartFinished2="$TargetHomePart $FMHOMEPART1 (erased) ext3 $FMHOMEPART2 /home"
    else
-    HomePartFinished2="$TargetHomePart will be formated (erased) ext4 and used for /home"
+    HomePartFinished2="$TargetHomePart $FMHOMEPART1 (erased) ext4 $FMHOMEPART2 /home"
    fi
   else
-   HomePartFinished2="$TargetHomePart will be used for /home without erasing data"
+   HomePartFinished2="$TargetHomePart $FMHOMEPART3"
   fi
  fi
 else
  SwapFinished='Swap-File'
- SwapFinished2="A $SwapFileSize Megabytes swap file will be created"
+ SwapFinished2="A $SwapFileSize Megabytes $FMSWAP"
  RootPartition="Use-Disk"
- RootPartition2="$PartDrive will be erased and the entire disk used"
+ RootPartition2="$PartDrive $FMROOT"
 fi
 
 if [ "$Internet" != "Continue" ]; then
 if [ "$InstallCodec" = "FALSE" ]; then
  CodecsFinished="Install-Plugins"
- CodecsFinished2="Restricted multimedia plug-ins will not be installed"
+ CodecsFinished2="$FMRESTRICTED1"
 else
  CodecsFinished="Install-Plugins"
- CodecsFinished2="Restricted multimedia plug-ins will be installed"
+ CodecsFinished2="$FMRESTRICTED2"
 fi
 fi
 
 UserFinished="User-Account"
-UserFinished2="A user account will be created for "$TargetUserRealName" with the username "$TargetUser""
+UserFinished2="$FMUSER1 "$TargetUserRealName" $FMUSER2 "$TargetUser""
 
 AutoLoginFinished="Auto-Login"
-AutoLoginFinished2="Require password for login is "$RequirePassword""
+AutoLoginFinished2="$FMAUTOLOG "$RequirePassword""
 
 HostnameFinished="Hostname"
-HostnameFinished2="The system hostname will be set to "$TargetHostname""
+HostnameFinished2="$FMHOSTNAME "$TargetHostname""
 
 TimeZoneFinished="Time-Zone"
-TimeZoneFinished2="The system time zone will be set to "$TimeZone""
+TimeZoneFinished2="$FMTIMEZONE "$TimeZone""
 
 GrubFinished="Boot-Loader"
-GrubFinished2="The GRUB2 boot loader will be installed to "$GrubLoc""
+GrubFinished2="$FMGRUB "$GrubLoc""
 
 if [ "$AutoPart" = "Auto" ]; then
-Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"gtk-quit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
+Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="$FINISHEDMENUTEXT" --button=$"gtk-quit:3" --button=$"$CHANGESELECTED:2" --button=$"$RUNBUTTON:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
 else
-Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now.\n" --button=$"gtk-quit:3" --button=$"Change Selected:2" --button=$"Run Installation:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$HomePartFinished" "$HomePartFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
+Change=$($Menu --height=400 --column="Option" --column="Current Status" --text="$FINISHEDMENUTEXT" --button=$"gtk-quit:3" --button=$"$CHANGESELECTED:2" --button=$"$RUNBUTTON:5" "$CodecsFinished" "$CodecsFinished2" "$RootPartition" "$RootPartition2" "$SwapFinished" "$SwapFinished2" "$HomePartFinished" "$HomePartFinished2" "$UserFinished" "$UserFinished2" "$AutoLoginFinished" "$AutoLoginFinished2" "$HostnameFinished" "$HostnameFinished2" "$TimeZoneFinished" "$TimeZoneFinished2" "$GrubFinished" "$GrubFinished2")
 fi
 
 ret="$?"
@@ -542,7 +542,7 @@ if [ "$ret" = "252" ]; then
  FinishedMenu
  exit 0 
 elif [ "$ret" = "3" ]; then 
-  $Question --text="Are you sure you want to cancel the installation?"
+  $Question --text="$CANCELINSTALLTEXT"
   if [ "$?" = "0" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
@@ -569,7 +569,7 @@ elif [ "$Change" = "Home" ]; then
  SelectHomePart
  exit 0
 elif [ "$Change" = "Auto-Login" ]; then
-  $Question --text="Require a password to login as "$TargetUser"?"
+  $Question --text="$REQUIREPASS2 "$TargetUser"?"
   if [ "$?" = "0" ]; then
    RequirePassword="TRUE"
    FinishedMenu 
@@ -598,7 +598,7 @@ elif [ "$Change" = "Install-Plugins" ]; then
  RestrictedMultimedia
  exit 0
 elif [ "$Change" = "" ]; then
- $Info --text="No change selected" --button=$"gtk-ok:1"
+ $Info --text="$NOCHANGE" --button=$"gtk-ok:1"
  FinishedMenu
  exit 0
 fi
@@ -617,7 +617,7 @@ GrubSelect () {
 GrubLocation=""
 GrubLoc=""
 
-GrubLoc=$($Menu --width=300 --height=250 --column='Location' --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="Please select where to install the grub boot loader\n" "${GrubMenu[@]}")
+GrubLoc=$($Menu --width=300 --height=250 --column="$LOCATION" --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="$INSTALLGRUBTEXT\n" "${GrubMenu[@]}")
 
 ret="$?"
 
@@ -625,7 +625,7 @@ if [ "$ret" = "252" ]; then
  GrubSelect
  exit 0 
 elif [ "$ret" = "3" ]; then 
-  $Question --text="Are you sure you want to cancel the installation?"
+  $Question --text="$CANCELINSTALLTEXT"
   if [ "$?" = "0" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
@@ -636,7 +636,7 @@ elif [ "$ret" = "3" ]; then
    exit 0
   fi
 elif [ "$GrubLoc" = "" ]; then
- $Info --text="The grub location cannot be blank, please choose where to install grub." --button=$"gtk-ok:1"
+ $Info --text="$GRUBBLANK" --button=$"gtk-ok:1"
  GrubSelect
  exit 0
 fi
@@ -676,7 +676,7 @@ for i in $(cat /tmp/SalineOS-TimeZones); do
 done
 rm /tmp/SalineOS-TimeZones
 
-TimeZone=$(yad --on-top --width=300 --height=450 --center --list --column="Select your time zone:" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --button=$"gtk-ok:2" $TimeZones)
+TimeZone=$(yad --on-top --width=300 --height=450 --center --list --column="$SELECTZONE:" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --button=$"gtk-ok:2" $TimeZones)
 
 ret="$?"
 
@@ -686,7 +686,7 @@ if [ "$ret" = "252" ]; then
  SetTimeZone
  exit 0 
 elif [ "$TimeZone" = "" ]; then
- $Info --text="The time zone cannot be blank, please select your time zone." --button=$"gtk-ok:1"
+ $Info --text="$TIMEZONEBLANK" --button=$"gtk-ok:1"
  SetTimeZone
  exit 0
 fi
@@ -709,7 +709,7 @@ SetHostname () {
 
 TargetHostname=""
 
-TargetHostname=$($TextEntry --text="Enter a hostname for the installed system. You can enter anything\nyou like here, except spaces and special characters" --button=$"About Hostname:3" --button=$"gtk-ok:2")
+TargetHostname=$($TextEntry --text="$HOSTNAMETEXT" --button=$"$ABOUTHOSTBUTTON:3" --button=$"gtk-ok:2")
 
 
 ret="$?"
@@ -718,11 +718,11 @@ if [ "$ret" = "252" ]; then
  SetHostname
  exit 0
 elif [ "$ret" = "3" ]; then
- $Info --text="The system\'s hostname is used to identify the machine on a network,\nsuch as a local area network or the internet.\n\nFor PCs the hostname is used mostly for easing administration of devices\non LAN, such as switches, routers, and wireless access points." --button=$"gtk-ok:1"
+ $Info --text="$ABOUTHOST" --button=$"gtk-ok:1"
  SetHostname
  exit 0
 elif [ "$TargetHostname" = "" ]; then
- $Info --text="The hostname cannot be blank." --width=200 --button=$"gtk-ok:1"
+ $Info --text="$BLANKHOST" --width=200 --button=$"gtk-ok:1"
  SetHostname
  exit 0
 fi
@@ -732,7 +732,7 @@ fi
 TestHostname=$(echo "$TargetHostname" | grep '[!@#$%&*()_+=~,.?:;*-+]')
 
 if [ "$TestHostname" != "" ]; then
- $Info --text="The hostname cannot contain special characters." --width=200 --button=$"gtk-ok:1"
+ $Info --text="$SPECCHAR" --width=200 --button=$"gtk-ok:1"
  SetHostname
  exit 0
 fi
@@ -763,12 +763,12 @@ TargetUser=""
 TargetUserPassword1=""
 TargetUserPassword2=""
 RequirePassword=""
-UserStuff=$(yad --center --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --form --text="Complete this form to setup an initial user.\nThis user\'s password will be required for administrative tasks." --field="User's Real Name:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="Require the user's password to logon?:CHK" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+UserStuff=$(yad --center --title="SalineOS Installer" --window-icon=/usr/share/pixmaps/salineos-installer.png --form --text="$SETUPUSER" --field="$USERREALNAME:" --field="Username:" --field="Password::H" --field="Re-enter Password::H" --field="$REQUIREPASS:CHK" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 ret="$?"
 
 if [ "$ret" = "3" ]; then
-  $Question --text="Are you sure you want to cancel the installation?"
+  $Question --text="$CANCELINSTALLTEXT"
   if [ "$?" = "0" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
@@ -793,23 +793,23 @@ RequirePassword="$(echo "$UserStuff" | awk -F '|' '{print $5}')"
 
 
 if [ "$TargetUserRealName" = "" ]; then
- $Info --button=$"gtk-ok:1" --text="User\'s real name field cannot be left blank, please try again."
+ $Info --button=$"gtk-ok:1" --text="$REALNAMEBLANK"
  UserSetup
  exit 0
 elif [ "$TargetUser" = "" ]; then
- $Info --button=$"gtk-ok:1" --text="Username cannot be left blank, please try again."
+ $Info --button=$"gtk-ok:1" --text="$UNBLANK"
  UserSetup
  exit 0
 elif [ "$TargetUserPassword1" = "" ]; then
- $Info --button=$"gtk-ok:1" --text="User\'s Password cannot be blank, please try again."
+ $Info --button=$"gtk-ok:1" --text="$EMPTYPASS"
  UserSetup
  exit 0
 elif [ "$TargetUserPassword2" = "" ]; then
- $Info --button=$"gtk-ok:1" --text="User\'s Password cannot be blank, please try again."
+ $Info --button=$"gtk-ok:1" --text="$EMPTYPASS"
  UserSetup
  exit 0
 elif [ "$TargetUserPassword1" != "$TargetUserPassword2" ]; then
- $Info --button=$"gtk-ok:1" --text="Passwords do not match, please try again."
+ $Info --button=$"gtk-ok:1" --text="$PASSMATCH"
  UserSetup
  exit 0
 fi
@@ -870,7 +870,7 @@ if [ "$(echo "$i" | grep [0-9] )" != "" ]; then
 fi
 
 done
-HomePart=$($Menu --width="575" --text="  Select a seperate partition for /home (User files) if desired\n" --height=400 --column="Name" --column="Partition Label" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --button=$"Put /home on the root partition:5" "${HomePartMenu[@]}")
+HomePart=$($Menu --width="575" --text="                            $SEPERATEHOME\n" --height=400 --column="Name" --column="$PARTLABEL" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"$USBUTTON:2" --button=$"$PUTHOME:5" "${HomePartMenu[@]}")
 
 ret="$?"
 
@@ -878,7 +878,7 @@ if [ "$ret" = "252" ]; then
  SelectHomePart
  exit 0
 elif [ "$ret" = "3" ]; then
-  $Question --text="Are you sure you want to cancel the installation?"
+  $Question --text="$CANCELINSTALLTEXT"
   if [ "$?" = "0" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
@@ -902,7 +902,7 @@ elif [ "$HomePart" = "" ]; then
  exit 0
 else
  TargetHomePart=$(echo "$HomePart" | awk -F '|' '{print $1}')
- $Question --text="Format (Erase all data) on the target home partition, $TargetHomePart?"
+ $Question --text="$FORMATHOME, $TargetHomePart?"
   if [ "$?" = "0" ]; then
    FormatHome="True"
   else
@@ -962,14 +962,14 @@ fi
 done
 
 
-Swap=$($Menu --width=415 --height=250 --text="            Please select the partition to use for swap            \n" --column="Name" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"Use Swap File:5" --button=$"Use Selected:2" "${SwapPartMenu[@]}")
+Swap=$($Menu --width=415 --height=250 --text="            $SELECTSWAPPART            \n" --column="$NAME" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --button=$"gtk-quit:3" --button=$"$USFBUTTON:5" --button=$"$USBUTTON:2" "${SwapPartMenu[@]}")
 
 ret="$?"
 
 
 
 if [ "$ret" = "3" ]; then
-  $Question --text="Are you sure you want to cancel the installation?"
+  $Question --text="$CANCELINSTALLTEXT"
   if [ "$?" = "0" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
@@ -1011,9 +1011,9 @@ SwapFile () {
 SwapFileSize=""
 
 if [ "$AutoPart" = "Auto" ]; then
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Continue:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  $SWAPFILETXT" --button=$"$CONTINUEBUTTON:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes $REC" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 else
-SwapFileSize=$($Menu --column="Size" --column=" " --text="  Please select the size of the SalineOS swap file to be created.\n" --button=$"Use Swap Partition (Advanced):3" --button=$"Continue using swap file:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
+SwapFileSize=$($Menu --column="Size" --column=" " --text="  $SWAPFILETXT" --button=$"$USESWAPPART:3" --button=$"$CONTINUESWAP:2" 8 Megabytes 32 Megabytes 64 Megabytes 128 Megabytes 256 Megabytes 512 Megabytes 1024 Megabytes 2048 "Megabytes It is recommended to choose this setting" 3072 Megabytes 4096 Megabytes 5120 Megabytes 6144 Megabytes 8192 Megabytes 16384 Megabytes 30000 Megabytes --height=350 ) 
 fi
 
 ret="$?"
@@ -1100,7 +1100,7 @@ fi
 done
 
 
-TargetPart=$($Menu --height=300 --width=575 --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="    Please select a partition to install the SalineOS root (Main) directory to.\n" "${PartDriveMenu[@]}" )
+TargetPart=$($Menu --height=300 --width=575 --column="$NAME" --column="$PARTLABEL" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --button=$"gtk-quit:3" --button=$"Use Selected:2" --text="$ROOTPART" "${PartDriveMenu[@]}" )
 
 ret="$?"
 
@@ -1110,7 +1110,7 @@ if [ "$ret" = "252" ]; then
  SelectRootPart
  exit 0
 elif [ "$ret" = "3" ]; then
-   $Question --text="Are you sure you want to cancel the installation?"
+   $Question --text="$CANCELINSTALLTEXT"
   if [ "$?" = "0" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
@@ -1184,9 +1184,9 @@ done
 GrubMenu=("${GrubMenu[@]}" "root" "Root Partition (Advanced)")
 
 if [ "$AutoPart" = "Auto" ]; then
-PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="               Please select a drive to erase and use.               \n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
+PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="               $ERASEANDUSE               \n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
 else
-PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="                 Please select a drive to partition.               \n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
+PartDrive=$($Menu --width=375 --height=300 --column="Drive" --column="Approx. Size In GiB" --column="Approx. Size In MiB" --text="                 $PARTDRIVE               \n"  --button=$"gtk-quit:3" --button=$"gtk-ok:2" "${PartDriveMenu[@]}" )
 fi
 
 ret="$?"
@@ -1194,7 +1194,7 @@ ret="$?"
 
 
 if [ "$ret" = "3" ]; then
-  $Question --text="Are you sure you want to cancel the installation?"
+  $Question --text="$CANCELINSTALLTEXT"
   if [ "$?" = "0" ]; then
    if [ -f /tmp/Finished-Menu ]; then
     rm /tmp/Finished-Menu
@@ -1236,7 +1236,7 @@ fi
 ## Ask the user if they wish to use automatic partitioning.
 
 AutoPartitioning () {
-$Info --width=400 --wrap --text="You will need at least one partition in order to install SalineOS.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk.\n" --button=$"Partition disk manually:3" --button=$"Erase and use an entire disk:5"
+$Info --width=400 --wrap --text="$PARTITIONINGTEXT" --button=$"$MANUALPART:3" --button=$"$AUTOPART:5"
 
 ret="$?"
 
@@ -1260,7 +1260,7 @@ RestrictedMultimedia () {
 
 InstallCodec=""
 
-yad --wrap --height=300 --width=500 --center --button=$"Read Adobe EULA:3" --button=$"Decline:5" --button=$"Agree and Install:9" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --text="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright). In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
+yad --wrap --height=300 --width=500 --center --button=$"$READADOBE:3" --button=$"$DECLINE:5" --button=$"$AGREEINSTALL:9" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --text="$RESTRICTEDTEXT"
 
 ret="$?"
 
@@ -1307,6 +1307,17 @@ if [ "$ret" = "5" ]; then
  /usr/bin/localizesys Installer
 fi
 
+## Check to see if we have a translation for their language
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/salineos-installer/Translations/$LanguageLess ]; then
+ . /etc/salineos-installer/Translations/$LanguageLess
+else
+ . /etc/salineos-installer/Translations/en_US
+fi
+
+
 AutoPartitioning
 exit 0
 }
@@ -1314,11 +1325,6 @@ exit 0
 ## Tell the user that there are instructions in the user manual 
 
 Instruction (){ 
-
-## Allow Magix to start on any installed systems
-if [ -f /etc/magix-driver-installer/dont-run ]; then
- rm /etc/magix-driver-installer/dont-run
-fi
 
 $Info --text="Complete installation instructions are included\nin the user manual if needed." '--button=gtk-ok:1'
 
