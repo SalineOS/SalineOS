@@ -933,9 +933,11 @@ BlockSize=""
 TargetSwap=$(fdisk -l | grep "swap" | cut -d " " -f1)
 TargetSwap=$(echo "$TargetSwap" | sed -r "s/\/dev\///g")
 
-PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
 
 for i in $TargetSwap; do
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+
 ## Part Drive Size is in blocks, first we need to convert the blocks to bytes
 BlockSize=$(df -P /dev/$i | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
 ## Multiply blocks by block size to get bytes
