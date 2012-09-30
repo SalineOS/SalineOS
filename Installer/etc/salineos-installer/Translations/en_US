@@ -121,3 +121,23 @@ export FMHOMEPART4="The home folder will be placed on the root partition"
 export FMSWAP1="will be used as the swap partition"
 
 export LASTDIALOG="Installation is complete.  If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?"
+
+export PSWAP="Setting up swap space"
+
+export PCOPY="Copying files to"
+
+export PINSTALL="Installing Optional Packages"
+
+export PUPDATE="Updating package cache"
+
+export PUUID="Generating UUID values for fstab"
+
+export PCONFIGFILESYSTEM="Configure the filesystem to be checked every 35 mounts"
+
+export PPREP="Preparing disk and partitions"
+
+export PUSER="Setting up user account"
+
+export PCONFIGFILES="Changing configuration files on installed system"
+
+export PGRUB="Installing and configuring GRUB2"

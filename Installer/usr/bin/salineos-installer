@@ -62,7 +62,7 @@ Input="$@"
 
 RunInstallation () { 
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="           Preparing disk and partitions           " &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="           $PPREP           " &
 
 ## Preserve kernel options in the new grub system
 NewGrubLine="$(cat /proc/cmdline | awk -F 'config ' '{print $2}' | awk -F ' BOOT' '{print $1}')"
@@ -122,7 +122,7 @@ sleep 3
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="Configure the filesystem to be checked\nevery 35 mounts" &
+tail -f /usr/bin/salineos-installer | $Progress --wrap --width="300" --pulsate --text="$PCONFIGFILESYSTEM" &
 
 tune2fs -c 35 -i 0 /dev/$TargetPart
 
@@ -138,7 +138,7 @@ fi
 
 if [ "$TargetHomePart" != "root" ]; then
  if [ "$FormatHome" = "True" ]; then
-  tail -f /usr/bin/salineos-backup | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
+  tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="           Formatting $TargetHomePart for /home           " &
   umount /dev/$TargetHomePart
   umount -l /dev/$TargetHomePart
   sleep 2
@@ -173,7 +173,7 @@ if [ "$TargetHomePart" != "root" ]; then
  killall -KILL tail
 fi
 
-tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="               Generating UUID values for fstab               " &
+tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="               $PUUID               " &
 
 TargetPartUUID=$(blkid /dev/$TargetPart | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
 TargetCDRom="/dev/cdrom"
@@ -202,7 +202,7 @@ if [ "$InstallCodec" != "FALSE" ]; then
    CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2" 
 fi 
 
-tail -f /usr/bin/salineos-installer | yad --progress --auto-close --no-buttons --pulsate --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer.png" --text="               Updating package cache               \n" &
+tail -f /usr/bin/salineos-installer | yad --progress --auto-close --no-buttons --pulsate --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer.png" --text="               $PUPDATE               \n" &
 
 aptitude update
 
@@ -220,7 +220,7 @@ sleep 2
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="                    Installing Optional Packages                    \n"
+done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="                    $PINSTALL                    \n"
 
 ## Show debugging output
 cat /tmp/packagekit-url-tmp
@@ -241,7 +241,7 @@ sleep 2
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="                    Installing Optional Packages                    \n"
+done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="                    $PINSTALL                    \n"
 
 rm /tmp/packagekit-url-tmp
 
@@ -253,7 +253,7 @@ fi
 ## End installation section #######################################################################################
 
 ## Copy the live system to $Target
-tail -f /usr/bin/salineos-installer | $Progress --text="                   Copying files to $TargetPart                   " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="                   $PCOPY $TargetPart                   " --pulsate &
 
 rsync -a / /Target --ignore-existing --exclude=/{Target,live,cdrom,mnt,proc,sys,media}
 
@@ -264,7 +264,7 @@ sleep 3
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --text="                    Setting up swap space                    " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="                    $PSWAP                    " --pulsate &
 
 
 if [ "$UseSwapFile" = "True" ]; then
@@ -284,7 +284,7 @@ fi
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --text="Changing configuration files on installed system" --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="$PCONFIGFILES" --pulsate &
 
 ## Prepare a chroot envoirnment for post install changes
 
@@ -365,7 +365,7 @@ sleep 2
 
 killall -KILL tail
 
-tail -f /usr/bin/salineos-installer | $Progress --text="             Setting up user account             " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="             $PUSER             " --pulsate &
 
 ## Remove auto login or enable it for the new user 
 if [ "$RequirePassword" = "TRUE" ]; then
@@ -416,7 +416,7 @@ killall -KILL tail
 
 
 ## Install GRUB2
-tail -f /usr/bin/salineos-installer | $Progress --text="         Installing and configuring GRUB2         " --pulsate &
+tail -f /usr/bin/salineos-installer | $Progress --text="         $PGRUB         " --pulsate &
 chroot /Target chmod -x /etc/grub.d/20_memtest86+
 chroot /Target grub-install --force --no-floppy "$GrubLocation"
 sleep 2
