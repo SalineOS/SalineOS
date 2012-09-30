@@ -1,0 +1,87 @@
+export CONVERTCA="Select the format to convert to"
+
+export NOFORMAT="No image format selected"
+
+export CONVERSIONCOMPLETE="Convert Image(s) Complete"
+
+export CONVERTFILE="Please select the folder to save converted files to"
+
+export NODESTINATION="No destination folder was selected."
+
+export NOW="now"
+
+export CONVERTINGIMAGES="Converting image(s) to"
+
+export PLAYLISTNAME="Please enter a name for the playlist."
+
+export SELECTDRIVE="Please select the drive to copy the image to."
+
+export NODRIVES="No USB drives found."
+
+export NODRIVESELECTED="No USB drive selected, please retry."
+
+export USBCONFIRM1="This will completely erase the contents of"
+
+export USBCONFIRM2="and replace them with the contents of"
+
+export USBCONFIRM3="Are you sure you want to continue?"
+
+export COPYING="Copying"
+
+export TO="to"
+
+export COMPLETED="completed"
+
+export SELECTONE="Select One"
+
+export NOPERCENT="No percentage selected"
+
+export PRESIZE="Resizing image(s) to"
+
+export RESIZECOMPLETE="Resize Image(s) Complete"
+
+export RESIZEFILE="Please select the folder to save resized files to"
+
+export OVERWRITEFILES="Overwrite Files"
+
+export APPENDBUTTON="Append"
+
+export APPENDOVERWRITE="Destination folder is same as the current directory. Would you like to overwrite existing files, or append -RESIZED to the end of the file names. Warning, if you overwrite the existing files you will be unable to recover the originals."
+
+export ROTATETEXT="Select the desired number of degrees\nto rotate."
+
+export NODEGREES="No rotation amount selected"
+
+export ROTATEIMAGES="Rotating image(s)"
+
+export ROTATECOMPLETE="Rotate Image(s) Complete"
+
+export SELECTSCALE="Select the size to scale image(s) to."
+
+export NORESOLUTION="No resolution selected."
+
+export PLEASEENTER="Please enter the desired resolution to scale to."
+
+export SCALING="Scaling image(s)"
+
+export SCALECOMPLETE="Scale Image(s) Complete"
+
+export SCALEFILE="Please select where to save the scaled images to."
+
+export AORO="Destination folder is same as the current directory. Would you like to overwrite existing files, or append the resolution to the end of the file names. Warning, if you overwrite the existing files you will be unable to recover the originals."
+
+export FOLDERCOPY="Please select the folder to copy to"
+
+export DELETEFILES="Would you like to delete files that don't exist in"
+
+export FROM="from"
+
+export OPCXL="Operation cancelled"
+
+export CONFIRMATION="This operation will sync the contents of"
+
+export CONFIRMATION1="would you like to continue"
+
+export SYNCING="Syncing"
+
+export FOLDERSYNCDONE="Folder Sync Completed"

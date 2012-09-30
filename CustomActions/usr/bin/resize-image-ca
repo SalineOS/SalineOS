@@ -18,9 +18,19 @@
 ## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
 ## Copyright 2011,2012 Anthony Nordquist 
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/custom-actions/Translations/$LanguageLess ]; then
+ . /etc/custom-actions/Translations/$LanguageLess
+else
+ . /etc/custom-actions/Translations/en_US
+fi
+
 Icon="--window-icon=image-x-generic"
 
-ResizeTo=$(yad $Icon --list --height=300 --column="Select One" --no-headers --title="Image(s) Resize" --text="Select the percentage to resize to." 10% 15% 20% 25% 30% 35% 40% 45% 50% 55% 60% 65% 70% 75% 80% 85% 90% 95% 100% 105% 110% 115% 120% 125% 130% 135% 140% 145% 150% 155% 160% 165% 170% 175% 180% 185% 190% 195% 200%)
+ResizeTo=$(yad $Icon --list --height=300 --column="$SELECTONE" --no-headers --title="Image(s) Resize" --text="Select the percentage to resize to." 10% 15% 20% 25% 30% 35% 40% 45% 50% 55% 60% 65% 70% 75% 80% 85% 90% 95% 100% 105% 110% 115% 120% 125% 130% 135% 140% 145% 150% 155% 160% 165% 170% 175% 180% 185% 190% 195% 200%)
 
 ret="$?"
 
@@ -31,20 +41,54 @@ if [ "$ret" = "1" ]; then
 elif [ "$ret" = "252" ]; then
  exit
 elif [ "$ResizeTo" = "" ]; then
- yad $Icon --title=ERROR --text="           No percentage selected           \n" --button=$"gtk-quit:1"
+ yad $Icon --title=ERROR --text="           $NOPERCENT           \n" --button=$"gtk-quit:1"
  exit 0
+fi
+
+## Allow saving files to a different folder
+
+CurrentDirectory="$(pwd)"
+
+Destination=$(yad $Icon --file-selection --height="450" --directory --text="                                   $RESIZEFILE                                   \n" --title="Resize Image(s)" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit
+elif [ "$ret" = "3" ]; then
+ exit
+elif [ "$Destination" = "" ]; then
+ yad --title="ERROR" --text="     $NODESTINATION     \n" --button=$"gtk-quit:1"
+fi
+
+## Check to see if we are overwriting files and prompt the user
+
+if [ "$CurrentDirectory" = "$Destination" ]; then
+ yad --title="Resize Image(s)" --wrap --width="275"--text="$APPENDOVERWRITE" --button=$"$OVERWRITEFILES:3" --button=$"$APPENDBUTTON:5"
+ ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit
+elif [ "$ret" = "5" ]; then
+ Overwrite="False"
+fi
+
 fi
 
 progressbar () {
 tail -f /usr/bin/resize-image-ca |  yad $Icon --progress --no-buttons --pulsate --auto-close --title="Image(s) Resize" --text="$@"
 }
 
-progressbar "       Resizing image(s) to $ResizeTo now       \n" &
+progressbar "       $PRESIZE $ResizeTo $NOW       \n" &
 
 for i in "$@"; do
  Extension="$(echo "$i" | awk -F "." '{print $NF}')"
  Resized="$(echo "$i" | sed -e "s|.$Extension||g")"
- convert "$i" -resize $ResizeTo "$Resized"-RESIZED."$Extension"
+ if [ "$Overwrite" = "False" ]; then
+  convert "./$i" -resize $ResizeTo "$Destination/$Resized"-RESIZED."$Extension"
+ else
+  convert "./$i" -resize $ResizeTo "$Destination/$i"
+ fi
 done
 
 sleep 5
@@ -52,6 +96,6 @@ sleep 5
 killall -KILL tail
 
 notify-send -u normal -i image-x-generic -t 15000 '
-Resize Image(s) Complete'
+$RESIZECOMPLETE'
 
 exit

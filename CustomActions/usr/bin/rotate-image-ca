@@ -18,9 +18,19 @@
 ## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
 ## Copyright 2011,2012 Anthony Nordquist 
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/custom-actions/Translations/$LanguageLess ]; then
+ . /etc/custom-actions/Translations/$LanguageLess
+else
+ . /etc/custom-actions/Translations/en_US
+fi
+
 Icon="--window-icon=image-x-generic"
 
-Rotation=$(yad $Icon --height=150 --list --no-headers --column="Select One" --title="Rotate Image(s)" --text="Select the desired number of degrees\nto rotate." 90 180 270)
+Rotation=$(yad $Icon --height=150 --list --no-headers --column="$SELECTONE" --title="Rotate Image(s)" --text="$ROTATETEXT" 90 180 270)
 
 ret="$?"
 
@@ -31,7 +41,7 @@ if [ "$ret" = "1" ]; then
 elif [ "$ret" = "252" ]; then
  exit 0
 elif [ "$Rotation" = "" ]; then
- yad $Icon --title=ERROR --text="          No rotation amount selected          \n" --button=$"gtk-quit:1"
+ yad $Icon --title=ERROR --text="          $NODEGREES          \n" --button=$"gtk-quit:1"
  exit 0
 fi
 
@@ -39,10 +49,10 @@ progressbar () {
 tail -f /usr/bin/rotate-image-ca |  yad $Icon --no-buttons --progress --pulsate --auto-close --title="Rotate Image(s)" --text="$@"
 }
 
-progressbar "     Rotating image(s) $Rotation degrees now     \n" &
+progressbar "     $ROTATEIMAGES $Rotation degrees $NOW     \n" &
 
 for i in "$@"; do
- convert "$i" -rotate $Rotation "$i"
+ convert "./$i" -rotate $Rotation "./$i"
 done
 
 sleep 5
@@ -50,6 +60,6 @@ sleep 5
 killall -KILL tail
 
 notify-send -u normal -i image-x-generic -t 15000 '
-Rotate Image(s) Complete'
+$ROTATECOMPLETE'
 
 exit

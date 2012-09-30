@@ -18,11 +18,21 @@
 ## Authored and maintained by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
 ## Copyright Anthony Nordquist 2012
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/custom-actions/Translations/$LanguageLess ]; then
+ . /etc/custom-actions/Translations/$LanguageLess
+else
+ . /etc/custom-actions/Translations/en_US
+fi
+
 Input="$@"
 
 Icon="--window-icon=folder-copy"
 
-Destination=$(yad $Icon --file-selection --height="450" --directory --text="                                   Please select the folder to copy to                                   \n" --title="Sync Folder" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+Destination=$(yad $Icon --file-selection --height="450" --directory --text="                                   $FOLDERCOPY                                   \n" --title="Sync Folder" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
 
 
 ret="$?"
@@ -32,17 +42,17 @@ if [ "$ret" = "3" ]; then
 elif [ "$ret" = "252" ];then
  exit
 elif [ "$Destination" = "" ]; then
- yad --title="ERROR" --text="     No destination folder was selected.     \n" --button=$"gtk-quit:1"
+ yad --title="ERROR" --text="     $NODESTINATION     \n" --button=$"gtk-quit:1"
  exit
 fi
 
 ## Add the option to delete files that don't exist in $Input
-yad --title="Sync Folder" $Icon --width=250 --wrap --text="Would you like to delete files that don't exist in $Input from $Destination?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"
+yad --title="Sync Folder" $Icon --width=250 --wrap --text="$DELETEFILES $Input $FROM $Destination?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"
 
 ret="$?"
 
 if [ "$ret" = "252" ]; then
- yad $Icon --title="Sync Folder" --text="          Operation cancelled          \n" --button=$"gtk-quit:1"
+ yad $Icon --title="Sync Folder" --text="          $OPCXL          \n" --button=$"gtk-quit:1"
  exit
 elif [ "$ret" = "3" ]; then
  Delete="No"
@@ -51,15 +61,15 @@ elif [ "$ret" = "5" ]; then
 fi
 
 ## I think we should warn the user what this will actually do :)
-yad --title="Sync Folder" $Icon --width=250 --wrap --text="This operation will sync the contents of $Input to $Destination, would you like to continue?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"
+yad --title="Sync Folder" $Icon --width=250 --wrap --text="$CONFIRMATION $Input $TO $Destination, $CONFIRMATION1?\n" --button=$"gtk-no:3" --button=$"gtk-yes:5"
 
 ret="$?"
 
 if [ "$ret" = "252" ]; then
- yad $Icon --title="Sync Folder" --text="          Operation cancelled          \n" --button=$"gtk-quit:1"
+ yad $Icon --title="Sync Folder" --text="          $OPCXL          \n" --button=$"gtk-quit:1"
  exit
 elif [ "$ret" = "3" ]; then
- yad $Icon --title="Sync Folder" --text="          Operation cancelled          \n" --button=$"gtk-quit:1"
+ yad $Icon --title="Sync Folder" --text="          $OPCXL          \n" --button=$"gtk-quit:1"
  exit
 fi
 
@@ -71,19 +81,19 @@ tail -f /usr/bin/sync-folder-ca |  yad $Icon --no-buttons --progress --pulsate -
 
 ## Actually run the rsync 
 if [ "$Delete" = "Yes" ]; then
- progressbar "       Syncing $Input to $Destination      \n" &
+ progressbar "       $SYNCING $Input $TO $Destination      \n" &
  rsync --delete -a -u -H "$Input/" "$Destination"
  sleep 5
  killall -KILL tail
 else
- progressbar "       Syncing $Input to $Destination      \n" &
+ progressbar "       $SYNCING $Input $TO $Destination      \n" &
  rsync -a -u -H "$Input/" "$Destination"
  sleep 5
  killall -KILL tail
 fi
 
 notify-send -u normal -i folder -t 15000 '
-Folder Sync Completed'
+$FOLDERSYNCDONE'
 
 exit
 

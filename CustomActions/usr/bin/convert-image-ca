@@ -18,11 +18,21 @@
 ## Authored by Anthony Nordquist of the SalineOS project. http://www.salineos.com/  salinelinux@gmail.com 
 ## Copyright 2011,2012 Anthony Nordquist 
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/custom-actions/Translations/$LanguageLess ]; then
+ . /etc/custom-actions/Translations/$LanguageLess
+else
+ . /etc/custom-actions/Translations/en_US
+fi
+
 Icon="--window-icon=image-x-generic"
 
 ConvertArray=("jpg" "gif" "jpeg" "png" "tiff" "dpx" "xhtml" "bmp" "pdf")
 
-ConvertTo=$(yad $Icon --height=285 --width=300 --no-headers --list --column="Select One" --title="Image(s) Conversion" --text="Select the format to convert to" "${ConvertArray[@]}")
+ConvertTo=$(yad $Icon --height=285 --width=300 --no-headers --list --column="Select One" --title="Image(s) Conversion" --text="$CONVERTCA" "${ConvertArray[@]}")
 
 ret="$?"
 
@@ -33,20 +43,34 @@ if [ "$ret" = "1" ]; then
 elif [ "$ret" = "252" ]; then
  exit
 elif [ "$ConvertTo" = "" ]; then
- yad $Icon --title=ERROR --text="          No image format selected          \n" --button=$"gtk-quit:1"
+ yad $Icon --title=ERROR --text="          $NOFORMAT          \n" --button=$"gtk-quit:1"
  exit 0
+fi
+
+## Allow saving files to a different folder
+
+Destination=$(yad $Icon --file-selection --height="450" --directory --text="                                   $CONVERTFILE                                   \n" --title="Convert Image" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit
+elif [ "$ret" = "3" ]; then
+ exit
+elif [ "$Destination" = "" ]; then
+ yad --title="ERROR" --text="     $NODESTINATION     \n" --button=$"gtk-quit:1"
 fi
 
 progressbar () {
 tail -f /usr/bin/convert-image-ca |  yad $Icon --no-buttons --progress --pulsate --auto-close --title="Image(s) Conversion" --text="$@"
 }
 
-progressbar "     Converting image(s) to $ConvertTo now     \n" &
+progressbar "     $CONVERTINGIMAGES $ConvertTo $NOW     \n" &
 
 for i in "$@"; do
  Extension="$(echo "$i" | awk -F "." '{print $NF}')"
  Converted="$(echo "$i" | sed -e "s|.$Extension||g")"
- convert "$i" "$Converted.$ConvertTo"
+ convert "./$i" "$Destination/$Converted.$ConvertTo"
 done
 
 sleep 5
@@ -54,6 +78,6 @@ sleep 5
 killall -KILL tail
 
 notify-send -u normal -i image-x-generic -t 15000 '
-Convert Image(s) Complete'
+$CONVERSIONCOMPLETE'
 
 exit

@@ -22,6 +22,16 @@ Icon="--window-icon=drive-removable-media-usb"
 DisplayName=$(echo "$1" | awk -F '/' '{print $NF}')
 Iso="$1"
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/custom-actions/Translations/$LanguageLess ]; then
+ . /etc/custom-actions/Translations/$LanguageLess
+else
+ . /etc/custom-actions/Translations/en_US
+fi
+
 progressbar () {
 tail -f /usr/bin/image-to-usb | yad --text="$@" --title="Image to USB" --progress --pulsate --auto-close --no-buttons $Icon
 }
@@ -55,7 +65,7 @@ fi
 
 ## Error out if no USB drive is found
 if [ "$USBDrives" = "" ]; then
- yad $Icon --title="Image To USB" --text="      No USB drives found.      \n" --width=250 --button=$"gtk-ok:1"
+ yad $Icon --title="Image To USB" --text="      $NODRIVES      \n" --width=250 --button=$"gtk-ok:1"
  exit 0 
 fi
 
@@ -97,7 +107,7 @@ fi
 done
 
 
-UseDrive=$(yad --height="350" --list  $Icon --title="Image to USB" --column="Name" --column="Associated Label(s)" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="                            Please select the drive to copy the image to.                            \n" "${USBDriveMenu[@]}")
+UseDrive=$(yad --height="350" --list  $Icon --title="Image to USB" --column="Name" --column="Associated Label(s)" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="                            $SELECTDRIVE                            \n" "${USBDriveMenu[@]}")
 
 ret="$?"
 
@@ -106,7 +116,7 @@ if [ "$ret" = "3" ]; then
 elif [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$UseDrive" = "" ]; then
- yad $Icon --title="Image to USB" --text="No USB drive selected, please retry." --button=$"gtk-ok:1"
+ yad $Icon --title="Image to USB" --text="$NODRIVESELECTED" --button=$"gtk-ok:1"
  GetDrive
  exit 0
 fi
@@ -119,7 +129,7 @@ Continue
 
 Continue () {
 
-yad --width=300 --wrap --image=gtk-dialog-warning --title="Image to USB" $Icon --text="This will completely erase the contents of $UseDrive and replace them with the contents of $DisplayName. Are you sure you want to continue?" --button=$"gtk-no:1" --button=$"gtk-yes:0"
+yad --width=300 --wrap --image=gtk-dialog-warning --title="Image to USB" $Icon --text="$USBCONFIRM1 $UseDrive $USBCONFIRM2 $DisplayName. $USBCONFIRM3" --button=$"gtk-no:1" --button=$"gtk-yes:0"
 
 if [ "$?" != "0" ]; then
  exit
@@ -133,7 +143,7 @@ for i in $Unmount; do
  umount -l "$i"
 done
 
-progressbar "     Copying $DisplayName to $UseDrive.     \n" &
+progressbar "     $COPYING $DisplayName $TO $UseDrive.     \n" &
 
 
 dd if="$Iso" of=/dev/$UseDrive
@@ -143,7 +153,7 @@ sync
 killall -KILL tail
 
 notify-send -u normal -i drive-removable-media-usb -t 20000 "
-$DisplayName to USB completed"
+$DisplayName $TO USB $COMPLETED"
 
 exit 0
 
