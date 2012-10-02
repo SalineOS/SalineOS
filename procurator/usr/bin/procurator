@@ -17,6 +17,16 @@
 ####################################################################################################
 # Copyright 2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/procurator/Translations/$LanguageLess ]; then
+ . /etc/procurator/Translations/$LanguageLess
+else
+ . /etc/procurator/Translations/en_US
+fi
+
 Info='yad --center --window-icon=kvm --title=Procurator'
 
 Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=Procurator --window-icon=kvm'
@@ -44,7 +54,7 @@ RamSize=$(($SystemRam / 2))
 
 NameDisk () {
 
-NewDiskName=$(yad --entry --window-icon=kvm --width=250 --wrap --title="Procurator" --text="Enter the desired name of the virtual disk, do not use spaces or special characters." --button=$"gtk-ok:2")
+NewDiskName=$(yad --entry --window-icon=kvm --width=250 --wrap --title="Procurator" --text="$ENTERNAME" --button=$"gtk-ok:2")
 
 ret="$?"
 
@@ -57,7 +67,7 @@ elif [ "$NewDiskName" = "" ]; then
 fi
 
 if [ -f "$HOME/.procurator/disk/$NewDiskName" ]; then
- $Question --text="File exists, would you like to overwrite the contents?"
+ $Question --text="$FILEEXISTS"
  if [ "$?" != "0" ]; then
   NameDisk
   exit 0
@@ -65,7 +75,7 @@ if [ -f "$HOME/.procurator/disk/$NewDiskName" ]; then
 fi
 
 
-NewDiskNotes=$(yad --entry --width=250 --wrap --window-icon=kvm --title="Procurator" --text="If desired, enter some notes to be associated with this disk." --button=$"gtk-ok:2")
+NewDiskNotes=$(yad --entry --width=250 --wrap --window-icon=kvm --title="Procurator" --text="$NOTES" --button=$"gtk-ok:2")
 
 if [ -f "$HOME/.procurator/notes/$NewDiskName" ]; then
  rm -rf "$HOME/.procurator/notes/$NewDiskName"
@@ -93,7 +103,7 @@ CreateNewDisk () {
 
 NewDiskSize=""
 
-NewDiskSize=$(yad --list --title=Procurator --window-icon=kvm --print-column=1 --height=350 --column="Size In Megabytes" --column="Size In Gigabytes" --text="Please select the desired size of the new virtual disk" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" Custom '    Custom' 1024 '        1' 2048 '        2' 3072 '        3' 4096 '        4' 5120 '        5' 6144 '        6' 7168 '        7' 8192 '        8' 9216 '        9' 10240 '        10' 11264  '        11' 12288 '        12' 13312 '        13' 14336 '        14' 15360 '        15' 16384 '        16' 17408 '        17' 18432 '        18' 19456 '        19' 20480 '        20' 21504 '        21' 22528 '        22' 23552 '        23' 24576 '        24' 25600 '        25' 26624 '        26' 27648 '        27' 28672 '        28' 29696 '        29' 30720 '        30' 31744 '        31' 32768 '        32' 33792 '        33' 34816 '        34' 35840 '        35' 36864 '        36' 37888 '        37' 38912 '        38' 39936 '        39' 40960 '        40' 41984 '        41' 43008 '        42' 44032 '        43' 45056 '        44' 46080 '        45' 47104 '        46' 48128 '        47' 49152 '        48' 50176 '        49' 51200 '        50')
+NewDiskSize=$(yad --list --title=Procurator --window-icon=kvm --print-column=1 --height=350 --column="Size In Megabytes" --column="Size In Gigabytes" --text="$DISKSIZE" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" Custom '    Custom' 1024 '        1' 2048 '        2' 3072 '        3' 4096 '        4' 5120 '        5' 6144 '        6' 7168 '        7' 8192 '        8' 9216 '        9' 10240 '        10' 11264  '        11' 12288 '        12' 13312 '        13' 14336 '        14' 15360 '        15' 16384 '        16' 17408 '        17' 18432 '        18' 19456 '        19' 20480 '        20' 21504 '        21' 22528 '        22' 23552 '        23' 24576 '        24' 25600 '        25' 26624 '        26' 27648 '        27' 28672 '        28' 29696 '        29' 30720 '        30' 31744 '        31' 32768 '        32' 33792 '        33' 34816 '        34' 35840 '        35' 36864 '        36' 37888 '        37' 38912 '        38' 39936 '        39' 40960 '        40' 41984 '        41' 43008 '        42' 44032 '        43' 45056 '        44' 46080 '        45' 47104 '        46' 48128 '        47' 49152 '        48' 50176 '        49' 51200 '        50')
 
 ret="$?"
 
@@ -106,7 +116,7 @@ elif [ "$ret" = "3" ]; then
  MainMenu
  exit 0
 elif [ "$NewDiskSize" = "Custom" ]; then
- NewDiskSize=$(yad --entry --width=250 --window-icon=kvm --wrap --title="Procurator" --text="Enter the desired size of the virtual disk in gigabytes." --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
+ NewDiskSize=$(yad --entry --width=250 --window-icon=kvm --wrap --title="Procurator" --text="$ENTERSIZE" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
 
  ret="$?"
 
@@ -152,7 +162,7 @@ fi
 done
 
 if [ "$Input" != "" ]; then
-Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="Virtual Disks" --column="Size" --column="Notes" --title=Procurator --window-icon=kvm --text="If desired, please select a virtual disk to make it available to $ISOName" --button=$"gtk-help:3" --button=$"Delete Selected:5" --button=$"Create New:7" --button=$"gtk-ok:9" "${Menu[@]}" )
+Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" --title=Procurator --window-icon=kvm --text="$MAKEAVAILABLE $ISOName" --button=$"gtk-help:3" --button=$"$DELSELECTED:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:9" "${Menu[@]}" )
 
 ret="$?"
 
@@ -161,16 +171,16 @@ Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
 if [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$ret" = "3" ]; then
- $Info --wrap --width=250 --title="Procurator Help" --text="This program will allow you to create and manage virtual disks for use with KVM (Kernel Virtual Machine), which is included with SalineOS. Virtual machines allow you to run one operating system like a program within another. Virtual disks are specialized files, which can be mounted (Accessed), formated to various filesystems and installed to within a virtual machine. Procurator is a very simple program, with few features, solely meant to be used for creating, deleting and allowing you to use virtual disks easily with KVM.\n\nIn order to use KVM you must have a CPU or APU with virtualization support. You may also have to enable virtualization support in your computer's bios before using this utility. To boot an ISO file with access to any of the virtual disks, simply right click on the .iso from within Thunar and select Boot with KVM from the menu.\n\nProcurator will always launch KVM with access to a cdrom device if possible.  If you select an ISO and launch Procurator through the custom action, then the .iso file will be mounted as a loop device and appear inside the virtual machine as /dev/cdrom under Linux and D: under Windows. If no .iso file is used, then procurator will allow your virtual machine access to the host systems cd/dvd drive if available. Within the running KVM window, your virtual disk will appear as /dev/sda under Linux, and as the C: drive in Windows." --button=$"gtk-ok:1"
+ $Info --wrap --width=250 --title="Procurator Help" --text="$HELPTEXT" --button=$"gtk-ok:1"
  MainMenu
  exit 0
 elif [ "$ret" = "5" ]; then
  if [ "$Selection" = "" ]; then
-  $Info --text="No disk was selected for deletion."  --button=$"gtk-ok:1"
+  $Info --text="$NODISK"  --button=$"gtk-ok:1"
   MainMenu
   exit 0
  fi
- $Question --width=250 --text="Warning, this will permanently delete "$Selection" and all information it contains. Are you sure you want to do this?"
+ $Question --width=250 --text="$WARNING1 "$Selection" $WARNING2"
  if [ "$?" = "0" ]; then
   rm "$HOME/.procurator/disks/$Selection"
   rm "$HOME/.procurator/notes/$Selection"
@@ -194,7 +204,7 @@ fi
 
 else
 
-Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="Virtual Disks" --column="Size"  --column="Notes" --title=Procurator --window-icon=kvm --button=$"gtk-help:3" --button=$"Delete Selected:5" --button=$"Create New:7" --button=$"Boot Selected:9" "${Menu[@]}")
+Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE"  --column="$NOTES1" --title=Procurator --window-icon=kvm --button=$"gtk-help:3" --button=$"$DSELECTED:5" --button=$"$CREATENEW:7" --button=$"$BOOTSELECTED:9" "${Menu[@]}")
 
 ret="$?"
 
@@ -203,16 +213,16 @@ Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
 if [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$ret" = "3" ]; then
- $Info --wrap --width=250 --title="Procurator Help" --text="This program will allow you to create and manage virtual disks for use with KVM (Kernel Virtual Machine), which is included with SalineOS. Virtual machines allow you to run one operating system like a program within another. Virtual disks are specialized files, which can be mounted (Accessed), formated to various filesystems and installed to within a virtual machine. Procurator is a very simple program, with few features, solely meant to be used for creating, deleting and allowing you to use virtual disks easily with KVM.\n\nIn order to use KVM you must have a CPU or APU with virtualization support. You may also have to enable virtualization support in your computer's bios before using this utility. To boot an ISO file with access to any of the virtual disks, simply right click on the .iso from within Thunar and select Boot with KVM from the menu.\n\nProcurator will always launch KVM with access to a cdrom device if possible.  If you select an ISO and launch Procurator through the custom action, then the .iso file will be mounted as a loop device and appear inside the virtual machine as /dev/cdrom. If no .iso file is used, then procurator will allow your virtual machine access to the host systems cd/dvd drive if available. Within the running KVM window, your virtual disk will appear as /dev/sda under Linux, and as the C: drive in Windows." --button=$"gtk-ok:1"
+ $Info --wrap --width=250 --title="$HELPTEXT" --button=$"gtk-ok:1"
  MainMenu
  exit 0
 elif [ "$ret" = "5" ]; then
  if [ "$Selection" = "" ]; then
-  $Info --text="No disk was selected for deletion." --button=$"gtk-ok:1"
+  $Info --text="$NODISK" --button=$"gtk-ok:1"
   MainMenu
   exit 0
  fi
- $Question --width=250 --text="Warning, this will permanently delete "$Selection" and all information it contains. Are you sure you want to do this?"
+ $Question --width=250 --text="$WARNING1 "$Selection" $WARNING2"
  if [ "$?" = "0" ]; then
   rm "$HOME/.procurator/disks/$Selection"
   rm "$HOME/.procurator/notes/$Selection"
@@ -227,7 +237,7 @@ elif [ "$ret" = "7" ]; then
  exit 0
 elif [ "$ret" = "9" ]; then
  if [ "$Selection" = "" ]; then
-  $Info --text="You must select a disk to boot from before continuing"
+  $Info --text="$MUSTSELECT"
   MainMenu
   exit 0
  fi
