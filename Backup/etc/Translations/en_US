@@ -1,0 +1,203 @@
+export EXCLUDESINFO="If desired you can exclude select files or folders from being included in the generated .backup file. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog."
+
+export ADDNEW="Add New"
+
+export SELECTFORF="Select the file or folder you wish to exclude"
+
+export SAVEFOLDER="Select the folder to save the backup image to"
+
+export ENTERNAME="Enter a name for the backup file."
+
+export WARNING="Warning"
+
+export WARNING1="already exists in folder"
+
+export WARNING2="would you like to overwrite?"
+
+export CLOSEAPPS="Please close all other running applications before continuing and refrain from opening any applications until this operation has completed."
+
+export CREATING="Creating backup image"
+
+export PLEASEWAIT="Please wait"
+
+export DONE="Creation of backup image"
+
+export COMPLETE="complete"
+
+export IMAGESAVED="Image saved to directory"
+
+export PREPDISK="Preparing disk and partitions"
+
+export CONFIGFILESYSTEM="Configure the filesystem to be checked every 35 mounts"
+
+export GENERATING="Generating"
+
+export VALUESFOR="values for"
+
+export COPYING="Copying files to"
+
+export SETUPSWAP="Setting up swap space"
+
+export CHANGECONFIG="Changing configuration files on installed system"
+
+export INSTALLGRUB="Installing and configuring GRUB2"
+
+export RESTORECOMPLETE="Restoration is complete. If everything went well you should have your new system installed and ready. Do you want to reboot now to try it out?"
+
+export ANYUSER="WARNING: Any user folders on"
+
+export SAMENAME="with the same name as one on SalineOS will be overwritten"
+
+export CONTINUEWITH="Continue with operation?"
+
+export FORMATANDUSED="will be formatted and used for"
+
+export WILLNOTFORMAT="will not be formatted but still used for"
+
+export FMSWAP="swap file will be created"
+
+export FMSWAP1="will be used as the swap partition"
+
+export WILLBEFORMATTED="will be formatted"
+
+export FMROOT="and used for root"
+
+export FMHOME="The home folder will be placed on the root partition"
+
+export ANDUSED="and used for"
+
+export WILLBEUSED="will be used for"
+
+export WITHOUTERASE="without erasing data"
+
+export ENTIREDISK="will be erased and the entire disk used"
+
+export FMGRUB="The GRUB2 boot loader will be installed to"
+
+export REVIEW="Please review the settings you have chosen carefully, you may go back and change any \nof these settings now"
+
+export RUNINSTALL="Run Installation"
+
+export CURRENTSTATUS="Current Status"
+
+export CHANGESELECTED="Change Selected"
+
+export CXLRESTORE="Are you sure you want to cancel the restoration?"
+
+export NOCHANGE="No change selected"
+
+export GRUBSELECT="Please select where to install the grub boot loader"
+
+export CANNOTBLANK="The grub location cannot be blank, please choose where to install grub."
+
+export MUSTROOT="must be run as root"
+
+export VALIDFILE="You must specify a valid .backup file with the Restore option"
+
+export SELECTOPTION="You must select an action before continuing"
+
+export WELCOMETEXT="Welcome to the SalineOS backup utility. For complete usage information please refer to the SalineOS backup section in the user manual"
+
+export CLONEOPTION="Create a direct copy of the system on a partition"
+
+export CLONEUSBOPTION="Create a direct copy of the system on a USB drive"
+
+export CREATEBACKUP="Create a new .backup file"
+
+export RESTOREBACKUP="Restore a .backup file to a partition"
+
+export CLONECOMPLETE="Cloning of system is complete."
+
+export INSTALLING="Installing"
+
+export NOW="now"
+
+export GENERATEUUID="Generating UUID values for fstab"
+
+export PREPDISK="Preparing disk and partitions"
+
+export USBWARN="WARNING! This operation will erase all information on"
+
+export USBWARN1="and replace it with an exact copy of this system. Are you sure you with to continue?"
+
+export CHOOSETHIS="It is recommended to choose this setting"
+
+export USBEXCLUDETEXT="If desired you can exclude select files or folders from being included on the cloned system. Simply enter the full path of the files or folders you wish to exclude below, one entry per line.\n\nAlternatively, select Add New to open a file selection dialog"
+
+export SELECTDRIVE="Please select the drive to clone the system to"
+
+export NAME="Name"
+
+export ASLABEL="Associated Label"
+
+export SIZEINGIB="Approx. Size in GiB"
+
+export SIZEINMIB="Approx. Size in MiB"
+
+export NOUSB="No USB drive selected, please retry."
+
+export NODRIVES="No USB drives found."
+
+export AND="and"
+
+export NOLOCATION="No location selected, please retry."
+
+export CXLCLONING="Are you sure you want to cancel the cloning?"
+
+export DESCRIPTION="Description"
+
+export FORMATHOME="Format (Erase all data) on the target home partition"
+
+export ABORTINSTALL="Are you sure you want to abort the installation?"
+
+export PARTLABEL="Partition Label"
+
+export HOMEPARTLOC="Select a seperate partition for /home (User files) if desired"
+
+export USESELECTED="Use Selected"
+
+export SWAPPART="Please select the partition to use for swap"
+
+export SWAPFILESIZE="Please select the size of the swap file to be created."
+
+export CONTINUESWAP="Continue using swap file"
+
+export MUSTSELECTPART="You must select a partition before continuing."
+
+export SELECTCLONEPART="Please select a partition to clone the root partition to."
+
+export SIZE="Size"
+
+export CLONEPARTSTART="You will need at least one partition to clone the system to.  You can use any existing partition, except for the currently used root and home partitions. If you need to resize the currently used partition(s), in order to create a new one, you will have to launch GParted from a live environment.\n\nWould you like SalineOS backup to launch GParted?"
+
+export VALIDBACKUP="is not a valid backup image"
+
+export SELECTBACKUP="Select the backup image you wish to restore"
+
+export AUTOPARTRESTORE="You will need at least one partition in order to restore your backup image.\n\nThe installer can erase all data on a hard drive, USB flash drive, or solid state disk of your choice and create this partition for you automatically, or you can manually partition your storage media using GParted.\n\nManual partitioning will allow you to preserve other operating systems and information on your hard disk."
+
+export PARTMANUAL="Partition disk manually"
+
+export PARTAUTO="Erase and use an entire disk"
+
+export CANNOTERASE="You cannot erase the partition this utility is running from, please select another disk or use manual partitioning to select another partition on this disk."
+
+export SELECTDRIVEPART="Please select a drive to partition."
+
+export SELECTDRIVEEU="Please select a drive to erase and use."
+
+export CANNOTERASEPART="You cannot erase the partition this utility is running from, please select another partition to install to, or run this utility from a live environment."
+
+export SELECTROOTPART="Please select a partition to install the SalineOS root (Main) directory to"
+
+export CONTINUE="Continue"
+
+export CXLINSTALL="Are you sure you wish to cancel the installation?"
+
+export PUTHOME="Put /home on the root partition"
+
+export LOCATIONRES="Location"
+
+export CURRENTOPTION="Option"
+
+export CURRENTSTATUS="Current Status"
