@@ -1,0 +1,21 @@
+export MUSTROOT="must be run with root privileges, will now exit"
+
+export THERECANBEONLYONE="There can only have one running instance of Package Kit URL.\n\nIf there are not any operations in progress then please remove the lockfile.\n\nRunning the command sudo rm /tmp/packagekit-url-lock-file will remove the lockfile."
+
+export THISWILL="This will install"
+
+export CONTINUE="Continue with installation?"
+
+export INSTALLING="Installing"
+
+export INSTALLCXL="Installation cancelled, press ok to exit."
+
+export THISWILL1="This will remove"
+
+export CONTINUE1="Continue with removal?"
+
+export REMOVING="Removing"
+
+export REMOVECXL="Removal cancelled, press ok to exit."
+
+export INVALID="Invalid Package Kit URL, press ok to exit."

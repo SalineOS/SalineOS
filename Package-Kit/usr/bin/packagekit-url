@@ -22,7 +22,7 @@
 Input="$@"
 
 ## Not sure pkcon supports this but I hope so.
-export DEBIAN_FRONTEND='gnome'
+export DEBIAN_FRONTEND="gnome"
 
 ## Set a variable of YAD options for questions, just cleaner this way.
 Question='yad --on-top --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=PackageKit-URL'
@@ -32,15 +32,24 @@ Question='yad --on-top --wrap --center --image=gtk-dialog-question --button=gtk-
 testroot="$(whoami)"
 
 if [ "$testroot" != "root" ]; then
- yad --title="ERROR" --text=" Package Kit URL must be run with root privileges, will now exit " --button=$"gtk-ok:1"
+ yad --title="ERROR" --text=" Package Kit URL $MUSTROOT " --button=$"gtk-ok:1"
  exit 0
 fi
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/packagekit-url/Translations/$LanguageLess ]; then
+ . /etc/packagekit-url/Translations/$LanguageLess
+else
+ . /etc/packagekit-url/Translations/en_US
+fi
 
 ## Use a lockfile since more than one running instance is bad mojo. 
 
 if [ -f /tmp/packagekit-url-lock-file ]; then
- yad  --title="Package Kit URL" --text="There can only have one running instance of Package Kit URL.\n\nIf there are not any operations in progress then please remove the lockfile.\n\nRunning the command sudo rm /tmp/packagekit-url-lock-file will remove the lockfile."
+ yad  --title="Package Kit URL" --text="$THERECANBEONLYONE"
  exit
 else
  touch /tmp/packagekit-url-lock-file
@@ -81,13 +90,13 @@ fi
 ## Do everything else.
 
 if [ "$Operation" = "install" ]; then
-$Question --text="This will install $Package.\n\nContinue with installation?"
+$Question --text="$THISWILL $Package.\n\n$CONTINUE"
   if [ "$?" = "0" ]; then
    pkcon -p -y install "$Package">>/tmp/packagekit-url-tmp &
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         Installing $Package                         \n"
+done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         $INSTALLING $Package                         \n"
    if [ "$(grep -B 0  "Installed" /tmp/packagekit-url-tmp)" = "" ]; then
     Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage" | grep -v "Package:" | grep -v "Downloaded")"
    else
@@ -98,18 +107,18 @@ done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --tex
    rm -rf /tmp/packagekit-url-tmp
    exit
   else
-   yad --title="Package Kit URL" --text="Installation cancelled, press ok to exit." --button=$"gtk-ok:1"
+   yad --title="Package Kit URL" --text="$INSTALLCXL" --button=$"gtk-ok:1"
   rm -rf /tmp/packagekit-url-lock-file
   exit
   fi
 elif [ "$Operation" = "" ]; then
-$Question --text="This will install $Package.\n\nContinue with installation?"
+$Question --text="$THISWILL $Package.\n\n$CONTINUE?"
   if [ "$?" = "0" ]; then
    pkcon -p -y install "$Package">>/tmp/packagekit-url-tmp &
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         Installing $Package                         \n"
+done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         $INSTALLING $Package                         \n"
    if [ "$(grep -B 0  "Installed" /tmp/packagekit-url-tmp)" = "" ]; then
     Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage" | grep -v "Package:" | grep -v "Downloaded")"
    else
@@ -120,30 +129,30 @@ done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --tex
    rm -rf /tmp/packagekit-url-tmp
    exit
   else
-   yad --title="Package Kit URL" --text="Installation cancelled, press ok to exit." --button=$"gtk-ok:1"
+   yad --title="Package Kit URL" --text="$INSTALLCXL" --button=$"gtk-ok:1"
   rm -rf /tmp/packagekit-url-lock-file
   exit
   fi
 elif [ "$Operation" = "remove" ]; then
- $Question --text="This will remove $Package.\n\nContinue with removal?"
+ $Question --text="$THISWILL1 $Package.\n\n$CONTINUE1"
   if [ "$?" = "0" ]; then
 pkcon -p -y remove "$Package">>/tmp/packagekit-url-tmp &
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         Removing $Package                         \n"
+done)| yad --progress --auto-close --no-buttons --title="Package Kit URL"  --text="                         $REMOVING $Package                         \n"
    Result="$(cat /tmp/packagekit-url-tmp | grep -v "Transaction" | grep -v "Status" | grep -v "Results" |grep -v "Percentage")"
    yad --title="Package Kit URL" --width=275 --text="$Result" --button=$"gtk-ok:1"
    rm -rf /tmp/packagekit-url-lock-file
    rm -rf /tmp/packagekit-url-tmp
    exit
   else
-   yad --title="Package Kit URL" --text="Removal cancelled, press ok to exit." --button=$"gtk-ok:1"
+   yad --title="Package Kit URL" --text="$REMOVECXL" --button=$"gtk-ok:1"
    rm -rf /tmp/packagekit-url-lock-file
    exit
   fi
 else
-  yad --title="Package Kit URL" --text="Invalid Package Kit URL, press ok to exit." --button=$"gtk-ok:1"
+  yad --title="Package Kit URL" --text="$INVALID" --button=$"gtk-ok:1"
   rm -rf /tmp/packagekit-url-lock-file
   rm -rf /tmp/packagekit-url-tmp
   exit
