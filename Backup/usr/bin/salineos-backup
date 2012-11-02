@@ -2509,6 +2509,16 @@ if [ "$TestRoot" != "root" ]; then
  exit 1
 fi
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/salineos-backup/Translations/$LanguageLess ]; then
+ . /etc/salineos-backup/Translations/$LanguageLess
+else
+ . /etc/salineos-backup/Translations/en_US
+fi
+
 if [ "$1" = "Restore" ]; then
  BackupImage="$2"
 ## Check to make sure we are passed a valid .backup file
