@@ -1,0 +1,44 @@
+export MUSTROOT="must be run as root"
+
+export NOPORT="No port selected."
+
+export SERVICE="Service"
+
+export SELECTCLOSEPORT="Select the port to close from the list below."
+
+export NOWENABLED="is now enabled"
+
+export ALLOWTEXT="Input the port you wish to open in the top box.  If you wish to open a whole range of ports, enter the ending port in the box below it."
+
+export PTO="Port to open"
+
+export STOPPORT="Stop Port (Optional)"
+
+export SERVICEALLOW="Service to allow on this port"
+
+export NOSPECIFY="No port specified."
+
+export ALLOWARRAY="Open a port to allow incoming connections"
+
+export CLOSEARRAY="Close a port, previously opened with SOS Firewall"
+
+export STOPARRAY="Stop the firewall and prevent it from starting, until it is re-enabled"
+
+export STARTARRAY="Start the firewall"
+
+export STOPARRAY="Stop the firewall temporarily"
+
+export ENABLEARRAY="Enable the firewall"
+
+export DESCRIPTION="Description"
+
+export ACTION="Action"
+
+export INFOTEXT="SOS Firewall is designed to be an easy and painless front-end to the Linux firewall system iptables. By default all incoming connections will be silently dropped, and all outgoing connections will be allowed. SOS Firewall is meant for machines that will have only one network connection active at any given time, and where simplicity is more important than fine grained control. For more advanced use cases, it is advised to disable SOS Firewall and install the Firestarter firewall utility.\n\nSOS Firewall will protect each and every physical network device, even if that interface is not connected to the internet. Simply put, this means that it does not matter to SOS Firewall what device is connected to the internet or if a device is connected at all, it will apply the same rules universally and automatically (Unless disabled)."
+
+export DISABLEDQ="Firewall is currently disabled, would you like to enable it?"
+
+export NOWDISABLED="is now completely disabled."
+
+export NOWACTIVE="SOS Firewall is now active."
+

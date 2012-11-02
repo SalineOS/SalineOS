@@ -17,6 +17,24 @@
 ####################################################################################################
 # Copyright 2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
 
+## Check for root.
+
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ $Info --button=$"gtk-quit:1" --text="     SalineOS Backup $MUSTROOT.     \n"
+ exit 1
+fi
+
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/SOS-Firewall/Translations/$LanguageLess ]; then
+ . /etc/SOS-Firewall/Translations/$LanguageLess
+else
+ . /etc/SOS-Firewall/Translations/en_US
+fi
 
 CloseFunction () {
 
@@ -34,7 +52,7 @@ for i in $(cat /etc/SOS-Firewall/rules); do
  fi
 done
 
-Close=$(yad --list --height="300" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="Select the port to close from the list below" --column="Ports" --column="Service" --column="Full Entry" --hide-column="3" --print-column="3" --button=$"Main Menu:3" --button=$"gtk-ok:2" "${CloseArray[@]}" )
+Close=$(yad --list --height="300" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="$SELECTCLOSEPORT" --column="Ports" --column="$SERVICE" --column="Full Entry" --hide-column="3" --print-column="3" --button=$"Main Menu:3" --button=$"gtk-ok:2" "${CloseArray[@]}" )
 
 ret="$?"
 
@@ -47,7 +65,7 @@ elif [ "$ret" = "3" ]; then
  MainMenu
  exit 0
 elif [ "$Close" = "" ]; then
- yad --width=200 --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --title="SOS Firewall" --text="No port selected" --button=$"gtk-ok:1"
+ yad --width=200 --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --title="SOS Firewall" --text="$NOPORT" --button=$"gtk-ok:1"
  CloseFunction
  exit 0
 fi
@@ -178,7 +196,7 @@ chmod +x /usr/bin/Start-SOS-Firewall
 
 ## Inform the user that the firewall is active
 
-yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="SOS Firewall is now enabled" --button=$"gtk-ok:1"
+yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="SOS Firewall $NOWENABLED" --button=$"gtk-ok:1"
 
 ## Return to main menu
 MainMenu
@@ -195,7 +213,7 @@ AllowArray=("")
 
 AllowArray=( "" "" "tcp"!"udp"!"sctp" )
 
-AllowInfo=$(yad --form --wrap --width="250" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="Input the port you wish to open in the top box.  If you wish to open a whole range of ports, enter the ending port in the box below it." --field="Port to open:" --field="Stop Port (Optional):" --field="Service to allow on this port:CB" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" "${AllowArray[@]}") 
+AllowInfo=$(yad --form --wrap --width="250" --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="$ALLOWTEXT" --field="$PTO:" --field="$STOPPORT:" --field="$SERVICEALLOW:CB" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" "${AllowArray[@]}") 
 
 ret="$?"
 
@@ -213,7 +231,7 @@ elif [ "$ret" = "3" ]; then
  MainMenu
  exit 0
 elif [ "$Allow" = "" ]; then
- yad --width=250 --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="No port specified" --button=$"gtk-ok:1"
+ yad --width=250 --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="$NOSPECIFY" --button=$"gtk-ok:1"
  AllowFunction
  exit 0
 elif [ "$EndPort" != "" ]; then
@@ -293,15 +311,15 @@ mkdir -p /etc/SOS-Firewall
 
 if [ "$(grep '## Firewall is Disabled' /usr/bin/Start-SOS-Firewall)" = "" ]; then
 
-MainMenuArray=("Allow" "Open a port to allow incoming connections" "Close" "Close a port, previously opened with SOS Firewall" "Disable" "Stop the firewall and prevent it from starting, until it is re-enabled" "Start" "Start the firewall" "Stop" "Stop the firewall temporarily") 
+MainMenuArray=("Allow" "$ALLOWARRAY" "Close" "$CLOSEARRAY" "Disable" "$STOPARRAY" "Start" "$STARTARRAY" "Stop" "$STOPARRAY") 
 
 else
 
-MainMenuArray=("Allow" "Open a port to allow incoming connections" "Close" "Close a port, previously opened with SOS Firewall" "Enable" "Enable the firewall" "Start" "Start the firewall" "Stop" "Stop the firewall temporarily") 
+MainMenuArray=("Allow" "$ALLOWARRAY" "Close" "$CLOSEARRAY" "Enable" "$ENABLEARRAY" "Start" "$STARTARRAY" "Stop" "$STOPARRAY") 
 
 fi
 
-Operation=$(yad --list --width="600" --title="SOS Firewall" --column="Action" --column="Description" --height="300" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --button=$"gtk-help:3" --button=$"gtk-quit:5" --button=$"gtk-ok:2" "${MainMenuArray[@]}")
+Operation=$(yad --list --width="600" --title="SOS Firewall" --column="$ACTION" --column="$DESCRIPTION" --height="300" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --button=$"gtk-help:3" --button=$"gtk-quit:5" --button=$"gtk-ok:2" "${MainMenuArray[@]}")
 
 
 ret="$?"
@@ -313,7 +331,7 @@ if [ "$ret" = "5" ]; then
 elif [ "$ret" = "252" ]; then
  exit 0
 elif [ "$ret" = "3" ]; then
- yad --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --title="SOS Firewall" --wrap --width="300" --text="SOS Firewall is designed to be an easy and painless front-end to the Linux firewall system iptables. By default all incoming connections will be silently dropped, and all outgoing connections will be allowed. SOS Firewall is meant for machines that will have only one network connection active at any given time, and where simplicity is more important than fine grained control. For more advanced use cases, it is advised to disable SOS Firewall and install the Firestarter firewall utility.\n\nSOS Firewall will protect each and every physical network device, even if that interface is not connected to the internet. Simply put, this means that it does not matter to SOS Firewall what device is connected to the internet or if a device is connected at all, it will apply the same rules universally and automatically (Unless disabled)." --button=$"gtk-ok:1"
+ yad --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --title="SOS Firewall" --wrap --width="300" --text="$INFOTEXT" --button=$"gtk-ok:1"
  MainMenu
  exit 0
 elif [ "$Operation" = "Allow" ]; then
@@ -344,7 +362,7 @@ iptables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
 
 ## Inform the user
-yad --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="SOS Firewall is now completely disabled" --button=$"gtk-ok:1"
+yad --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="SOS Firewall $NOWDISABLED" --button=$"gtk-ok:1"
 MainMenu
 exit 0
 elif [ "$Operation" = "Enable" ]; then
@@ -352,7 +370,7 @@ elif [ "$Operation" = "Enable" ]; then
  exit 0
 elif [ "$Operation" = "Start" ]; then
  if [ "$(grep '## Firewall is Disabled' /usr/bin/Start-SOS-Firewall)" != "" ]; then
-  yad --window-icon=/usr/share/pixmaps/SOS-Firewall.png --title="SOS Firewall" --text="Firewall is currently disabled, would you like to enable it?" --button=$"gtk-no:3" --button="gtk-yes:5"
+  yad --window-icon=/usr/share/pixmaps/SOS-Firewall.png --title="SOS Firewall" --text="$DISABLEDQ" --button=$"gtk-no:3" --button="gtk-yes:5"
 
   ret="$?"
 
@@ -367,7 +385,7 @@ elif [ "$Operation" = "Start" ]; then
   exit 0
  else
   /usr/bin/Start-SOS-Firewall
-  yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="SOS Firewall is now active" --button=$"gtk-ok:1"
+  yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="$NOWACTIVE" --button=$"gtk-ok:1"
   MainMenu
   exit 0
  fi
