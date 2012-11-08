@@ -1,6 +1,0 @@
-#!/bin/bash
-wget http://www.salineos.com/Repo/apt/2x/preferences -O /etc/apt/preferences
-saline-get update
-saline-get dist-upgrade
-echo Done
-exit

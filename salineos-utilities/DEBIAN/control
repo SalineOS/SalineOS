@@ -1,9 +1,9 @@
 Package: salineos-utilities
-Version: 2.0-5
+Version: 2.0-6
 Architecture: all
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Installed-Size: 93
-Depends: coreutils, findutils, bash, sed, syslinux, util-linux, aptitude
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux, aptitude, packagekit-tools
 Section: system
 Priority: optional
 Description: Simple front end for misc actions.

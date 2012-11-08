@@ -1,9 +1,9 @@
 Package: magix-driver-installer
-Version: 2.0-7
+Version: 2.0-8
 Architecture: all
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Installed-Size: 94
-Depends: coreutils, findutils, bash, sed, libnotify-bin, util-linux, xfce4-notifyd, salineos-autostart, packagekit
+Depends: coreutils, findutils, bash, sed, libnotify-bin, util-linux, xfce4-notifyd, packagekit-tools
 Section: system
 Priority: optional
 Description: Script to ease installation of proprietary graphics drivers.
