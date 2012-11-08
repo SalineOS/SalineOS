@@ -943,6 +943,16 @@ update-locale --no-checks LANG
 ## But, it's probably best not to poke the Xorg beast with a stick, he bites and I am a meaty morsel.
 update-locale "LANG=$NewLocale"
 
+## Load translations for localizesys
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/localizesys/Translations/$LanguageLess ]; then
+ . /etc/localizesys/Translations/$LanguageLess
+else
+ . /etc/clean/Translations/en_US
+fi
+
 ## UserManual support, this used to use wget, now translated manuals are shipped on the images. 
 
 ## Remove the country from the locale name for displaying to user on progress dialog. 
@@ -1090,7 +1100,7 @@ sleep 2
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          Installing Optional Packages          \n"
+done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          $INSTALLIONOPTIONAL          \n"
 
 ## Show debugging output
 cat /tmp/packagekit-url-tmp
@@ -1112,7 +1122,7 @@ setxkbmap $KeyMap
 ## Dear Mr or Mrs User this is the score, I violated your machine while you weren't looking and I don't know if it liked it, here have a box.
 
 TestLayout () {
-yad --form --field=":TXT" --title="Localizesys" $Icon --text="Your keyboard layout has now been set based on your language selection.\n\nPlease use the text box below to test.\n\n" --button=$"Keyboard Layout Is Wrong:3" --button=$"Keyboard Layout Is Correct:5"
+yad --form --field=":TXT" --title="Localizesys" $Icon --text="$KEYBOARDTEXT\n\n" --button=$"$BUTTONWRONG:3" --button=$"$BUTTONRIGHT:5"
 
 ret="$?"
 

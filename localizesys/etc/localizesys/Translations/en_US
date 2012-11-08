@@ -1,0 +1,8 @@
+export INSTALLINGOPTIONAL="Installing Optional Packages"
+
+export KEYBOARDTEXT="Your keyboard layout has now been set based on your language selection.\n\nPlease use the text box below to test."
+
+export BUTTONWRONG="Keyboard Layout Is Wrong"
+
+export BUTTONRIGHT="Keyboard Layout Is Correct"
+
