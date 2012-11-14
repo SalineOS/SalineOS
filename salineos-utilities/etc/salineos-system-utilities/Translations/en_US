@@ -1,0 +1,81 @@
+export MULTIMEDIATEXT="Support for a variety of media formats are possibly under patent protection in some jurisdictions. Therefore, support for decoding some media files is not included on this disk.  Plug-ins are available from a third party to decode a wide range of media formats, but use of these plug-ins without a license could possibly violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright). In order to install these plug-ins you must agree to:\n\nA. Accept responsibility for knowing the laws in your country.\n\nB. Never use the software to illegally copy a DVD disk.\n\nC. Accept the terms of Adobe's End User License Agreement.\n\n"
+
+export INUSE="Package kit is in use, please wait until it is finished."
+
+export AGREEANDINSTALL="Agree and Install"
+
+export DECLINE="Decline"
+
+export READBTN="Read"
+
+export UPDATINGPACKAGECACHE="Updating package cache, please wait."
+
+export INSTALLINGOPTIONAL="Installing Optional Packages"
+
+export CODECSDONE="Restricted codecs installed successfully."
+
+export CLEANINFO="Clean allows you to optionally remove; log files, flash cookies, cached thumbnails, cache of packages that are kept when installing new software and packages that were installed as dependencies but are no longer required."
+
+export LANGUAGEINFO="This action will launch Localizesys, a simple program that will walk you through changing the current system language step by step. Localizesys is used by the SalineOS installer to set the system language."
+
+export RESTRICTEDINFO="Support for a variety of media formats are possibly under patent protection in some jurisdictions. This script will download and install codecs for decoding most every video and audio format commonly used. Use of these codecs without paying for a license may violate government sanctioned intellectual property rights (Patent rights, not to be confused with copyright), depending on your country of residence. You can purchase the licenses for these codecs at http://www.fluendo.com. This action does exactly the same thing the installer offers to do during install."
+
+export WINEINFO="Installs Wine Is Not an Emulator a compatibility layer that allows Linux based systems to run some Windows .exe files. This will also install WineTricks, a simple program that automates the install of Windows components and a small selection of popular Windows applications."
+
+export LAMPINFO="Install a traditional Linux Apache MySQL PHP server stack; L.A.M.P is one of the most popular server stacks ever constructed. This will install everything you need to test webpages locally, or host your own webpage. If you wish to allow others to connect to your machine's new web server you must open port 80 in your current firewall (Default is SOS Firewall) and if your computer is behind a router, you must ensure that port 80 is forwarded to your machine."
+
+export DNSINFO="DNS or Domain Name System is the system that gets the machine readible IP addresses from human readible web addresses (Such as http://www.salineos.com). This action will setup a local cache of all the IP addresses of web pages you visit.  This will slightly speed up web browsing for web sites you visit more than once, but will create a local record of your browsing activity."
+
+export KEYINFO="If you add a repository to your /etc/apt/sources.list then you will most likely also have to add its' gpg key.  This gpg key is a security measure, you should never add a key from a source you do not absolutely trust."
+
+export SWAPINFO="Allows you to resize the SalineOS swap file."
+
+export CLOCKINFO="Set the system clock. SalineOS includes ntp which should keep your clock synced to a remote server. This option is most useful on machines without internet access or on machines that need to switch from Localtime to UTC or vice versa."
+
+export DRIVERSINFO="Starts an automated script to detect if there are any proprietary closed source drivers available for your system. If found, it will offer to install these drivers for you."
+
+export CLEANMENU="Launch the Clean utility to reclaim disk space"
+
+export LANGUAGEMENU="Change the system language with Localizesys"
+
+export DRIVERSMENU="Check for and install proprietary graphics drivers"
+
+export KEYMENU="Have apt trust a repository by importing its' GPG key"
+
+export MULTIMEDIAMENU="Install potentially patent encumbered multimedia codecs"
+
+export WINEMENU="Install the Windows compatibility layer Wine, with extras"
+
+export LAMPMENU="Install a traditional Linux Apache MySQL PHP server stack."
+
+export DNSMENU="Setup a local DNS server on this machine"
+
+export CLOCKMENU="Set the system's time and date"
+
+export SWAPMENU="Resize the SalineOS swapfile"
+
+export ACTION="Action"
+
+export DESCRIPTION="Description"
+
+export WELCOMETEXT="Welcome to SalineOS system utilities. This program allows you to tweak and manage your system with a set of straight forward and simple utilities. To view more detailed information about each action simply highlight it and press Info."
+
+export MUSTSELECTACTION="You must select an action before continuing."
+
+export KEYIMPORT="Enter the key you wish to import:"
+
+export NOKEY="No key supplied"
+
+export SETCLOCK="Set Clock"
+
+export STANDARD="Standard"
+
+export SETHOUR="Hour"
+
+export SETMINUTE="Set the current minute"
+
+export HARDWARECLOCK="Please select whether to set the hardware clock to UTC or Localtime. Microsoft Windows will expect the hardware clock to be in localtime, Mac OS X will expect it to be in UTC and SalineOS will adapt properly to either automatically."
+
+export LOCALTIME="Local Time"
+
+
