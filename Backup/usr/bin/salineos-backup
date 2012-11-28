@@ -448,6 +448,8 @@ if [ "$UseSwapFile" = "True" ]; then
  sleep 2
  mkswap /Target/swap/salineos-swap
  SwapFstab="/swap/salineos-swap"
+ ## Ensure that all hibernate actions get diverted to suspend
+ echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
 else
  mkswap "$Swap"
  sleep 2
@@ -1850,6 +1852,8 @@ if [ "$UseSwapFile" = "True" ]; then
  sleep 2
  mkswap /Target/swap/salineos-swap
  SwapFstab="/swap/salineos-swap"
+ ## Ensure that all hibernate actions get diverted to suspend
+ echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
 else
  mkswap "$Swap"
  sleep 2
@@ -2326,8 +2330,6 @@ done
 ## Rsync
 rsync -a / /Target --ignore-existing --exclude-from=/tmp/backup-excludes
 
-
-
 sleep 3
 
 killall -KILL tail
@@ -2340,6 +2342,9 @@ fallocate --l "$SwapFileSize"m /Target/swap/salineos-swap
 sleep 2
 mkswap /Target/swap/salineos-swap
 SwapFstab="/swap/salineos-swap"
+
+## Ensure that all hibernate actions get diverted to suspend
+echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
 
 
 killall -KILL tail

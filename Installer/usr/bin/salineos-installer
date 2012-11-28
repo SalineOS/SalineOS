@@ -273,6 +273,8 @@ if [ "$UseSwapFile" = "True" ]; then
  sleep 2
  mkswap /Target/swap/salineos-swap
  SwapFstab="/swap/salineos-swap"
+ ## Ensure that all hibernate actions get diverted to suspend
+ echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
 else
  mkswap $Swap
  sleep 2
