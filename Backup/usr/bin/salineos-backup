@@ -449,7 +449,9 @@ if [ "$UseSwapFile" = "True" ]; then
  mkswap /Target/swap/salineos-swap
  SwapFstab="/swap/salineos-swap"
  ## Ensure that all hibernate actions get diverted to suspend
- echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
+ if [ "$(grep 'METHOD=' /etc/pm/config.d/config)" = "" ]; then
+  echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
+ fi
 else
  mkswap "$Swap"
  sleep 2
@@ -1853,7 +1855,9 @@ if [ "$UseSwapFile" = "True" ]; then
  mkswap /Target/swap/salineos-swap
  SwapFstab="/swap/salineos-swap"
  ## Ensure that all hibernate actions get diverted to suspend
- echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
+ if [ "$(grep 'METHOD=' /etc/pm/config.d/config)" = "" ]; then
+  echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
+ fi
 else
  mkswap "$Swap"
  sleep 2
@@ -2344,7 +2348,9 @@ mkswap /Target/swap/salineos-swap
 SwapFstab="/swap/salineos-swap"
 
 ## Ensure that all hibernate actions get diverted to suspend
-echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
+if [ "$(grep 'METHOD=' /etc/pm/config.d/config)" = "" ]; then
+ echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
+fi
 
 
 killall -KILL tail
