@@ -54,7 +54,7 @@ export FORMATANDUSED="will be formatted and used for"
 
 export WILLNOTFORMAT="will not be formatted but still used for"
 
-export FMSWAP="swap file will be created"
+export FMSWAP="MiB swap file will be created"
 
 export FMSWAP1="will be used as the swap partition"
 
