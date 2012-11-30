@@ -190,11 +190,12 @@ fi
 
  if [ "$Driver" = "Too old" ]; then
   yad --title="Magix" --width="250" --wrap --window-icon="jockey" --text="Your chipset is no longer supported by Nvidia. You will have to continue using the provided open source driver." --button=$"gtk-quit:1"
-  touch /etc/magix-driver-installer/dont-run
   exit 0
  fi
 
 yad --title="Magix Driver Installer" --window-icon="jockey" --width="300" --wrap --text="Nvidia provides a closed source proprietary driver for your graphics chipset. This driver will provide better 3D performance than the currently used open source driver. This program can automatically download and install this driver for you if desired. Installation of the proprietary driver will requiring rebooting the machine when finished.\n" --button=$"gtk-quit:3" --button=$"Install:5"
+
+ret="$?"
 
 if [ "$ret" = "3" ]; then
  exit 0
@@ -210,6 +211,8 @@ fi
 ## End Nvidia
 
 yad --title="Magix Installer" --width="250" --wrap --window-icon="jockey" --button=$"gtk-quit:1" --text="This utility did not find any proprietary drivers available for your system.\n"
+
+exit 0
 
 }
 
@@ -271,9 +274,9 @@ if [ "$Driver" = "Current" ]; then
 CurrentKernel=$(uname -r)
 
 if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
-Packages="dkms nvidia-kernel-dkms libvdpau1 lib32vdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx-ia32 nvidia-glx libgl1-nvidia-glx libgl1-nvidia-glx-ia32 nvidia-kernel-common nvidia-settings nvidia-vdpau-driver-ia32"
+Packages="dkms nvidia-kernel-dkms libvdpau1 lib32vdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx-ia32 nvidia-glx libgl1-nvidia-glx libgl1-nvidia-glx-ia32 nvidia-kernel-common nvidia-settings nvidia-vdpau-driver-ia32 nvidia-xconfig"
 else
-Packages="dkms nvidia-kernel-dkms libvdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx libgl1-nvidia-glx  nvidia-kernel-common nvidia-settings"
+Packages="dkms nvidia-kernel-dkms libvdpau1 libgl1-nvidia-alternatives libglx-nvidia-alternatives nvidia-libvdpau1 nvidia-glx libgl1-nvidia-glx  nvidia-kernel-common nvidia-settings nvidia-xconfig"
 fi
 
 
