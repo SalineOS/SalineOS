@@ -242,7 +242,7 @@ InstallNvidia () {
 
 ## Update package cache and purge the old driver
 tail -f /usr/bin/magix-driver-installer | yad --progress --auto-close --no-buttons --pulsate --title="Magix Installer" --window-icon="jockey" --text="               Updating package cache               \n" &
-aptitude update
+apt-get update
 sleep 1
 aptitude purge -y xserver-xorg-video-nouveau
 sleep 1
@@ -334,11 +334,11 @@ fi
 
 }
 
-InstallAMD {
+InstallAMD () {
 
 ## Update the package cache
 tail -f /usr/bin/magix-driver-installer | yad --progress --auto-close --no-buttons --pulsate --title="Magix Installer" --window-icon="jockey" --text="               Updating package cache               \n" &
-aptitude update
+apt-get update
 sleep 1
 killall -KILL tail
 
