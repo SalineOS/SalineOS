@@ -210,7 +210,29 @@ fi
 fi
 ## End Nvidia
 
-yad --title="Magix Installer" --width="250" --wrap --window-icon="jockey" --button=$"gtk-quit:1" --text="This utility did not find any proprietary drivers available for your system.\n"
+## Check for supported AMD/ATI card
+CardCheck="$(lspci | grep "VGA compatible controller" | awk -F "[" '{print $NF}' | awk -F "]" '{print $1}')"
+
+Checked="$(grep "$CardCheck" /etc/magix-driver-installer/supported-amd)"
+
+if [ "$Checked" != "" ]; then
+ yad --title="Magix Driver Installer" --window-icon="jockey" --width="300" --wrap --text="AMD provides a closed source proprietary driver for your graphics chipset. This driver will provide better 3D performance than the currently used open source driver. This program can automatically download and install this driver for you if desired. Installation of the proprietary driver will requiring rebooting the machine when finished.\n" --button=$"gtk-quit:3" --button=$"Install:5"
+
+ ret="$?"
+
+ if [ "$ret" = "3" ]; then
+  exit 0
+ elif [ "$ret" = "252" ]; then 
+  exit 0
+ elif [ "$ret" = "5" ]; then
+  InstallAMD
+  exit 0
+ fi
+
+fi
+
+
+yad --title="Magix Installer" --width="250" --wrap --window-icon="jockey" --button=$"gtk-quit:1" --text="This utility did not find any proprietary drivers available for your system.\n\nIf you believe this is in error, please report this at www.salinelinux.proboards.com"
 
 exit 0
 
@@ -309,6 +331,55 @@ Please Reboot Your Machine.'
 
 
 fi
+
+}
+
+InstallAMD {
+
+## Update the package cache
+tail -f /usr/bin/magix-driver-installer | yad --progress --auto-close --no-buttons --pulsate --title="Magix Installer" --window-icon="jockey" --text="               Updating package cache               \n" &
+aptitude update
+sleep 1
+killall -KILL tail
+
+## Install ia32 packages if this is a 64 bit system
+
+CurrentKernel=$(uname -r)
+
+if [ "$(echo "$CurrentKernel" | grep "AMD64")" != "" ]; then
+Packages="fglrx-modules-dkms fglrx-glx fglrx-control glx-alternative-fglrx libgl1-fglrx-glx fglrx-atieventsd"
+else
+Packages="fglrx-modules-dkms fglrx-glx fglrx-control glx-alternative-fglrx libgl1-fglrx-glx fglrx-atieventsd libfglrx-ia32 fglrx-glx-ia32"
+fi
+
+for i in $Packages; do
+
+pkcon -p -y install "$i">>/tmp/magix-installing &
+
+sleep 2
+
+(while [ "$(pidof pkcon)" != "" ]; do
+CurrentOutput="$(tail --lines=1 /tmp/magix-installing)"
+echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
+done)| yad --window-icon="jockey" --progress --auto-close --no-buttons --title="Magix Installer"  --text="             Installing AMD proprietary graphics driver             \n"
+
+## Add debugging
+cat /tmp/magix-installing
+
+rm -rf /tmp/magix-installing
+
+done
+
+
+## Configure Xorg
+aticonfig --initial
+
+## Inform the user and reboot the machine
+## Inform the user and reboot the machine
+notify-send -u normal -i jockey -t 999999 'Installation Complete
+Please Reboot Your Machine.'
+
+exit 0
 
 }
 
