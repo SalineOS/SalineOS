@@ -5,7 +5,9 @@
 set -e
 
 for i in $(ls /home); do
- cp -f /etc/custom-actions/uca.xml /home/$i/.config/Thunar
+ if [ -f /home/$i/.config/Thunar/uca.xml ]; then
+  cp -f /etc/custom-actions/uca.xml /home/$i/.config/Thunar
+ fi
 done
 
 exit 0
