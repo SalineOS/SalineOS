@@ -6,3 +6,8 @@ export BUTTONWRONG="Keyboard Layout Is Wrong"
 
 export BUTTONRIGHT="Keyboard Layout Is Correct"
 
+export CHANGETEXT="Would you like to change the current system language and keyboard layout?"
+
+export SELECTLANGUAGE="Please select your language"
+
+export MUSTSELECTLANG="You must select a language before continuing."

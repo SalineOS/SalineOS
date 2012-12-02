@@ -31,6 +31,15 @@ if [ "$testroot" != "root" ]; then
  exit 0
 fi
 
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/localizesys/Translations/$LanguageLess ]; then
+ . /etc/localizesys/Translations/$LanguageLess
+else
+ . /etc/clean/Translations/en_US
+fi
 
 progressbar () {
 tail -f /usr/bin/localizesys | yad --text="$@" $Icon --progress --pulsate --auto-close --title="Localizesys" --no-buttons
@@ -39,7 +48,7 @@ tail -f /usr/bin/localizesys | yad --text="$@" $Icon --progress --pulsate --auto
 if [ "$Input" != "Installer" ]; then
 
 ## Since the use of this script is entirely optional, ask the user if they need it.
-yad --title="Localizesys" $Icon --width="250" --wrap --text"Would you like to change the current system language and keyboard layout?" --button=$"gtk-no:3" --button=$"gtk-yes:5" 
+yad --title="Localizesys" $Icon --width="250" --wrap --text="$CHANGETEXT" --button=$"gtk-no:3" --button=$"gtk-yes:5" 
 
 ret="$?"
 
@@ -54,7 +63,7 @@ fi
 GetLanguage () {
 
 ## Give the user a list of languages to choose from using our nifty variable,then set another nifty variable of their choice.
-Language=$(yad --height="375" $Icon --list --column='  ' --no-headers --title="Localizesys" --text="                Please select your language                \n" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" $(cat /etc/localizesys/languages) )
+Language=$(yad --height="375" $Icon --list --column='  ' --no-headers --title="Localizesys" --text="                $SELECTLANGUAGE                \n" --button=$"gtk-cancel:3" --button=$"gtk-ok:2" $(cat /etc/localizesys/languages) )
 
 ret="$?"
 
@@ -63,7 +72,7 @@ if [ "$ret" = "3" ]; then
 elif [ "$ret" = "252" ]; then
  exit 0
 elif [ "$Language" = "" ]; then
- yad --title="Localizesys" $Icon --width="250" --wrap --text="You must select a language before continuing.\n" --button=$"gtk-ok:1"
+ yad --title="Localizesys" $Icon --width="250" --wrap --text="$MUSTSELECTLANG\n" --button=$"gtk-ok:1"
  GetLanguage
  exit 0
 fi
