@@ -204,7 +204,7 @@ fi
 
 else
 
-Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE"  --column="$NOTES1" --title=Procurator --window-icon=kvm --button=$"gtk-help:3" --button=$"$DSELECTED:5" --button=$"$CREATENEW:7" --button=$"$BOOTSELECTED:9" "${Menu[@]}")
+Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE"  --column="$NOTES1" --title=Procurator --window-icon=kvm --button=$"gtk-help:3" --button=$"$DELSELECTED:5" --button=$"$CREATENEW:7" --button=$"$BOOTSELECTED:9" "${Menu[@]}")
 
 ret="$?"
 
