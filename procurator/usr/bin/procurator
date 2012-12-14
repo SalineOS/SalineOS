@@ -171,7 +171,7 @@ Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
 if [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$ret" = "3" ]; then
- $Info --wrap --width=250 --title="Procurator Help" --text="$HELPTEXT" --button=$"gtk-ok:1"
+ yad --wrap --width=250 --title="Procurator Help" --text="$HELPTEXT" --button=$"gtk-ok:1"
  MainMenu
  exit 0
 elif [ "$ret" = "5" ]; then
@@ -213,7 +213,7 @@ Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
 if [ "$ret" = "252" ]; then
  exit 0 
 elif [ "$ret" = "3" ]; then
- $Info --wrap --width=250 --title="$HELPTEXT" --button=$"gtk-ok:1"
+ $Info --wrap --width=250 --text="$HELPTEXT" --button=$"gtk-ok:1"
  MainMenu
  exit 0
 elif [ "$ret" = "5" ]; then
