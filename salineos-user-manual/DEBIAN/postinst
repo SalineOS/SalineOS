@@ -4,6 +4,11 @@
 
 set -e
 
+for i in $(ls /home); do
+ if [ -f "/home/$i/Desktop/UserManual.pdf" ]; then
+  cp -f /etc/user-manuals/UserManual.pdf "/home/$i/Desktop/UserManual.pdf"
+fi
+done
 
 exit 0
 
