@@ -193,7 +193,7 @@ if [ "$(echo "$Operation" | grep Thumbnails)" != "" ]; then
 fi
 if [ "$(echo "$Operation" | grep Packages)" != "" ]; then
  DialogText=$(apt-get -y -s autoremove | grep '  ' | grep -v "This is only a simulation" | grep -v "root privileges for real" | grep -v "Keep also in mind that locking" | grep -v "depend on the relevance to the real")
- yad $Icon --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:3"
+ yad $Icon --width="275" --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:3"
 
  if [ "$?" = "3" ]; then
   PackagesCode=( "apt-get -y autoremove" )
