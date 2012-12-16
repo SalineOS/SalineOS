@@ -171,6 +171,7 @@ fi
 
 if [ "$(echo "$Operation" | grep Package-Cache)" != "" ]; then
  CacheCode=( "apt-get clean" )
+ UseSudo="Yes"
 else
  CacheCode=( "" )
 fi
@@ -181,6 +182,7 @@ if [ "$(echo "$Operation" | grep Logs)" != "" ]; then
  LogsCode=( "for i in $(cat /tmp/Clean-Logs); do
  rm -rf /var/log/\$i
 done" )
+ UseSudo="Yes"
  else
  LogsCode=( "" )
 fi
@@ -195,6 +197,7 @@ if [ "$(echo "$Operation" | grep Packages)" != "" ]; then
 
  if [ "$?" = "3" ]; then
   PackagesCode=( "apt-get -y autoremove" )
+  UseSudo="Yes"
  else
   PackagesCode=( "" )
  fi
@@ -206,13 +209,29 @@ if [ "$KernelSizes" != "0" ]; then
  KernelCode=( "for i in $(cat /tmp/Clean-Kernel-List); do
 apt-get -y remove linux-image-$i --purge
 done" )
+UseSudo="Yes"
 else
  KernelCode=( "" )
 fi
 fi
 
+if [ "$UseSudo" != "" ]; then
+
+PIUArray=( 'PidOfUsing=$(fuser -a /var/lib/dpkg/lock)' )
+PNArray=( 'NameOfUsing=$(ps -p $PidOfUsing -o comm=)' )
+
 cat > /tmp/Clean-SalineOS <<FOO
 #!/bin/bash
+
+${PIUArray[@]}
+
+${PNArray[@]}
+
+if [ "\$PidOfUsing" != "" ]; then
+ yad --title="Clean" $Icon --wrap --width="275" --text="Process \$PidOfUsing \$NameOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again" --button=$"gtk-quit:3"
+
+exit 0
+fi
 
 ${KernelCode[@]}
 
@@ -226,6 +245,9 @@ FOO
 
 chmod +x /tmp/Clean-SalineOS
 gksudo /tmp/Clean-SalineOS
+
+
+fi
 
 if [ "$Operation" != "" ]; then
 notify-send -u normal -i /usr/share/pixmaps/clean.png -t 15000 "
