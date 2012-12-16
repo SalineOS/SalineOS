@@ -90,6 +90,42 @@ else
  done
 fi
 
+## Determine if there are old kernels to remove 
+## Caculate their size if there are.
+
+RunningKernel=$(uname -r)
+
+KernelList="$(ls /lib/modules | grep -v "$RunningKernel")"
+
+if [ "$(echo "$RunningKernel" | grep "686")" != "" ]; then
+ ToRemove="\-686\-pae"
+else
+ ToRemove="\-AMD64"
+fi
+
+CurrentKernel=$(echo "$RunningKernel" | sed -e "s|$ToRemove||g" | sed -e "s|\-||g" | sed -e "s|\.||g")
+
+
+for i in $KernelList; do
+Kernel="$i"
+QKernel=$(echo $i | sed -e "s|$ToRemove||g" | sed -e "s|\-||g" | sed -e "s|\.||g")
+echo $QKernel
+echo $CurrentKernel
+if (($CurrentKernel > $QKernel)); then
+ echo "$Kernel">>/tmp/Clean-Kernel-List
+ KernelFindSize="$KernelFindSize /lib/modules/$Kernel"
+fi
+
+done
+
+## Calculate Size, a very rough estimate
+
+if [ "$KernelFindSize" != "" ]; then
+  KernelSizes="$(du -chs --apparent-size $KernelFindSize | grep "total" | awk '{print $1}')"
+else
+ KernelSizes="0"
+fi
+
 ## Dirty but effective hax
 if [ "$PackageCacheSize" = "8.0K" ]; then
  PackageCacheSize="0"
@@ -109,7 +145,7 @@ killall -KILL tail
 
 MainMenu () {
 
-Operation=$(yad $Icon --button=$"gtk-info:5" --button=$"gtk-quit:3" --button=$"gtk-ok:2" --list --text="Please select the actions you wish to perform" --height="250" --checklist --multiple --on-top --column=' ' --column="Action" --column="Size" --title="Clean" --print-column="2" X Flash-Cookies "$FlashCookieSize" X Logs "$LogsSize" X Package-Cache "$PackageCacheSize" X Un-Needed-Packages "$FinalSize"M X Thumbnails "$ThumbnailsSize")
+Operation=$(yad $Icon --button=$"gtk-info:5" --button=$"gtk-quit:3" --button=$"gtk-ok:2" --list --text="Please select the actions you wish to perform" --height="250" --checklist --multiple --on-top --column=' ' --column="Action" --column="Size" --title="Clean" --print-column="2" X Flash-Cookies "$FlashCookieSize" X Logs "$LogsSize" X Package-Cache "$PackageCacheSize" X Un-Needed-Packages "$FinalSize"M X Thumbnails "$ThumbnailsSize" X Old-Kernels "$KernelSizes")
 
 ret=$?
 
@@ -132,14 +168,23 @@ if [ "$(echo "$Operation" | grep Flash-Cookies)" != "" ]; then
  mkdir -p $HOME/.adobe
  mkdir -p $HOME/.macromedia/Flash_Player
 fi
+
 if [ "$(echo "$Operation" | grep Package-Cache)" != "" ]; then
- gksudo apt-get clean
+ CacheCode=( "apt-get clean" )
+else
+ CacheCode=( "" )
 fi
+
 if [ "$(echo "$Operation" | grep Logs)" != "" ]; then
  rm $HOME/.xsession-errors
  touch $HOME/.xsession-errors
- gksudo /usr/bin/Clean-Remove-Logs
+ LogsCode=( "for i in $(cat /tmp/Clean-Logs); do
+ rm -rf /var/log/\$i
+done" )
+ else
+ LogsCode=( "" )
 fi
+
 if [ "$(echo "$Operation" | grep Thumbnails)" != "" ]; then
  rm -rf $HOME/.thumbnails
  mkdir -p $HOME/.thumbnails
@@ -147,18 +192,50 @@ fi
 if [ "$(echo "$Operation" | grep Packages)" != "" ]; then
  DialogText=$(apt-get -y -s autoremove | grep '  ' | grep -v "This is only a simulation" | grep -v "root privileges for real" | grep -v "Keep also in mind that locking" | grep -v "depend on the relevance to the real")
  yad $Icon --on-top --wrap --center --title="Clean" --image=gtk-dialog-question --text="The following packages will be removed:\n\n$DialogText" --button=$"gtk-no:1" --button=$"gtk-yes:3"
+
  if [ "$?" = "3" ]; then
-  gksudo apt-get -y autoremove
+  PackagesCode=( "apt-get -y autoremove" )
+ else
+  PackagesCode=( "" )
  fi
+
 fi
 
+if [ "$(echo "$Operation" | grep Old-Kernels)" != "" ]; then
+if [ "$KernelSizes" != "0" ]; then
+ KernelCode=( "for i in $(cat /tmp/Clean-Kernel-List); do
+apt-get -y remove linux-image-$i --purge
+done" )
+else
+ KernelCode=( "" )
+fi
+fi
+
+cat > /tmp/Clean-SalineOS <<FOO
+#!/bin/bash
+
+${KernelCode[@]}
+
+${PackagesCode[@]}
+
+${LogsCode[@]}
+
+${CacheCode[@]}
+
+FOO
+
+chmod +x /tmp/Clean-SalineOS
+gksudo /tmp/Clean-SalineOS
 
 if [ "$Operation" != "" ]; then
 notify-send -u normal -i /usr/share/pixmaps/clean.png -t 15000 "
 $CLEANCOMPLETE"
 fi
 
+
 rm -rf /tmp/Clean-Logs
+rm -rf /tmp/Clean-SalineOS
+rm -rf /tmp/Clean-Kernel-List
 
 exit 
 
