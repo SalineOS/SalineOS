@@ -228,7 +228,7 @@ ${PIUArray[@]}
 ${PNArray[@]}
 
 if [ "\$PidOfUsing" != "" ]; then
- yad --title="Clean" $Icon --wrap --width="275" --text="Process \$PidOfUsing \$NameOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again" --button=$"gtk-quit:3"
+ yad --title="Clean" $Icon --wrap --width="275" --text="Application \$NameOfUsing with process ID\$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again" --button=$"gtk-quit:3"
 
 exit 0
 fi

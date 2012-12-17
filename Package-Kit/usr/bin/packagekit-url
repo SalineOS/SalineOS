@@ -46,6 +46,16 @@ else
  . /etc/packagekit-url/Translations/en_US
 fi
 
+## Check to ensure that the apt lock file is clean
+PidOfUsing=$(fuser -a /var/lib/dpkg/lock)
+NameOfUsing=$(ps -p $PidOfUsing -o comm=)
+
+if [ "$PidOfUsing" != "" ]; then
+ yad --title="Packagekit URL" $Icon --wrap --width="275" --text="Application $NameOfUsing with process ID$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again" --button=$"gtk-quit:3"
+
+exit 0
+fi
+
 ## Use a lockfile since more than one running instance is bad mojo. 
 
 if [ -f /tmp/packagekit-url-lock-file ]; then
