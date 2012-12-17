@@ -62,6 +62,9 @@ TestCards
 
 TestCards () {
 
+## Check the apt lock file
+CheckApt
+
 ## Make sure our temp file is empty
 if [ -f /tmp/magix-driver-installer ]; then
  rm -rf /tmp/magix-driver-installer
@@ -380,6 +383,26 @@ notify-send -u normal -i jockey -t 999999 'Installation Complete
 Please Reboot Your Machine.'
 
 exit 0
+
+}
+
+CheckApt () { 
+PidOfUsing=$(fuser -a /var/lib/dpkg/lock)
+
+if [ "$PidOfUsing" != "" ]; then
+NameOfUsing=$(ps -p $PidOfUsing -o comm=)
+ yad --title="Magix Driver Installer" $Icon --wrap --width="275" --text="Application $NameOfUsing with process ID$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish, close it and press ok to continue.\n" --button=$"gtk-quit:3" --button=$"gtk-ok:5"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "5" ]; then
+ CheckApt
+fi
+fi
 
 }
 
