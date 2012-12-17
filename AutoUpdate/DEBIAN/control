@@ -1,9 +1,9 @@
 Package: salineos-autoupdate
-Version: 2.0-4
+Version: 2.0-5
 Architecture: all
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Installed-Size: 94
-Depends: coreutils, findutils, bash, sed, util-linux, synaptic, apt-xapian-index
+Depends: coreutils, findutils, bash, sed, util-linux, synaptic, apt-xapian-index, psmisc, procps
 Section: system
 Priority: optional
 Description: SalineOS auto update script.
