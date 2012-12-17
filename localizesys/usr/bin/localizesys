@@ -24,9 +24,9 @@ Icon="--window-icon=config-language"
 Input="$@"
 
 ## Cry like a little girl if we don't have root
-testroot="$(whoami)"
+TestRoot="$(whoami)"
 
-if [ "$testroot" != "root" ]; then
+if [ "$TestRoot" != "root" ]; then
  echo " Must be run with root privileges, will now exit "
  exit 0
 fi
@@ -1100,6 +1100,10 @@ fi
 
 Packages="$MySpell $IceDove $Iceweasel $LOffice"
 if [ "$Input" != "Installer" ]; then
+
+## Ensure the apt lock file is not in use
+CheckApt
+
 for i in $Packages; do
 
 pkcon -p -y install $i>>/tmp/packagekit-url-tmp &
@@ -1149,6 +1153,26 @@ exit 0"
 
 sed -i /etc/rc.local -e "s|^exit 0|\n${RCLOCAL}|"
 
+fi
+
+}
+
+CheckApt () { 
+PidOfUsing=$(fuser -a /var/lib/dpkg/lock)
+
+if [ "$PidOfUsing" != "" ]; then
+NameOfUsing=$(ps -p $PidOfUsing -o comm=)
+ yad --title="Clean" $Icon --wrap --width="275" --text="Application $NameOfUsing with process ID$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish, close it and press ok to continue.\n" --button=$"gtk-quit:3" --button=$"gtk-ok:5"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "5" ]; then
+ CheckApt
+fi
 fi
 
 }
