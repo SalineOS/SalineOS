@@ -42,8 +42,12 @@ if [ -f /tmp/packagekit-url-lock-file ]; then
 else
  touch /tmp/packagekit-url-lock-file
 fi
+fi
 
-Test=$(grep "http://www.deb-multimedia.org" /etc/apt/sources.list)
+PIUArray=( 'PidOfUsing=$(fuser -a /var/lib/dpkg/lock)' )
+PNArray=( 'NameOfUsing=$(ps -p $PidOfUsing -o comm=)' )
+
+BigArray=( 'Test=$(grep "http://www.deb-multimedia.org" /etc/apt/sources.list)
 
 if [ "$Test" = "" ]; then
  echo ' ' >> /etc/apt/sources.list
@@ -54,7 +58,7 @@ fi
 
 CodecPackages="deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd flashplugin-nonfree gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2"
 
-tail -f /usr/bin/salineos-system-utilities | yad --progress --pulsate --title='  ' --no-buttons --text="     $UPDATINGPACKAGECACHE     \n" 
+tail -f /tmp/SOS-Utils-Restricted | yad --progress --pulsate --title="SOS-Utils" --no-buttons --auto-close --text="     $UPDATINGPACKAGECACHE     \n" &
 
 apt-get update
 
@@ -83,10 +87,43 @@ else
 fi
 yad --title='       ' --width=275 --text="$Result" --button=$"gtk-ok:1"
 
+exit 0' )
+
+cat > /tmp/SOS-Utils-Restricted << FOO
+#!/bin/bash
+
+## Load translations
+
+LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
+
+if [ -f /etc/clean/Translations/$LanguageLess ]; then
+ . /etc/salineos-system-utilities/Translations/$LanguageLess
+else
+ . /etc/salineos-system-utilities/Translations/en_US
+fi
+
+${PIUArray[@]}
+
+${PNArray[@]}
+
+if [ "\$PidOfUsing" != "" ]; then
+ yad --title="SOS-Utils" $Icon --wrap --width="275" --text="Application \$NameOfUsing with process ID\$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again." --button=$"gtk-ok:3"
+
+rm -rf /tmp/packagekit-url-lock-file
+MainMenu
+exit 0
+fi
+
+${BigArray[@]}
+
+FOO
+
+chmod +x /tmp/SOS-Utils-Restricted
+gksudo /tmp/SOS-Utils-Restricted
+sleep 1 
+rm -rf /tmp/SOS-Utils-Restricted
 rm -rf /tmp/packagekit-url-lock-file
 rm -rf /tmp/packagekit-url-tmp
-
-fi
 
 MainMenu
 exit 0
@@ -176,8 +213,20 @@ elif [ "$Operation" = "Install Restricted Multimedia" ]; then
  Restricted
  exit 0
 elif [ "$Operation" = "Local DNS" ]; then
- gksudo /usr/bin/packagekit-url 'pkgkit://dnsmasq'
- gksudo sed -i -e 's|#prepend domain-name-servers|prepend domain-name-servers|g' /etc/dhcp/dhclient.conf
+ DNSArray=( '/usr/bin/packagekit-url pkgkit://dnsmasq
+ sed -i -e "s|#prepend domain-name-servers|prepend domain-name-servers|g" /etc/dhcp/dhclient.conf' )
+ cat > /tmp/SOS-Utils-DNS << FOO
+#!/bin/bash
+${DNSArray[@]}
+
+exit 0
+
+FOO
+
+ chmod +x /tmp/SOS-Utils-DNS
+ gksudo /tmp/SOS-Utils-DNS
+ sleep 1
+ rm -rf /tmp/SOS-Utils-DNS
  MainMenu
  exit 0
 elif [ "$Operation" = "Install Wine" ]; then
@@ -280,19 +329,39 @@ yad --width="250" --wrap --window-icon="clock" --title="$SETCLOCK" --text="$HARD
 ret="$?"
 
 if [ "$ret" = "252" ]; then
- exit
+ MainMenu
+ exit 0
 elif [ "$ret" = "3" ]; then
- gksudo date "$CurrentDate$Hour$Minute"
- gksudo "hwclock -w --utc"
- if [ "$(grep "LOCALTIME" /etc/adjtime)" != "" ]; then
-  gksudo 'sed -i -e "s|LOCALTIME|UTC|g" /etc/adjtime'
- fi
+ cat > /tmp/SOS-Utils-Time << FOO
+#!/bin/bash
+date "$CurrentDate$Hour$Minute"
+"hwclock -w --utc"
+if [ "\$(grep "LOCALTIME" /etc/adjtime)" != "" ]; then
+ sed -i -e "s|LOCALTIME|UTC|g" /etc/adjtime
+fi
+exit
+FOO
+ chmod +x /tmp/SOS-Utils-Time
+ gksudo /tmp/SOS-Utils-Time
+ rm -rf /tmp/SOS-Utils-Time
+ MainMenu
+ exit 0
 elif [ "$ret" = "5" ]; then
- gksudo date "$CurrentDate$Hour$Minute"
- gksudo "hwclock -w --localtime"
- if [ "$(grep "UTC" /etc/adjtime)" != "" ]; then
-  gksudo 'sed -i -e "s|UTC|LOCALTIME|g" /etc/adjtime'
- fi
+cat > /tmp/SOS-Utils-Time << FOO
+#!/bin/bash
+date "$CurrentDate$Hour$Minute"
+"hwclock -w --localtime"
+if [ "\$(grep "UTC" /etc/adjtime)" != "" ]; then
+ sed -i -e "s|UTC|LOCALTIME|g" /etc/adjtime
+fi
+
+exit
+FOO
+ chmod +x /tmp/SOS-Utils-Time
+ gksudo /tmp/SOS-Utils-Time
+ rm -rf /tmp/SOS-Utils-Time
+ MainMenu
+ exit 0
 fi
 
 fi
