@@ -1162,7 +1162,7 @@ PidOfUsing=$(fuser -a /var/lib/dpkg/lock)
 
 if [ "$PidOfUsing" != "" ]; then
 NameOfUsing=$(ps -p $PidOfUsing -o comm=)
- yad --title="Clean" $Icon --wrap --width="275" --text="Application $NameOfUsing with process ID$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish, close it and press ok to continue.\n" --button=$"gtk-quit:3" --button=$"gtk-ok:5"
+ yad --title="Localizesys" $Icon --wrap --width="275" --text="Application $NameOfUsing with process ID$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish, close it and press ok to continue.\n" --button=$"gtk-quit:3" --button=$"gtk-ok:5"
 
 ret="$?"
 

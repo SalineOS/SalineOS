@@ -186,6 +186,8 @@ killall -KILL tail
 if [ "$Internet" != "Continue" ]; then
 
  if [ -f /tmp/localizesys-output ]; then
+## Check the apt lock file
+  CheckApt
   LanguagePackages="$(cat /tmp/localizesys-output)"
  fi
  
@@ -202,9 +204,12 @@ if [ "$InstallCodec" != "FALSE" ]; then
    CodecPackages="flashplugin-nonfree deb-multimedia-keyring gstreamer0.10-ffmpeg gstreamer0.10-crystalhd gstreamer0.10-plugins-bad gstreamer0.10-plugins-ugly gstreamer0.10-fluendo-mp3 unrar libdvdread4 libdvdcss2" 
 fi 
 
+## Check the apt lock file
+CheckApt
+
 tail -f /usr/bin/salineos-installer | yad --progress --auto-close --no-buttons --pulsate --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer.png" --text="               $PUPDATE               \n" &
 
-aptitude update
+apt-get update
 
 sleep 1
 
@@ -1388,6 +1393,26 @@ else
  exit 0
 fi
 
+
+}
+
+CheckApt () { 
+PidOfUsing=$(fuser -a /var/lib/dpkg/lock)
+
+if [ "$PidOfUsing" != "" ]; then
+NameOfUsing=$(ps -p $PidOfUsing -o comm=)
+ yad --title="SalineOS Installer" --window-icon="/usr/share/pixmaps/salineos-installer --wrap --width="275" --text="Application $NameOfUsing with process ID$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish, close it and press ok to continue.\n" --button=$"gtk-ok:5"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "5" ]; then
+ CheckApt
+fi
+fi
 
 }
 
