@@ -121,7 +121,7 @@ done
 ## Calculate Size, a very rough estimate
 
 if [ "$KernelFindSize" != "" ]; then
-  KernelSizes="$(du -chs --apparent-size $KernelFindSize | grep "total" | awk '{print $1}')"
+  KernelSizes="$(du -chs --apparent-size "$KernelFindSize" | grep "total" | awk '{print $1}')"
 else
  KernelSizes="0"
 fi
@@ -179,7 +179,7 @@ fi
 if [ "$(echo "$Operation" | grep Logs)" != "" ]; then
  rm $HOME/.xsession-errors
  touch $HOME/.xsession-errors
- LogsCode=( "for i in $(cat /tmp/Clean-Logs); do
+ LogsCode=( "for i in \$(cat /tmp/Clean-Logs); do
  rm -rf /var/log/\$i
 done" )
  UseSudo="Yes"
@@ -206,8 +206,8 @@ fi
 
 if [ "$(echo "$Operation" | grep Old-Kernels)" != "" ]; then
 if [ "$KernelSizes" != "0" ]; then
- KernelCode=( "for i in $(cat /tmp/Clean-Kernel-List); do
-apt-get -y remove linux-image-$i --purge
+ KernelCode=( "for i in \$(cat /tmp/Clean-Kernel-List); do
+apt-get -y remove linux-image-\$i --purge
 done" )
 UseSudo="Yes"
 else
@@ -217,15 +217,11 @@ fi
 
 if [ "$UseSudo" != "" ]; then
 
-PIUArray=( 'PidOfUsing=$(fuser -a /var/lib/dpkg/lock)' )
-PNArray=( 'NameOfUsing=$(ps -p $PidOfUsing -o comm=)' )
-
 cat > /tmp/Clean-SalineOS <<FOO
 #!/bin/bash
 
-${PIUArray[@]}
-
-${PNArray[@]}
+PidOfUsing=\$(fuser -a /var/lib/dpkg/lock)
+NameOfUsing=\$(ps -p \$PidOfUsing -o comm=)
 
 if [ "\$PidOfUsing" != "" ]; then
  yad --title="Clean" $Icon --wrap --width="275" --text="Application \$NameOfUsing with process ID\$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again" --button=$"gtk-quit:3"
@@ -242,6 +238,8 @@ ${LogsCode[@]}
 ${CacheCode[@]}
 
 FOO
+
+cat /tmp/Clean-SalineOS
 
 chmod +x /tmp/Clean-SalineOS
 gksudo /tmp/Clean-SalineOS
