@@ -19,13 +19,6 @@
 
 ## Check for root.
 
-TestRoot="$(whoami)"
-
-if [ "$TestRoot" != "root" ]; then
- $Info --button=$"gtk-quit:1" --text="     SalineOS Backup $MUSTROOT.     \n"
- exit 1
-fi
-
 ## Load translations
 
 LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
@@ -35,6 +28,14 @@ if [ -f /etc/SOS-Firewall/Translations/$LanguageLess ]; then
 else
  . /etc/SOS-Firewall/Translations/en_US
 fi
+
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ $Info --button=$"gtk-quit:1" --text="     SalineOS Backup $MUSTROOT.     \n"
+ exit 1
+fi
+
 
 CloseFunction () {
 
@@ -311,7 +312,7 @@ mkdir -p /etc/SOS-Firewall
 
 if [ "$(grep '## Firewall is Disabled' /usr/bin/Start-SOS-Firewall)" = "" ]; then
 
-MainMenuArray=("Allow" "$ALLOWARRAY" "Close" "$CLOSEARRAY" "Disable" "$STOPARRAY" "Start" "$STARTARRAY" "Stop" "$STOPARRAY") 
+MainMenuArray=("Allow" "$ALLOWARRAY" "Close" "$CLOSEARRAY" "Disable" "$DISABLEARRAY" "Start" "$STARTARRAY" "Stop" "$STOPARRAY") 
 
 else
 
@@ -362,7 +363,7 @@ iptables -P FORWARD ACCEPT
 iptables -P OUTPUT ACCEPT
 
 ## Inform the user
-yad --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="SOS Firewall $NOWDISABLED" --button=$"gtk-ok:1"
+yad --title="SOS Firewall" --window-icon="/usr/share/pixmaps/SOS-Firewall.png" --text="     SOS Firewall $NOWDISABLED    " --button=$"gtk-ok:1"
 MainMenu
 exit 0
 elif [ "$Operation" = "Enable" ]; then
@@ -385,7 +386,7 @@ elif [ "$Operation" = "Start" ]; then
   exit 0
  else
   /usr/bin/Start-SOS-Firewall
-  yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="$NOWACTIVE" --button=$"gtk-ok:1"
+  yad --title="SOS Firewall" --window-icon=/usr/share/pixmaps/SOS-Firewall.png --text="       $NOWACTIVE       " --button=$"gtk-ok:1"
   MainMenu
   exit 0
  fi
