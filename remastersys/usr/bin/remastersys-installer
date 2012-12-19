@@ -757,9 +757,13 @@ GrubSelectGUI
 
 $DIALOG $TITLE"$TITLETEXT" $YESNO $TEXT"Is your system clock set to your current local time?\n\nAnswering no will indicate it is set to UTC"
 if [ $? = 0 ]; then
-sed -i -e 's/^UTC=.*/UTC=no/g' /etc/default/rcS
+if [ "$(grep "UTC" /etc/adjtime)" != "" ]; then
+ sed -i -e "s|UTC|LOCALTIME|g" /etc/adjtime
+fi
 else
-sed -i -e 's/^UTC=.*/UTC=yes/g' /etc/default/rcS
+if [ "$(grep "LOCALTIME" /etc/adjtime)" != "" ]; then
+ sed -i -e "s|LOCALTIME|UTC|g" /etc/adjtime
+fi
 fi
 
 cat /usr/share/zoneinfo/zone.tab | awk '{print $3}' | grep "/" | sort > /tmp/remastersys.zoneinfo
