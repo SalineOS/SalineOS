@@ -250,7 +250,7 @@ elif [ "$Operation" = "Import Key" ]; then
   exit 0
  fi
 
- gksudo exec "/usr/bin/xterm -hold -e /usr/bin/gpgimport $Key"
+ gksudo '/usr/bin/xterm -hold -e /usr/bin/gpgimport' $Key
  MainMenu
  exit 0
 elif [ "$Operation" = "Resize Swap" ]; then
