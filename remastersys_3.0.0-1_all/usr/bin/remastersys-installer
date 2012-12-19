@@ -363,7 +363,25 @@ rm /tmp/choice.$$
 
 
 #grub location
-$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"Please select where to install grub to.\n" $HEIGHT $WIDTH $MENUHEIGHT mbr "Master Boot Record of first drive" root "Root partition - safe choice if you use a different boot manager" rootmbr "MBR of the root partition - this is what you want for a usb install" 2>/tmp/choice.$$
+GrubSelectText () {
+
+## Blank the array in case this function is being rerun
+GrubMenu=()
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}')
+
+for i in $Drives; do
+PartDrive="$i"
+
+if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
+ GrubMenu=("${GrubMenu[@]}" "$PartDrive" "Master boot record of disk")
+fi
+done
+
+GrubMenu=( "${GrubMenu[@]}" "root" "Root partition - safe choice if you use a different boot manager" "rootmbr" "MBR of the root partition - this is what you want for a usb install" )
+
+#grub location
+$DIALOG $TITLE"$TITLETEXT" $MENU $TEXT"Please select where to install grub to.\n" $HEIGHT $WIDTH $MENUHEIGHT "${GrubMenu[@]}" 2>/tmp/choice.$$
 
 if [ "$?" = "0" ]; then
 GRUBLOCTEST=`cat /tmp/choice.$$`
@@ -372,15 +390,21 @@ rm /tmp/choice.$$
 
 if [ "$GRUBLOCTEST" = "root" ]; then
 GRUBLOCTEXT="root partition of $TARGETPART"
-GRUBLOC="root"
+GRUBLOC="/dev/$TARGETPART"
 elif [ "$GRUBLOCTEST" = "rootmbr" ]; then
 GRUBLOCTEXT="mbr of root partition of $TARGETPART"
-GRUBLOC="rootmbr"
+GRUBLOC="/dev/$PARTDRIVE"
+elif [ "$GRUBLOCTEST" = "" ]; then
+GrubSelectText
+exit 0
 else
-GRUBLOCTEXT="master boot record"
-GRUBLOC=""
+GRUBLOCTEXT="master boot record of $GRUBLOCTEST"
+GRUBLOC="/dev/$GRUBLOCTEST"
 fi
 
+}
+
+GrubSelectText
 
 #dpkg-reconfigure tzdata
 #Timezone setting
@@ -677,24 +701,53 @@ fi
 
 
 #grub location
-GRUBLOCTEST=""
-while [ "$GRUBLOCTEST" = "" ]
-do
-GRUBLOCTEST=`$DIALOGMENU $TITLE"$TITLETEXT" $MENU  $TEXT"Please select where to install grub to.\n" mbr "Master Boot Record of first drive" root "Root partition - safe choice if you use a different boot manager" rootmbr "MBR of the root partition - this is what you want for a usb install"`
+
+GrubSelectGUI () {
+
+GrubMenu=()
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}')
+
+for i in $Drives; do
+PartDrive="$i"
+
+if [ "$(echo "$PartDrive" | grep [0-9] )" = "" ]; then
+ GrubMenu=("${GrubMenu[@]}" "$PartDrive" "Master boot record of disk")
+fi
 done
 
-GRUBLOCTEST=`echo $GRUBLOCTEST | cut -d "|" -f 1`
+GrubMenu=( "${GrubMenu[@]}" "root" "Root partition - safe choice if you use a different boot manager" "rootmbr" "MBR of the root partition - this is what you want for a usb install" )
+
+#grub location
+GRUBLOCTEST=$($DIALOGMENU $TITLE"$TITLETEXT" $MENU $TEXT"Please select where to install grub to.\n" "${GrubMenu[@]}")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ GrubSelectGUI
+ exit 0
+elif [ "$GRUBLOCTEST" = "" ]; then
+ GrubSelectGUI
+ exit 0
+fi
+
+GRUBLOCTEST=$(echo "$GRUBLOCTEST" | awk -F '|' '{print $1}')
 
 if [ "$GRUBLOCTEST" = "root" ]; then
 GRUBLOCTEXT="root partition of $TARGETPART"
-GRUBLOC="root"
+GRUBLOC="/dev/$TARGETPART"
 elif [ "$GRUBLOCTEST" = "rootmbr" ]; then
 GRUBLOCTEXT="mbr of root partition of $TARGETPART"
-GRUBLOC="rootmbr"
+GRUBLOC="/dev/$PARTDRIVE"
 else
-GRUBLOCTEXT="master boot record"
-GRUBLOC=""
+GRUBLOCTEXT="master boot record of $GRUBLOCTEST"
+GRUBLOC="/dev/$GRUBLOCTEST"
 fi
+
+
+}
+
+GrubSelectGUI
 
 #Timezone setting
 
@@ -1136,12 +1189,26 @@ if [ "$GUI" != "" ]; then
 killall -KILL tail
 fi
 # Setup grub
+
+cat > /tmp/Remastersys-Grub-Install << FOO
+#!/bin/bash
+chroot /TARGET grub-install --force -no-floppy "$GRUBLOC"
+chroot /TARGET update-grub
+exit 0
+FOO
+
+chmod +x /tmp/Remastersys-Grub-Install
+
 if [ "$GUI" != "" ]; then
 progressbar "Installing and setting up grub...Please Wait\n" &
-xterm -e remastersys-grubconfig /TARGET $GRUBLOC
+xterm -e /tmp/Remastersys-Grub-Install
+sleep 1
+rm -rf /tmp/Remastersys-Grub-Install
 else
 echo "Installing and setting up grub."
-remastersys-grubconfig /TARGET $GRUBLOC
+/tmp/Remastersys-Grub-Install
+sleep 1
+rm -rf /tmp/Remastersys-Grub-Install
 fi
 
 echo "Post-install has completed."
