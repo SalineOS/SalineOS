@@ -1201,7 +1201,7 @@ fi
 
 cat > /tmp/Remastersys-Grub-Install << FOO
 #!/bin/bash
-chroot /TARGET grub-install --force -no-floppy "$GRUBLOC"
+chroot /TARGET grub-install --force --no-floppy "$GRUBLOC"
 chroot /TARGET update-grub
 exit 0
 FOO
