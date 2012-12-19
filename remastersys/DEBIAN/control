@@ -4,7 +4,7 @@ Section: system
 Installed-Size: 1152
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Architecture: all
-Version: 3.0.0-3
+Version: 3.0.0-4
 Depends: coreutils, dialog, memtest86+, mkisofs | genisoimage, findutils, grub-pc, xorriso|syslinux, os-prober, bash, passwd, sed, squashfs-tools, live-boot, live-config, live-config-sysvinit, live-boot-initramfs-tools, rsync, mount, laptop-detect, util-linux, user-setup, hwdata
 Conffiles:
  /etc/remastersys/remastersys.version bfd5de7cfc9d37ade0d9eb9c7d7ecc4f
