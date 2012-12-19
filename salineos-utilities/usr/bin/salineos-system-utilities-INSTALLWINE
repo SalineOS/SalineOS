@@ -17,7 +17,7 @@
 ####################################################################################################
 # Copyright 2011,2012 Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
 
-tail -f /usr/bin/salineos-system-utilities-INSTALLWINE | yad --progress --pulsate --title="SalineOS Utils" --window-icon=system-settings --text="             Installing Winetricks.             \n" --no-buttons &
+tail -f /usr/bin/salineos-system-utilities-INSTALLWINE | yad --auto-close --progress --pulsate --title="SalineOS Utils" --window-icon=system-settings --text="             Installing Winetricks.             \n" --no-buttons &
 
 cd /tmp
 
@@ -25,17 +25,17 @@ wget http://www.kegel.com/wine/winetricks
 
 
 for i in $(ls /home); do
- mkdir -p "/home/$i/.winetricks"
- cp -f /tmp/winetricks "/home/$i/.winetricks/winetricks"
- chmod +x "/home/$i/.winetricks/winetricks"
- chown "$i" "/home/$i/.winetricks/winetricks"
-
+cp -f /tmp/winetricks /home/$i/.local/share/applications/winetricks
+chmod +x /home/$i/.local/share/applications/winetricks
+chown $i /home/$i/.local/share/applications/winetricks
 echo '[Desktop Entry]'>>/home/$i/.local/share/applications/winetricks
 echo 'Version=1.0'>>/home/$i/.local/share/applications/winetricks
 echo 'Type=Application'>>/home/$i/.local/share/applications/winetricks
+echo 'Name=Wine Tricks'>>/home/$i/.local/share/applications/winetricks
 echo "TryExec=/home/$i/.winetricks/winetricks">>/home/$i/.local/share/applications/winetricks
 echo "Exec=/home/$i/.winetricks/winetricks">>/home/$i/.local/share/applications/winetricks
 echo 'Categories=System;'>>/home/$i/.local/share/applications/winetricks
+echo 'Icon=wine'>>/home/$i/.local/share/applications/winetricks
 
 mv -f "/home/$i/.local/share/applications/winetricks" "/home/$i/.local/share/applications/winetricks.desktop"
 
@@ -45,7 +45,7 @@ sleep 1
 
 killall -KILL tail
 
-gksudo /usr/bin/packagekit-url 'pkgkit://wine'
+/usr/bin/packagekit-url 'pkgkit://wine'
 
 for i in $(ls /home); do
 if [ -f "/home/$i/.local/share/defaults.list" ]; then
