@@ -849,14 +849,13 @@ progressbar "Formatting $TARGETPART Now...Please Wait \n" &
 fi
 echo "Formatting the $TARGETPART partition now"
 
-## Preserve kernel options in the new grub system
-NewGrubLine="$(cat /proc/cmdline | awk -F 'config ' '{print $2}' | awk -F ' BOOT' '{print $1}')"
+## Check for safe mode and change the grub line.
+TestSafeMode=$(grep -B 0  "noapic noapm nodma nomce nolapic nomodeset radeon.modeset=0 nouveau.modeset=0" /proc/cmdline)
 
-OldGrubLine=$(grep -B 0  "GRUB_CMDLINE_LINUX=" /etc/default/grub)
-
-sed -i -e "s/$OldGrubLine/GRUB_CMDLINE_LINUX=\"$NewGrubLine\"/g" /etc/default/grub
-
-
+if [ "$TestSafeMode" != "" ]; then
+ OldGrubLine=$(grep -B 0  "GRUB_CMDLINE_LINUX=" /etc/default/grub)
+ sed -i -e "s/$OldGrubLine/GRUB_CMDLINE_LINUX=\"noapic noapm nodma nomce nolapic nomodeset radeon.modeset=0 nouveau.modeset=0 nosmp\"/g" /etc/default/grub
+fi
 #make the filesystem and mount the partition on /TARGET
 if [ "`mount | grep $TARGETPART`" ]; then
 echo "Unmounting the partition we are going to use and format now"
