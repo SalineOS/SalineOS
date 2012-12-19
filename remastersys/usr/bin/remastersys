@@ -261,8 +261,13 @@ mkdir -p $WORKDIR/dummysys/etc/skel/Desktop
 fi
 
 if [ "`grep kdm /etc/X11/default-display-manager`" = "" ]; then
+if [ "$2" != "saline" ]; then
 cp /usr/share/applications/remastersys-installer.desktop $WORKDIR/dummysys/etc/skel/Desktop/
 chmod +x $WORKDIR/dummysys/etc/skel/Desktop/remastersys-installer.desktop
+else
+ cp /usr/share/applications/salineos-installer.deskop $WORKDIR/dummysys/etc/skel/Desktop/
+chmod +x $WORKDIR/dummysys/etc/skel/Desktop/salineos-installer.desktop
+fi
 else
 cp /usr/share/applications/remastersys-installer-kde.desktop $WORKDIR/dummysys/etc/skel/Desktop/
 chmod +x $WORKDIR/dummysys/etc/skel/Desktop/remastersys-installer-kde.desktop
