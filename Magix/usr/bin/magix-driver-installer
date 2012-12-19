@@ -286,8 +286,7 @@ done
 nvidia-xconfig
 
 ## Inform the user and reboot the machine
-notify-send -u normal -i jockey -t 999999 'Installation Complete
-Please Reboot Your Machine.'
+yad --window-icon="jockey" --title="Magix" --width="250" --wrap --text="Installation complete, please reboot your machine." --button=$"gtk-ok:1"
 
 fi
 
@@ -328,9 +327,7 @@ done
 nvidia-xconfig
 
 ## Inform the user and reboot the machine
-## Inform the user and reboot the machine
-notify-send -u normal -i jockey -t 999999 'Installation Complete
-Please Reboot Your Machine.'
+yad --window-icon="jockey" --title="Magix" --width="250" --wrap --text="Installation complete, please reboot your machine." --button=$"gtk-ok:1"
 
 
 fi
@@ -377,10 +374,9 @@ done
 ## Configure Xorg
 aticonfig --initial
 
+
 ## Inform the user and reboot the machine
-## Inform the user and reboot the machine
-notify-send -u normal -i jockey -t 999999 'Installation Complete
-Please Reboot Your Machine.'
+yad --window-icon="jockey" --title="Magix" --width="250" --wrap --text="Installation complete, please reboot your machine." --button=$"gtk-ok:1"
 
 exit 0
 
