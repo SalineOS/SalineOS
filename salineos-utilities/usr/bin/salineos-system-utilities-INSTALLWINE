@@ -30,15 +30,12 @@ for i in $(ls /home); do
  chmod +x "/home/$i/.winetricks/winetricks"
  chown "$i" "/home/$i/.winetricks/winetricks"
 
-cat > "/home/$i/.local/share/applications/winetricks" <<FOO
-[Desktop Entry]
-Version=1.0
-Type=Application
-TryExec=/home/$i/.winetricks/winetricks
-Exec=/home/$i/.winetricks/winetricks
-Categories=Other;
-
-FOO
+echo '[Desktop Entry]'>>/home/$i/.local/share/applications/winetricks
+echo 'Version=1.0'>>/home/$i/.local/share/applications/winetricks
+echo 'Type=Application'>>/home/$i/.local/share/applications/winetricks
+echo "TryExec=/home/$i/.winetricks/winetricks">>/home/$i/.local/share/applications/winetricks
+echo "Exec=/home/$i/.winetricks/winetricks">>/home/$i/.local/share/applications/winetricks
+echo 'Categories=System;'>>/home/$i/.local/share/applications/winetricks
 
 mv -f "/home/$i/.local/share/applications/winetricks" "/home/$i/.local/share/applications/winetricks.desktop"
 
@@ -48,7 +45,7 @@ sleep 1
 
 killall -KILL tail
 
-sudo /usr/bin/packagekit-url 'pkgkit://wine'
+gksudo /usr/bin/packagekit-url 'pkgkit://wine'
 
 for i in $(ls /home); do
 if [ -f "/home/$i/.local/share/defaults.list" ]; then
