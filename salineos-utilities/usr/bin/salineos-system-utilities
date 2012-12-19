@@ -195,7 +195,7 @@ elif [ "$ret" = "5" ]; then
  MoreInfo
  exit 0
 elif [ "$Operation" = "Install LAMP" ]; then
- gksudo 'exec /usr/bin/xfce4-terminal -x /usr/bin/salineos-system-utilities-LAMP'
+ gksudo '/usr/bin/xterm -hold -e /usr/bin/salineos-system-utilities-LAMP'
  MainMenu
  exit 0
 elif [ "$Operation" = "Clean" ]; then
@@ -250,7 +250,7 @@ elif [ "$Operation" = "Import Key" ]; then
   exit 0
  fi
 
- gksudo exec "/usr/bin/xterm -hold -e /usr/bin/gpgimport $Key"
+ gksudo '/usr/bin/xterm -hold -e /usr/bin/gpgimport' $Key
  MainMenu
  exit 0
 elif [ "$Operation" = "Resize Swap" ]; then
@@ -335,7 +335,7 @@ elif [ "$ret" = "3" ]; then
  cat > /tmp/SOS-Utils-Time << FOO
 #!/bin/bash
 date "$CurrentDate$Hour$Minute"
-"hwclock -w --utc"
+hwclock -w --utc
 if [ "\$(grep "LOCALTIME" /etc/adjtime)" != "" ]; then
  sed -i -e "s|LOCALTIME|UTC|g" /etc/adjtime
 fi
@@ -350,13 +350,14 @@ elif [ "$ret" = "5" ]; then
 cat > /tmp/SOS-Utils-Time << FOO
 #!/bin/bash
 date "$CurrentDate$Hour$Minute"
-"hwclock -w --localtime"
+hwclock -w --localtime
 if [ "\$(grep "UTC" /etc/adjtime)" != "" ]; then
  sed -i -e "s|UTC|LOCALTIME|g" /etc/adjtime
 fi
 
 exit
 FOO
+ cat /tmp/SOS-Utils-Time
  chmod +x /tmp/SOS-Utils-Time
  gksudo /tmp/SOS-Utils-Time
  rm -rf /tmp/SOS-Utils-Time

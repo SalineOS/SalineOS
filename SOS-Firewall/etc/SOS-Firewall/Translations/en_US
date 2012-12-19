@@ -22,7 +22,7 @@ export ALLOWARRAY="Open a port to allow incoming connections"
 
 export CLOSEARRAY="Close a port, previously opened with SOS Firewall"
 
-export STOPARRAY="Stop the firewall and prevent it from starting, until it is re-enabled"
+export DISABLEARRAY="Stop the firewall and prevent it from starting, until it is re-enabled"
 
 export STARTARRAY="Start the firewall"
 

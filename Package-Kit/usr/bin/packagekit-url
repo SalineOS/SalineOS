@@ -27,15 +27,6 @@ export DEBIAN_FRONTEND="gnome"
 ## Set a variable of YAD options for questions, just cleaner this way.
 Question='yad --on-top --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=PackageKit-URL'
 
-
-## Got root?
-testroot="$(whoami)"
-
-if [ "$testroot" != "root" ]; then
- yad --title="ERROR" --text=" Package Kit URL $MUSTROOT " --button=$"gtk-ok:1"
- exit 0
-fi
-
 ## Load translations
 
 LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
@@ -44,6 +35,15 @@ if [ -f /etc/packagekit-url/Translations/$LanguageLess ]; then
  . /etc/packagekit-url/Translations/$LanguageLess
 else
  . /etc/packagekit-url/Translations/en_US
+fi
+
+
+## Got root?
+testroot="$(whoami)"
+
+if [ "$testroot" != "root" ]; then
+ yad --title="ERROR" --text=" Package Kit URL $MUSTROOT " --button=$"gtk-ok:1"
+ exit 0
 fi
 
 ## Check to ensure that the apt lock file is clean
