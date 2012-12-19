@@ -38,7 +38,7 @@ LanguageLess="$(echo "$LANG" | awk -F '.' '{print $1}')"
 if [ -f /etc/localizesys/Translations/$LanguageLess ]; then
  . /etc/localizesys/Translations/$LanguageLess
 else
- . /etc/clean/Translations/en_US
+ . /etc/localizesys/Translations/en_US
 fi
 
 progressbar () {
