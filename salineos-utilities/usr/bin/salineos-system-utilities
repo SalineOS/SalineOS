@@ -20,7 +20,7 @@
 
 Restricted () {
 
-yad --wrap --height=300 --width=500 --center --button=$"$READBTN Adobe EULA:3" --button=$"$DECLINE:5" --button=$"$AGREEANDINSTALL:7" --title=SalineOS-Installer --window-icon=/usr/share/pixmaps/salineos-installer.png --text="$MULTIMEDIATEXT"
+yad --wrap --height=300 --width=500 --center --button=$"$READBTN Adobe EULA:3" --button=$"$DECLINE:5" --button=$"$AGREEANDINSTALL:7" --title="SOS Utils" --window-icon=/usr/share/pixmaps/salineos-installer.png --text="$MULTIMEDIATEXT"
 
 ret="$?"
 
@@ -75,7 +75,7 @@ sleep 2
 (while [ "$(pidof pkcon)" != "" ]; do
 CurrentOutput="$(tail --lines=1 /tmp/packagekit-url-tmp)"
 echo "# $CurrentOutput" | sed -u "s|# Percentage:	||g" | sed -u "s|100|99|g"
-done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SalineOS Installer"  --text="          $INSTALLINGOPTIONAL          \n"
+done)| yad --progress --auto-close --no-buttons --window-icon="/usr/share/pixmaps/salineos-installer.png" --title="SOS Utils"  --text="          $INSTALLINGOPTIONAL          \n"
 
 
 done
@@ -107,7 +107,7 @@ ${PIUArray[@]}
 ${PNArray[@]}
 
 if [ "\$PidOfUsing" != "" ]; then
- yad --title="SOS-Utils" $Icon --wrap --width="275" --text="Application \$NameOfUsing with process ID\$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again." --button=$"gtk-ok:3"
+ yad --title="SOS Utils" $Icon --wrap --width="275" --text="Application \$NameOfUsing with process ID\$PidOfUsing has an exclusive lock on the apt directory. Please allow this application to finish and close it before trying this operation again." --button=$"gtk-ok:3"
 
 rm -rf /tmp/packagekit-url-lock-file
 MainMenu
