@@ -121,7 +121,15 @@ done
 ## Calculate Size, a very rough estimate
 
 if [ "$KernelFindSize" != "" ]; then
-  KernelSizes="$(du -chs --apparent-size "$KernelFindSize" | grep "total" | awk '{print $1}')"
+ for $i in $KernelFindSize; do
+  KernelSize="$(du -chs --apparent-size "$i" | grep "total" | awk '{print $1}' | awk -F 'M' '{print $1}')"
+  if [ "$KernelSizes" = "" ]; then
+   KernelSizes="$KernelSize"
+  else
+   KernelSizes=$(($KernelSizes + $KernelSize))
+  fi
+done
+KernelSizes="$KernelSizesM"
 else
  KernelSizes="0"
 fi
