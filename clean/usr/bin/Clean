@@ -100,7 +100,7 @@ KernelList="$(ls /lib/modules | grep -v "$RunningKernel")"
 if [ "$(echo "$RunningKernel" | grep "686")" != "" ]; then
  ToRemove="\-686\-pae"
 else
- ToRemove="\-AMD64"
+ ToRemove="\-amd64"
 fi
 
 CurrentKernel=$(echo "$RunningKernel" | sed -e "s|$ToRemove||g" | sed -e "s|\-||g" | sed -e "s|\.||g")
@@ -121,15 +121,18 @@ done
 ## Calculate Size, a very rough estimate
 
 if [ "$KernelFindSize" != "" ]; then
- for $i in $KernelFindSize; do
+ for i in $KernelFindSize; do
   KernelSize="$(du -chs --apparent-size "$i" | grep "total" | awk '{print $1}' | awk -F 'M' '{print $1}')"
+ if [ "$(echo $KernelSize | grep '.')" != "" ]; then
+  KernelSize=$(echo $KernelSize | awk -F '.' '{print $1}')
+ fi
   if [ "$KernelSizes" = "" ]; then
    KernelSizes="$KernelSize"
   else
    KernelSizes=$(($KernelSizes + $KernelSize))
   fi
 done
-KernelSizes="$KernelSizesM"
+KernelSizes="$KernelSizes"M
 else
  KernelSizes="0"
 fi
@@ -160,8 +163,12 @@ ret=$?
 Operation=$(echo "$Operation" | sed -e "s/|//g")
 
 if [ "$ret" = "252" ]; then
+ rm -rf Clean-Kernel-List
+ rm -rf Clean-Logs
  exit 0
 elif [ "$ret" = "3" ]; then
+ rm -rf Clean-Kernel-List
+ rm -rf Clean-Logs
  exit 0
 elif [ "$ret" = "5" ]; then
  yad --title="Clean $CLEANINFO" $Icon --width="325" --wrap --button=$"gtk-ok:1" --text="$CLEANTEXT"
