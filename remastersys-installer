@@ -185,7 +185,7 @@ fi
 
 #choose the partition to install to
 
-PARTITIONS=`cat /proc/partitions | grep "$PARTDRIVE" | awk '{print $4}' | grep "[0-9]"`
+PARTITIONS=`cat /proc/partitions | grep -v "sr0" | awk '{print $4}' | grep "[0-9]"`
 PARTINSTTEMP=`echo $PARTITIONS | sed -r "s/$SWAP//"`
 PARTINST=`echo $PARTINSTTEMP`
 for i in $PARTINST; do
@@ -572,7 +572,7 @@ fi
 
 #choose the partition to install to
 
-PARTITIONS=`cat /proc/partitions | grep "$PARTDRIVE" | awk '{print $4}' | grep "[0-9]"`
+PARTITIONS=`cat /proc/partitions | grep -v "sr0" | awk '{print $4}' | grep "[0-9]"`
 PARTINSTTEMP=`echo $PARTITIONS | sed -r "s/$SWAP//"`
 PARTINST=`echo $PARTINSTTEMP`
 for i in $PARTINST; do
