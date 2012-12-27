@@ -42,7 +42,7 @@ export USBUTTON="Use Selected"
 
 export FORMATHOME="Format (Erase all data) on the target home partition"
 
-export SEPERATEHOME="Select a seperate partition for /home (User files) if desired"
+export SEPERATEHOME="Select a separate partition for /home (User files) if desired"
 
 export PUTHOME="Put /home on the root partition"
 
