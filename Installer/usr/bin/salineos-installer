@@ -279,6 +279,7 @@ if [ "$UseSwapFile" = "True" ]; then
  mkswap /Target/swap/salineos-swap
  SwapFstab="/swap/salineos-swap"
  ## Ensure that all hibernate actions get diverted to suspend
+ touch /etc/pm/config.d/config
  if [ "$(grep 'METHOD=' /etc/pm/config.d/config)" = "" ]; then
   echo -n 'METHOD="suspend"'>>/etc/pm/config.d/config
  fi
@@ -839,7 +840,7 @@ SelectHomePart () {
 HomePartMenu=""
 Partitions=""
 
-Partitions="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "swap" | grep -v 'p1' | grep -v "extended" | grep -v "Hidden" | cut -d " " -f1 | sed 's|/dev/||g')"
+Partitions="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "sr" | grep -v "Extended" | grep -v "$TargetPart" | grep -v "swap" | grep -v 'p1' | grep -v "extended" | grep -v "Hidden" | cut -d " " -f1 | sed 's|/dev/||g')"
 
 for i in $Partitions; do
 ## Get the label of the disk if available
@@ -1002,7 +1003,7 @@ elif [ -f /tmp/Finished-Menu ]; then
  FinishedMenu
  exit 0
 else
- HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "sr" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
  if [ "$HomePartTest" != "" ]; then
   Swap=$(echo "$Swap" | awk -F '|' '{print $1}')
   SelectHomePart
@@ -1047,7 +1048,7 @@ else
    UserSetup
    exit 0
   fi
- HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
+ HomePartTest="$(fdisk -l | grep '/dev/' | grep -v "Disk" | grep -v "sr" | grep -v 'p1' | grep -v "Extended" | grep -v "$TargetPart" | grep -v "Swap")"
  if [ "$HomePartTest" != "" ]; then
   SelectHomePart
   exit 0
@@ -1067,7 +1068,7 @@ SelectRootPart () {
 
 PartDriveMenu=""
 
-Partitions=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}' | grep -v 'p1')
+Partitions=$(cat /proc/partitions | grep -v loop | grep -v "sr" | | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}' | grep -v 'p1')
 
 for i in $Partitions; do
 ## Get the label of the disk if available
