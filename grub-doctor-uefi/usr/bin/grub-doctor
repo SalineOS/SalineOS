@@ -1,0 +1,348 @@
+#!/bin/bash
+# Licensed under the GNU General Public License Version 2
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
+####################################################################################################
+## Copyright 2012 Anthony Nordquist
+
+## Set some options
+Title="--title=\"Grub Doctor\""
+
+Icon="--window-icon=/usr/share/pixmaps/grub-doctor.png"
+
+## Test for root
+TestRoot="$(whoami)"
+
+if [ "$TestRoot" != "root" ]; then
+ yad --title="Grub Doctor" --text="Must be run with root privileges, will now exit" --button=$"gtk-ok:1"
+ exit 0
+fi
+
+if [ "$(echo "$@")" = "" ]; then
+
+## Just in case people don't know what this is, inform them.
+
+yad --wrap --image=gtk-dialog-question $Icon $Title --width=200 --text="This is a boot-loader restoration utility (GRUB2). Would you like to restore the system boot-loader?" --button=$"gtk-no:1" --button=$"gtk-yes:0"
+
+if [ "$?" != "0" ]; then
+ exit 0
+fi
+
+fi
+
+## Parse the supplied input
+
+for arg in "$@"
+do
+case "$arg" in
+-efi-part*)
+  GrubLocation=$(echo "$arg" | awk -F '=' '{print $2}')
+  ;;
+-root-dir*)
+  RootPart=$(echo "$arg" | awk -F '=' '{print $2}')
+  if [ "$RootPart" = "root" ]; then
+   NoBind="True"
+  fi
+  ;;
+-no-bind)
+  NoBind="True"
+  ;;
+-no-progress)
+  NoProgress="True"
+  ;;
+-no-fstab
+  NoFstab="True"
+  ;;
+esac
+done
+
+
+CallFunctions () {
+
+if [ "$RootPart" = "" ]; then
+ GetRootPart
+elif [ "$GrubLocation" = "" ]; then
+ GetGrubLocation
+elif [ "$NoBind" = "" ]; then
+ MountParts
+fi
+
+InstallGrub
+
+if [ "$NoFstab" = "" ]; then
+ ConfigFstab
+fi
+
+if [ "$NoBind" = "" ]; then
+ DisMount
+fi
+
+}
+
+
+CallFunctions
+
+
+GetRootPart () {
+
+## Reset the array 
+PartDriveMenu=("")
+
+Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}')
+
+for i in $Drives; do
+  PartDrive="$i"
+## Get the label of the disk if available
+ Label=$(find /dev/disk/by-label/* -printf %f" "%l\\n | grep "$PartDrive" | awk '{print $1}' | sed -e 's|\\x20| |g')
+
+if [ "$Label" = "" ]; then
+ Label=' '
+else
+ Label="$Label     "
+fi
+
+PartDriveSize=$(grep -m 1 "$i" /proc/partitions | awk '{print $3}')
+## Part Drive Size is in blocks, first we need to convert the blocks to bytes
+## Don't bother with extended partitions
+if [ "$PartDriveSize" != "1" ]; then
+  BlockSize=$(df -P /dev/$PartDrive | grep "blocks" | awk '{print $2}' | awk -F '-' '{print $1}')
+## Multiply blocks by block size to get bytes
+ SizeInBytes=$(($PartDriveSize * $BlockSize))
+## Divide Bytes by 1024 to get Kilobytes
+ SizeInKB=$(($SizeInBytes / 1024))
+## Divide Kilobytes by 1024 to get Megabytes
+ SizeInMB=$(($SizeInKB / 1024))
+## Divide Megabytes by 1024 to get Gigabytes
+ SizeInGB=$(($SizeInMB / 1024))
+## Bash always removes the decimels causing it to round down, this makes it round up.
+ SizeInGB=$(($SizeInGB + 1))
+fi
+if [ "$(echo "$PartDrive" | grep [0-9] )" != "" ]; then
+ if [ "$PartDriveSize" != "1" ]; then
+  if [ "$PartDriveMenu" = "" ]; then
+   PartDriveMenu=("$PartDrive" "$Label" "$SizeInGB" "$SizeInMB")
+  else
+   PartDriveMenu=("${PartDriveMenu[@]}" "$PartDrive" "$Label" "$SizeInGB" "$SizeInMB")
+  fi
+ fi
+fi
+
+RootPart=""
+
+RootPart=$(yad --height="300" --list $Icon $Title --column="Name" --column="Partition Label" --column="Approx. Size in GiB" --column="Approx. Size in MiB" --print-column=1 --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="Please select the root partition of a GRUB2 EFI based distribution." "${PartDriveMenu[@]}")
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GetRootPart
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+ GetRootPart
+ exit 0 
+elif [ "$RootPart" = "" ]; then
+ $Info --text="No partition selected, please retry." --button=$"gtk-ok:1"
+ GetRootPart
+ exit 0
+fi
+
+RootPart=$(echo "$RootPart" | awk -F '|' '{print $1}')
+
+
+
+}
+
+GetRootPart
+
+## Find out where grub is going
+
+GetGrubLocation (){
+
+FileSystemList=""
+GrubLocation=""
+GrubMenu=("")
+
+FileSystemList=$(parted -ls | grep -vi Error | grep -vi Model | grep -vi Sector | grep -vi Partition | grep -vi extended | grep [0-9] | sed -e 's/Disk //g' | awk '{print $1 " " $6}' | awk '{TempVar=""$1""; TempVar2=substr(TempVar,2,3); TempVar3="dev"; if ( TempVar2 == TempVar3 ) { PrintVar = $1; print PrintVar $1 } else { print PrintVar $1 " " $2 } }' | grep [0-9] | sed -e 's/://g' | sed -e 's"/dev/""g' | grep "fat" | awk '{print $1}')
+
+TestMultiple=$(echo $FileSystemList | awk '{print $2}')
+
+
+if [ "$TestMultiple" = "" ]; then
+
+GrubLocation="$FileSystemList"
+
+else
+
+for i in $(echo $FileSystemList); do
+ GrubMenu="$i $GrubMenu"
+done
+
+GrubLocation=$(yad --list $Icon --title="Grub Doctor" --column="Name" --height="300" --width="275" --wrap --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="   Please select where to install grub.   \n" $GrubMenu)
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GetGrubLocation
+   exit 0
+  fi
+elif [ "$ret" = "252" ]; then
+  $Question --text="Are you sure you want to cancel the installation?"
+  if [ "$?" = "0" ]; then
+   exit 0
+  else
+   GetGrubLocation
+   exit 0
+  fi
+elif [ "$GrubLocation" = "" ]; then
+ $Info --text="No location selected, please retry." --button=$"gtk-ok:1"
+ GetGrubLocation
+ exit 0
+fi
+
+GrubLocation=$(echo "$GrubLocation" | awk -F '|' '{print $1}')
+
+fi
+
+if [ "$GrubLocation" = "root" ]; then
+ GrubLocation="/dev/$RootPart"
+else
+ GrubLocation="/dev/$GrubLocation"
+fi
+
+}
+
+MountParts () {
+
+if [ "$NoProgress != "True" ]; then
+
+# Start Progress bar
+tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="     Mounting partitions     \n" &
+
+else
+
+echo "Mounting partitions please wait" 
+
+fi
+
+GrubDir="$(mount | grep $RootPart | awk '{print$3}')"
+
+umount -l "$GrubDir"
+GrubDir="/Target"
+
+## Mount the root directory
+umount -l "/dev/$RootPart"
+sleep 2
+if [ ! -d $GrubDir ]; then
+ mkdir -p $GrubDir
+fi
+mount /dev/$RootPart $GrubDir -o rw
+
+## Check to ensure that the partition was mounted properly.
+
+if [ "$(mount | grep "/dev/$RootPart" | awk '{print $3}')" != "/Target" ]; then
+if [ "$NoProgress != "True" ]; then
+ killall -KILL tail
+ yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Failed to mount $RootPart, please ensure there are no files in use on the partition and then run Grub Doctor again." --button=$"gtk-quit:1"
+else
+echo "Failed to mount $RootPart, please ensure there are no files in use on the partition and then run Grub Doctor again."
+fi
+ exit 0
+fi
+
+## Check the archetecture of host system and root partition matches.
+
+Arch1="$(file /usr/bin/file | awk '{print $3}')"
+Arch2="$(file /Target/usr/bin/file | awk '{print $3}')"
+
+
+if [ "$Arch1" != "$Arch2" ]; then
+if [ "$NoProgress != "True" ]; then
+ killall -KILL tail
+ yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Archetecture of the host system does not match the selected root partition. To restore grub for $RootPart you will need to run Grub Doctor from a $Arch2 system." --button=$"gtk-quit:1"
+else
+echo "Archetecture of the host system does not match the selected root partition. To restore grub for $RootPart you will need to run Grub Doctor from a $Arch2 system."
+fi
+
+umount -l /Target
+exit 0
+fi
+ 
+## Prepare chroot
+mount -o bind /proc $GrubDir/proc
+mount -o bind /dev  $GrubDir/dev
+mount -o bind /sys  $GrubDir/sys
+ 
+mount $GrubLocation /Target/boot/efi
+
+
+}
+
+InstallGrub () {
+
+if [ "$GrubDir" = "/" ]; then
+if [ "$NoProgress" = "True" ]; then 
+ grub-install --no-floppy --force "$GrubLocation"
+ update-grub
+else
+ tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="     Installing and configuring GRUB     \n" &
+ grub-install --no-floppy --force "$GrubLocation"
+ update-grub
+ sleep 2
+ killall -KILL tail
+fi
+
+else
+if [ "$NoProgress" = "True" ]; then 
+ chroot $GrubDir grub-install --force --no-floppy "$GrubLocation"
+ chroot $GrubDir update-grub
+else
+tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="     Installing and configuring GRUB     \n" &
+ chroot $GrubDir grub-install --force --no-floppy "$GrubLocation"
+ chroot $GrubDir update-grub
+ sleep 2
+ killall -KILL tail
+
+
+fi
+
+}
+
+DisMount () {
+
+umount $GrubDir/proc
+umount $GrubDir/dev
+umount $GrubDir/sys
+
+umount -l /Target/boot/efi
+umount -l /Target
+
+}
+
+ConfigFstab () {
+
+}
+
+
+##
+#
+exit 0

@@ -1,0 +1,10 @@
+Package: grub-doctor-uefi
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 93
+Depends: coreutils, findutils, bash, sed, syslinux, util-linux, grub-efi-amd64
+Section: system
+Priority: optional
+Conflicts: grub-doctor
+Description: Boot loader restoration utility for UEFI systems.
