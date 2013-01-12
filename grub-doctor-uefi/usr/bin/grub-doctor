@@ -18,7 +18,7 @@
 ## Copyright 2012 Anthony Nordquist
 
 ## Set some options
-Title="--title=\"Grub Doctor\""
+Title='--title=Grub-Doctor'
 
 Icon="--window-icon=/usr/share/pixmaps/grub-doctor.png"
 
@@ -56,7 +56,8 @@ case "$arg" in
    NoBind="True"
   fi
   ;;
--no-bind)
+-mount-point*)
+  GrubDir=$(echo "$arg" | awk -F '=' '{print $2}')
   NoBind="True"
   ;;
 -no-progress)
@@ -76,7 +77,9 @@ if [ "$RootPart" = "" ]; then
 elif [ "$GrubLocation" = "" ]; then
  GetGrubLocation
 elif [ "$NoBind" = "" ]; then
- MountParts
+ if [ "$(mount | grep "/dev/$RootPart" | awk '{print $3}')" != "/" ]; then
+  MountParts
+ fi
 fi
 
 InstallGrub
@@ -193,7 +196,7 @@ for i in $(echo $FileSystemList); do
  GrubMenu="$i $GrubMenu"
 done
 
-GrubLocation=$(yad --list $Icon --title="Grub Doctor" --column="Name" --height="300" --width="275" --wrap --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="   Please select where to install grub.   \n" $GrubMenu)
+GrubLocation=$(yad --list $Icon --title="Grub Doctor" --column="Name" --height="300" --width="275" --wrap --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="   Please select the efi partition.   \n" $GrubMenu)
 
 ret="$?"
 
@@ -223,11 +226,9 @@ GrubLocation=$(echo "$GrubLocation" | awk -F '|' '{print $1}')
 
 fi
 
-if [ "$GrubLocation" = "root" ]; then
- GrubLocation="/dev/$RootPart"
-else
- GrubLocation="/dev/$GrubLocation"
-fi
+
+GrubLocation2=$(echo "/dev/$GrubLocation" | sed "s|[1-9]||g") 
+
 
 }
 
@@ -236,7 +237,7 @@ MountParts () {
 if [ "$NoProgress != "True" ]; then
 
 # Start Progress bar
-tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="     Mounting partitions     \n" &
+tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="          Mounting partitions          \n" &
 
 else
 
@@ -244,9 +245,6 @@ echo "Mounting partitions please wait"
 
 fi
 
-GrubDir="$(mount | grep $RootPart | awk '{print$3}')"
-
-umount -l "$GrubDir"
 GrubDir="/Target"
 
 ## Mount the root directory
@@ -259,7 +257,7 @@ mount /dev/$RootPart $GrubDir -o rw
 
 ## Check to ensure that the partition was mounted properly.
 
-if [ "$(mount | grep "/dev/$RootPart" | awk '{print $3}')" != "/Target" ]; then
+if [ "$(mount | grep "/dev/$RootPart" | awk '{print $3}')" != "/$GrubDir" ]; then
 if [ "$NoProgress != "True" ]; then
  killall -KILL tail
  yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Failed to mount $RootPart, please ensure there are no files in use on the partition and then run Grub Doctor again." --button=$"gtk-quit:1"
@@ -272,7 +270,7 @@ fi
 ## Check the archetecture of host system and root partition matches.
 
 Arch1="$(file /usr/bin/file | awk '{print $3}')"
-Arch2="$(file /Target/usr/bin/file | awk '{print $3}')"
+Arch2="$(file /$GrubDir/usr/bin/file | awk '{print $3}')"
 
 
 if [ "$Arch1" != "$Arch2" ]; then
@@ -283,7 +281,7 @@ else
 echo "Archetecture of the host system does not match the selected root partition. To restore grub for $RootPart you will need to run Grub Doctor from a $Arch2 system."
 fi
 
-umount -l /Target
+umount -l /$GrubDir
 exit 0
 fi
  
@@ -292,7 +290,7 @@ mount -o bind /proc $GrubDir/proc
 mount -o bind /dev  $GrubDir/dev
 mount -o bind /sys  $GrubDir/sys
  
-mount $GrubLocation /Target/boot/efi
+mount $GrubLocation /$GrubDir/boot/efi
 
 
 }
@@ -313,17 +311,22 @@ fi
 
 else
 if [ "$NoProgress" = "True" ]; then 
- chroot $GrubDir grub-install --force --no-floppy "$GrubLocation"
+ chroot $GrubDir grub-install --force --no-floppy "$GrubLocation2"
  chroot $GrubDir update-grub
 else
 tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="     Installing and configuring GRUB     \n" &
- chroot $GrubDir grub-install --force --no-floppy "$GrubLocation"
+ chroot $GrubDir grub-install --force --no-floppy "$GrubLocation2"
  chroot $GrubDir update-grub
  sleep 2
  killall -KILL tail
 
 
 fi
+
+mkdir -p /$GrubDir/boot/efi/efi/boot
+cp -f "/usr/lib/grub-doctor-uefi/MokManager.efi" /$GrubDir/boot/efi/efi/boot
+cp -f "/usr/lib/grub-doctor-uefi/bootx64.efi" /$GrubDir/boot/efi/efi/boot
+cp -f "/boot/efi/efi/debian/grubx64.efi" /$GrubDir/boot/efi/efi/boot
 
 }
 
@@ -333,8 +336,8 @@ umount $GrubDir/proc
 umount $GrubDir/dev
 umount $GrubDir/sys
 
-umount -l /Target/boot/efi
-umount -l /Target
+umount -l /$GrubDir/boot/efi
+umount -l /$GrubDir
 
 }
 
