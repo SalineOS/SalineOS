@@ -27,34 +27,177 @@ else
  . /etc/procurator/Translations/en_US
 fi
 
-Info='yad --center --window-icon=kvm --title=Procurator'
+Icon='--window-icon=kvm'
 
-Question='yad  --wrap --center --image=gtk-dialog-question --button=gtk-no:1 --button=gtk-yes:0 --title=Procurator --window-icon=kvm'
-
-SingleMenu='yad  --center --list --column="Please choose one." --title=Procurator --window-icon=kvm'
-
-Menu='yad  --center --list --title=Procurator --window-icon=kvm --print-column=1'
-
-Progress='yad --center --progress --auto-close --title=Procurator --no-buttons --window-icon=kvm'
-
-TextEntry='yad --center --entry --title=Procurator --window-icon=kvm'
-
-
+Title='--title=Procurator'
 
 Input="$1"
 ISOName="$2"
 
 mkdir -p $HOME/.procurator/disks
 mkdir -p $HOME/.procurator/notes
+mkdir -p $HOME/.procurator/config
 
+MainMenu () {
+
+MainMenuArray=("")
+Operation=""
+
+MainMenuArray=( "Boot Existing" "$MMBDISK" "Boot ISO" "$MMBISO" "Create New" "$MMCREATENEW" "Delete Drive" "$MMDELETEDRIVE" "Modify Config" "$MMMODIFYCONFIG" "Rename Drive" "$MMRENAME" )
+
+Selection=$(yad --list --always-print-result --column="Action" --column="Description" --print-column="1" $Icon $Title --width="400" --height="300" --button=$"gtk-help:5" --button=$"gtk-quit:3" --button=$"gtk-ok:1" "${MainMenuArray[@]}")
+
+ret="$?"
+
+Selection="$(echo "$Selection" | awk -F '|' '{print $1}')"
+
+if [ "$ret" = "3" ]; then
+ exit 0
+elif [ "$ret" = "5" ]; then
+ DisplayHelp
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Boot Existing" ]; then
+ Operation="Boot"
+ SelectDrive
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Boot ISO" ]; then
+ Operation="ISO"
+ SelectISO
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Create New" ]; then
+ CreateNewDisk
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Delete Drive" ]; then
+ Operation="Delete"
+ SelectDrive
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Modify Config" ]; then
+ Operation="Modify"
+ SelectDrive
+ MainMenu
+ exit 0
+fi
+
+
+}
+
+ParseOptions () {
+
+if [ ! -f "$HOME/.procurator/config/$Disk" ]; then
+ WriteConfig
+fi
+
+
+RamSize=$(grep -B -0 'RamSize=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
+
+VideoOutput=$(grep -B -0 'VideoOutput=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
+
+
+VideoDriver=$(grep -B -0 'VideoDriver=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
+
+DiskDriver=$(grep -B -0 'DiskDriver=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
+
+TabletMode=$(grep -B -0 'TabletMode=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
+
+FullScreen=$(grep -B -0 'FullScreen=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
+
+BlueTooth=$(grep -B -0 'BlueTooth=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
+
+}
+
+
+
+ChangeOptions () {
+
+## Use the parse options function to get initial values
+ParseOptions
+
+## Construct proper arrays for yad form
+## Video output
+OutputArray=( "$VideOutput"!"sdl"!"spice" )
+
+## Memory size
 SystemRam=$(free -m | grep 'Mem' | awk '{print $2}')
+RamForArray=$(($SystemRam / 4))
+RamArray=( "$RamSize"!"$RamForArray"!"128"!"256"!"512"!"1024"!"2048"!"3072"!"4096" )
 
-RamSize=$(($SystemRam / 2))
+## VideoDriver
+DriverArray=( "$VideoDriver"!"cirrus"!"std"!"vmware"!"qxl" )
+
+## Disk Driver
+DiskDriverArray=( "$DiskDriver"!"ide"!"virtio" )
+
+SelectedOptions=$(yad --always-print-result $Icon $Title --form --text="               $OPTIONSDIALOGTEXT $Disk                \n" --field="$MEMORYFIELD:CB" --field="$DISKDRIVERFIELD:CB" --field="$VIDEOFIELD:CB" --field="$VDRIVERFIELD:CB" --field="$FULLSCREEN:CHK" --field="$TABLETMODE:CHK" --field="$BLUETOOTH:CHK" "${RamArray[@]}" "${DiskDriverArray[@]}" "${OutputArray[@]}" "${DriverArray[@]}" "$FullScreen" "$TabletMode" "$BlueTooth") 
+
+RamSize="$(echo "$SelectedOptions" | awk -F '|' '{print $1}')"
+DiskDriver="$(echo "$SelectedOptions" | awk -F '|' '{print $2}')"
+VideoOutput="$(echo "$SelectedOptions" | awk -F '|' '{print $3}')"
+VideoDriver="$(echo "$SelectedOptions" | awk -F '|' '{print $4}')"
+FullScreen="$(echo "$SelectedOptions" | awk -F '|' '{print $5}')"
+TabletMode="$(echo "$SelectedOptions" | awk -F '|' '{print $6}')"
+BlueTooth="$(echo "$SelectedOptions" | awk -F '|' '{print $7}')"
+
+WriteConfig
+
+}
+
+WriteConfig () {
+
+if [ -f "$HOME/.procurator/config/$Disk" ]; then
+ rm "$HOME/.procurator/config/$Disk"
+fi
+
+if [ "$RamSize" = "" ]; then
+ SystemRam=$(free -m | grep 'Mem' | awk '{print $2}')
+ RamSize=$(($SystemRam / 4))
+fi
+
+if [ "$DiskDriver" = "" ]; then
+ DiskDriver="ide"
+fi
+
+if [ "$VideoOutput" = "" ]; then
+ VideoOutput="sdl"
+fi
+
+if [ "$VideoDriver" = "" ]; then
+ VideoDriver="cirrus"
+fi
+
+if [ "$FullScreen" = "" ]; then
+ FullScreen="FALSE"
+fi
+
+if [ "$TabletMode" = "" ]; then
+ TabletMode="FALSE"
+fi
+
+if [ "$BlueTooth" = "" ]; then
+ BlueTooth="FALSE"
+fi
+
+cat > "$HOME/.procurator/config/$Disk" <<FOO
+RamSize=$RamSize
+DiskDriver=$DiskDriver
+VideoOutput=$VideoOutput
+VideoDriver=$VideoDriver
+FullScreen=$FullScreen
+TabletMode=$TabletMode
+BlueTooth=$BlueTooth
+
+FOO
+
+}
 
 
 NameDisk () {
 
-NewDiskName=$(yad --entry --window-icon=kvm --width=250 --wrap --title="Procurator" --text="$ENTERNAME" --button=$"gtk-ok:2")
+NewDiskName=$(yad --entry $Icon $Title --width=250 --wrap --text="$ENTERNAME" --button=$"gtk-ok:2")
 
 ret="$?"
 
@@ -67,7 +210,7 @@ elif [ "$NewDiskName" = "" ]; then
 fi
 
 if [ -f "$HOME/.procurator/disk/$NewDiskName" ]; then
- $Question --text="$FILEEXISTS"
+ yad $Title $Icon --text="$FILEEXISTS" --button=$"gtk-no:0" --button=$"gtk-yes:1"
  if [ "$?" != "0" ]; then
   NameDisk
   exit 0
@@ -83,18 +226,18 @@ fi
 
 if [ "$NewDiskNotes" != "" ]; then
  echo "$NewDiskNotes">>"$HOME/.procurator/notes/$NewDiskName"
+else
+ echo "Disk created on $(date +%Y%m%d-%H%M)">>"$HOME/.procurator/notes/$NewDiskName"
 fi
 
 
 
-kvm-img create -f qcow2 -o size="$NewDiskSize"M,preallocation=metadata,cluster_size=2M $HOME/.procurator/disks/"$NewDiskName"
+qemu-img create -f raw -o size="$NewDiskSize"M,cluster_size=2M $HOME/.procurator/disks/"$NewDiskName"
 
 
-$Info --text="Creation of $NewDiskName complete." --button=$"gtk-ok:1"
+Disk="$NewDiskName"
 
-
-MainMenu
-exit 0
+ChangeOptions
 
 }
 
@@ -116,7 +259,7 @@ elif [ "$ret" = "3" ]; then
  MainMenu
  exit 0
 elif [ "$NewDiskSize" = "Custom" ]; then
- NewDiskSize=$(yad --entry --width=250 --window-icon=kvm --wrap --title="Procurator" --text="$ENTERSIZE" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
+ NewDiskSize=$(yad --entry --width=250 $Icon --wrap $Title --text="$ENTERSIZE" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")
 
  ret="$?"
 
@@ -140,12 +283,41 @@ NameDisk
 }
 
 
-MainMenu () {
+SelectISO () {
+
+BootISO="$(yad $Title $Icon --width="500" --height="450" --file --text="                    $SELECTISOTEXT                    \n" --file-filter="*.iso" --filename="$HOME/*" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$BootISO" = "" ]; then
+ yad $Icon $Title --wrap --width="250" --text="$NOBOOTISO" --button=$"gtk-ok:1"
+ MainMenu
+ exit 0
+fi
+
+SelectDrive
+
+}
+
+DisplayHelp () {
+
+yad --wrap --width=250 --title="Procurator Help" --text="$HELPTEXT" --button=$"gtk-ok:1"
+
+}
+
+
+SelectDrive () {
 
 Menu=""
 
 for i in $(ls $HOME/.procurator/disks); do
- Disk="$i"
+ TempDisk="$i"
  DiskSize=$(du -c --apparent-size "$HOME/.procurator/disks/$i" | grep "total" | awk '{print $1}')
  DiskSize=$(($DiskSize / 1024))
  DiskSize="$DiskSize"M
@@ -155,9 +327,118 @@ else
  Note="None"
 fi
  if [ "$Menu" = "" ]; then
-  Menu=( "$Disk" "$DiskSize" "$Note" )
+  Menu=( "$TempDisk" "$DiskSize" "$Note" )
  else
-  Menu=( "${Menu[@]}" "$Disk" "$DiskSize" "$Note" )
+  Menu=( "${Menu[@]}" "$TempDisk" "$DiskSize" "$Note" )
+ fi
+done
+
+Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
+
+ret="$?"
+
+Disk=$(echo "$Selection" | awk -F '|' '{print $1}')
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0 
+elif [ "$ret" = "3" ]; then
+ DisplayHelp
+ SelectDrive
+ exit 0
+elif [ "$ret" = "7" ]; then
+ CreateNewDisk
+ SelectDrive
+ exit 0
+elif [ "$ret" = "5" ]; then
+ MainMenu
+ exit 0
+fi
+
+if [ "$Operation" = "Boot" ]; then
+if [ "$Disk" = "" ]; then
+ SelectDrive
+ exit 0
+fi
+ BootDrive
+ exit 0
+elif [ "$Operation" = "Modify" ]; then
+if [ "$Disk" = "" ]; then
+ SelectDrive
+ exit 0
+fi
+ ChangeOptions
+ exit 0
+elif [ "$Operation" = "ISO" ]; then
+ BootDrive
+ exit 0
+elif [ "$Operation" = "Delete" ]; then
+if [ "$Disk" = "" ]; then
+ SelectDrive
+ exit 0
+fi
+ DeleteDisk
+ exit 0
+fi
+
+
+}
+
+
+BootDrive () {
+
+## Get options
+ParseOptions
+
+## Determine the number of processor cores
+Cores=$(cat /proc/cpuinfo | grep 'processor' | tail --lines=1 | awk -F ': ' '{print $2}')
+Cores=$(($Cores + 1))
+
+## Determine if we have an ISO to boot
+if [ "$BootISO" = "" ]; then
+ BootISO=$(echo "/dev/cdrom")
+fi
+
+## Force QXL if we are using spice
+if [ "$VideoOutput" = "spice" ]; then
+ VideoDriver="qxl"
+fi
+
+if [ "$Disk" != "" ]; then
+ HardDisk=$(echo "-drive file="$HOME/.procurator/disks/$Disk",cache=none,media=disk,if=$DiskDriver")
+elif [ "$TabletMode" = "TRUE" ]; then
+ EnableTablet=$(echo "-tablet")
+elif [ "$FullScreen" = "TRUE" ]; then
+ EnableFullScreen=$(echo "-full-screen")
+elif [ "$BlueTooth" = "TRUE" ]; then
+ EnableBlueTooth=$(echo "-bt hci")
+fi
+
+kvm $EnableTablet $EnableFullScreen $EnableBlueTooth -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO $HardDisk
+
+
+}
+
+
+
+MainMenu4 () {
+
+Menu=""
+
+for i in $(ls $HOME/.procurator/disks); do
+ TempDisk="$i"
+ DiskSize=$(du -c --apparent-size "$HOME/.procurator/disks/$i" | grep "total" | awk '{print $1}')
+ DiskSize=$(($DiskSize / 1024))
+ DiskSize="$DiskSize"M
+if [ -f $HOME/.procurator/notes/$i ]; then
+ Note=$(cat "$HOME/.procurator/notes/$i")
+else
+ Note="None"
+fi
+ if [ "$Menu" = "" ]; then
+  Menu=( "$TempDisk" "$DiskSize" "$Note" )
+ else
+  Menu=( "${Menu[@]}" "$TempDisk" "$DiskSize" "$Note" )
  fi
 done
 
@@ -242,9 +523,9 @@ elif [ "$ret" = "9" ]; then
   exit 0
  fi
 if [ -a /dev/cdrom ]; then
-kvm  -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97  -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -cdrom /dev/cdrom
+kvm  -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97  -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -cdrom /dev/cdrom -name $Selection
 else
-kvm -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97 -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk
+kvm -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97 -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -name $Selection
 fi
  
 

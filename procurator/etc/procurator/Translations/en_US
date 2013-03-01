@@ -1,4 +1,36 @@
+export SELECTISOTEXT="Select the ISO you wish to boot"
+
+export OPTIONSDIALOGTEXT="Configure Settings For"
+
+export MEMORYFIELD="Virtual memory size"
+
+export DISKDRIVERFIELD="Driver used for virtual disk access"
+
+export VIDEOFIELD="Output video through"
+
+export VDRIVERFIELD="Video driver"
+
+export TABLETMODE="Enable tablet mode?"
+
+export FULLSCREEN="Start video output in fullscreen" 
+
+export BLUETOOTH="Enable bluetooth support \(Linux guests only, requires bluez\)"
+
+export MMBDISK="Boot an existing virtual disk"
+
+export MMBISO="Boot an ISO file, optionally with access to a virtual drive"
+
+export MMMODIFYCONFIG="Modify the settings used to boot a virtual drive"
+
+export MMCREATENEW="Create a new virtual drive"
+
+export MMDELETEDRIVE="Delete a virtual drive from your system"
+
+export MMRENAME="Rename an existing virtual disk"
+
 export ENTERNAME="Enter the desired name of the virtual disk, do not use spaces or special characters."
+
+export NOBOOTISO="No ISO selected for boot, press ok to return to the main menu." 
 
 export FILEEXISTS="File exists, would you like to overwrite the contents?"
 
@@ -20,7 +52,7 @@ export DELSELECTED="Delete Selected"
 
 export CREATENEW="Create New"
 
-export HELPTEXT="This program will allow you to create and manage virtual disks for use with KVM (Kernel Virtual Machine), which is included with SalineOS. Virtual machines allow you to run one operating system like a program within another. Virtual disks are specialized files, which can be mounted (Accessed), formated to various filesystems and installed to within a virtual machine. Procurator is a very simple program, with few features, solely meant to be used for creating, deleting and allowing you to use virtual disks easily with KVM.\n\nIn order to use KVM you must have a CPU or APU with virtualization support. You may also have to enable virtualization support in your computer's bios before using this utility. To boot an ISO file with access to any of the virtual disks, simply right click on the .iso from within Thunar and select Boot with KVM from the menu.\n\nProcurator will always launch KVM with access to a cdrom device if possible.  If you select an ISO and launch Procurator through the custom action, then the .iso file will be mounted as a loop device and appear inside the virtual machine as /dev/cdrom under Linux and D: under Windows. If no .iso file is used, then procurator will allow your virtual machine access to the host systems cd/dvd drive if available. Within the running KVM window, your virtual disk will appear as /dev/sda under Linux, and as the C: drive in Windows."
+export HELPTEXT="This program will allow you to create and manage virtual disks for use with KVM \(Kernel Virtual Machine\), which is included with SalineOS. Virtual machines allow you to run one operating system like a program within another. Virtual disks are specialized files, which can be mounted \(Accessed\), formated to various filesystems and installed to within a virtual machine. Procurator is a very simple program, with few features, solely meant to be used for creating, deleting and allowing you to use virtual disks easily with KVM.\n\nIn order to use KVM you must have a CPU or APU with virtualization support. You may also have to enable virtualization support in your computer\'s bios before using this utility. To boot an ISO file with access to any of the virtual disks, simply right click on the .iso from within Thunar and select Boot with KVM from the menu.\n\nProcurator will always launch KVM with access to a cdrom device if possible.  If you select an ISO and launch Procurator through the custom action, then the .iso file will be mounted as a loop device and appear inside the virtual machine as /dev/cdrom under Linux and D: under Windows. If no .iso file is used, then procurator will allow your virtual machine access to the host systems cd/dvd drive if available. Within the running KVM window, your virtual disk will appear as /dev/sda under Linux, and as the C: drive in Windows."
 
 export NODISK="No disk was selected for deletion."
 
