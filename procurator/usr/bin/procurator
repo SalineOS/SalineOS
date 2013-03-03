@@ -34,18 +34,24 @@ Title='--title=Procurator'
 Input="$1"
 ISOName="$2"
 
+## Ensure needed directories exist
 mkdir -p $HOME/.procurator/disks
 mkdir -p $HOME/.procurator/notes
 mkdir -p $HOME/.procurator/config
 
+
 MainMenu () {
 
+
+## Reset variables
 MainMenuArray=("")
 Operation=""
+BootISO=""
+Disk=""
 
-MainMenuArray=( "Boot Existing" "$MMBDISK" "Boot ISO" "$MMBISO" "Create New" "$MMCREATENEW" "Delete Drive" "$MMDELETEDRIVE" "Modify Config" "$MMMODIFYCONFIG" "Rename Drive" "$MMRENAME" )
+MainMenuArray=( "Boot Existing" "$MMBDISK" "Boot ISO" "$MMBISO" "Clone Drive" "$MMCLONE" "Create New" "$MMCREATENEW" "Delete Drive" "$MMDELETEDRIVE" "Import .vmdk" "$MMIMPORT" "Modify Config" "$MMMODIFYCONFIG" "Rename Drive" "$MMRENAME" )
 
-Selection=$(yad --list --always-print-result --column="Action" --column="Description" --print-column="1" $Icon $Title --width="400" --height="300" --button=$"gtk-help:5" --button=$"gtk-quit:3" --button=$"gtk-ok:1" "${MainMenuArray[@]}")
+Selection=$(yad --list --always-print-result --column="Action" --column="Description" --print-column="1" $Icon $Title --width="600" --height="350" --button=$"gtk-help:5" --button=$"gtk-quit:3" --button=$"gtk-ok:1" "${MainMenuArray[@]}")
 
 ret="$?"
 
@@ -59,6 +65,20 @@ elif [ "$ret" = "5" ]; then
  exit 0
 elif [ "$Selection" = "Boot Existing" ]; then
  Operation="Boot"
+ SelectDrive
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Clone Existing" ]; then
+ Operation="Clone"
+ SelectDrive
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Import .vmdk" ]; then
+ SelectVMDK
+ MainMenu
+ exit 0
+elif [ "$Selection" = "Rename Drive" ]; then
+ Operation="Rename"
  SelectDrive
  MainMenu
  exit 0
@@ -86,7 +106,9 @@ fi
 
 }
 
+
 ParseOptions () {
+
 
 if [ ! -f "$HOME/.procurator/config/$Disk" ]; then
  WriteConfig
@@ -108,22 +130,23 @@ FullScreen=$(grep -B -0 'FullScreen=' "$HOME/.procurator/config/$Disk" | awk -F 
 
 BlueTooth=$(grep -B -0 'BlueTooth=' "$HOME/.procurator/config/$Disk" | awk -F '=' '{print $2}')
 
+
 }
 
 
-
 ChangeOptions () {
+
 
 ## Use the parse options function to get initial values
 ParseOptions
 
 ## Construct proper arrays for yad form
 ## Video output
-OutputArray=( "$VideOutput"!"sdl"!"spice" )
+OutputArray=( "$VideoOutput"!"sdl"!"spice" )
 
 ## Memory size
 SystemRam=$(free -m | grep 'Mem' | awk '{print $2}')
-RamForArray=$(($SystemRam / 4))
+RamForArray=$(($SystemRam / 3))
 RamArray=( "$RamSize"!"$RamForArray"!"128"!"256"!"512"!"1024"!"2048"!"3072"!"4096" )
 
 ## VideoDriver
@@ -144,9 +167,12 @@ BlueTooth="$(echo "$SelectedOptions" | awk -F '|' '{print $7}')"
 
 WriteConfig
 
+
 }
 
+
 WriteConfig () {
+
 
 if [ -f "$HOME/.procurator/config/$Disk" ]; then
  rm "$HOME/.procurator/config/$Disk"
@@ -154,7 +180,7 @@ fi
 
 if [ "$RamSize" = "" ]; then
  SystemRam=$(free -m | grep 'Mem' | awk '{print $2}')
- RamSize=$(($SystemRam / 4))
+ RamSize=$(($SystemRam / 3))
 fi
 
 if [ "$DiskDriver" = "" ]; then
@@ -192,10 +218,12 @@ BlueTooth=$BlueTooth
 
 FOO
 
+
 }
 
 
 NameDisk () {
+
 
 NewDiskName=$(yad --entry $Icon $Title --width=250 --wrap --text="$ENTERNAME" --button=$"gtk-ok:2")
 
@@ -232,17 +260,19 @@ fi
 
 
 
-qemu-img create -f raw -o size="$NewDiskSize"M,cluster_size=2M $HOME/.procurator/disks/"$NewDiskName"
+qemu-img create -f raw -o size="$NewDiskSize"M $HOME/.procurator/disks/"$NewDiskName"
 
 
 Disk="$NewDiskName"
 
 ChangeOptions
 
+
 }
 
 
 CreateNewDisk () {
+
 
 NewDiskSize=""
 
@@ -277,15 +307,16 @@ elif [ "$NewDiskSize" = "Custom" ]; then
 fi
 
 
-
 NameDisk
+
 
 }
 
 
 SelectISO () {
 
-BootISO="$(yad $Title $Icon --width="500" --height="450" --file --text="                    $SELECTISOTEXT                    \n" --file-filter="*.iso" --filename="$HOME/*" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")"
+
+BootISO="$(yad $Title $Icon --width="725" --height="525" --file --text="                    $SELECTISOTEXT                    \n" --file-filter="*.iso" --filename="$HOME/*" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")"
 
 ret="$?"
 
@@ -296,18 +327,91 @@ elif [ "$ret" = "3" ]; then
  MainMenu
  exit 0
 elif [ "$BootISO" = "" ]; then
- yad $Icon $Title --wrap --width="250" --text="$NOBOOTISO" --button=$"gtk-ok:1"
+ yad $Icon $Title --wrap --width="250" --text="$NOBOOTISO \n" --button=$"gtk-ok:1"
  MainMenu
  exit 0
 fi
 
 SelectDrive
 
+
 }
+
+
+SelectVMDK () {
+
+
+ToImport="$(yad $Title $Icon --width="725" --height="525" --file --text="                    $SELECTVMDK                    \n" --file-filter="*.vmdk" --filename="$HOME/*" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")"
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ToImport" = "" ]; then
+ yad $Icon $Title --wrap --width="250" --text="$NOIMPORTSELECTED \n" --button=$"gtk-ok:1"
+ MainMenu
+ exit 0
+fi
+
+NewDiskName=$(echo "$ToImport" | awk -F '/' '{print $NF}')
+
+ImportNotes
+
+
+}
+
+
+ImportNotes () {
+
+
+NewDiskNotes=$(yad --entry --width=250 --wrap $Icon $Title --text="$NOTES" --button=$"gtk-ok:2")
+
+if [ -f "$HOME/.procurator/notes/$NewDiskName" ]; then
+ rm -rf "$HOME/.procurator/notes/$NewDiskName"
+fi
+
+if [ "$NewDiskNotes" != "" ]; then
+ echo "$NewDiskNotes">>"$HOME/.procurator/notes/$NewDiskName"
+else
+ echo "Drive imported on $(date +%Y%m%d-%H%M)">>"$HOME/.procurator/notes/$NewDiskName"
+fi
+
+
+## Change options first so we can use existing functions and return to main menu when finished
+ChangeOptions
+ImportDrive
+
+
+}
+
+
+ImportDrive () {
+
+
+tail -f /usr/bin/procurator | yad $Icon $Title --progress --pulsate --auto-close --text="          Importing $ToImport          /n" --no-buttons &
+
+cp -f "$ToImport" $HOME/.procurator/disks
+
+TailPID=$(pgrep -f "tail -f /usr/bin/procurator")
+
+kill $TailPID
+
+MainMenu
+exit 0
+
+
+}
+
 
 DisplayHelp () {
 
+
 yad --wrap --width=250 --title="Procurator Help" --text="$HELPTEXT" --button=$"gtk-ok:1"
+
 
 }
 
@@ -333,7 +437,7 @@ fi
  fi
 done
 
-Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
+Selection=$(yad --width="500" --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
 
 ret="$?"
 
@@ -356,29 +460,27 @@ elif [ "$ret" = "5" ]; then
 fi
 
 if [ "$Operation" = "Boot" ]; then
-if [ "$Disk" = "" ]; then
- SelectDrive
- exit 0
-fi
+ if [ "$Disk" = "" ]; then
+  SelectDrive
+  exit 0
+ fi
  BootDrive
  exit 0
 elif [ "$Operation" = "Modify" ]; then
-if [ "$Disk" = "" ]; then
- SelectDrive
- exit 0
-fi
+ if [ "$Disk" = "" ]; then
+  SelectDrive
+  exit 0
+ fi
  ChangeOptions
- exit 0
 elif [ "$Operation" = "ISO" ]; then
+ echo "This is Running"
  BootDrive
- exit 0
 elif [ "$Operation" = "Delete" ]; then
-if [ "$Disk" = "" ]; then
- SelectDrive
- exit 0
-fi
+ if [ "$Disk" = "" ]; then
+  SelectDrive
+  exit 0
+ fi
  DeleteDisk
- exit 0
 fi
 
 
@@ -387,14 +489,55 @@ fi
 
 BootDrive () {
 
-## Get options
-ParseOptions
+
+## Get options if needed
+if [ "$Disk" != "" ]; then
+ ParseOptions
+fi
+
+## If we are just booting an ISO set the needed options manually
+if [ "$RamSize" = "" ]; then
+ SystemRam=$(free -m | grep 'Mem' | awk '{print $2}')
+ RamSize=$(($SystemRam / 3))
+fi
+
+if [ "$DiskDriver" = "" ]; then
+ DiskDriver="ide"
+fi
+
+if [ "$VideoOutput" = "" ]; then
+ VideoOutput="sdl"
+fi
+
+if [ "$VideoDriver" = "" ]; then
+ VideoDriver="cirrus"
+fi
+
+if [ "$FullScreen" = "" ]; then
+ FullScreen="FALSE"
+fi
+
+if [ "$TabletMode" = "" ]; then
+ TabletMode="FALSE"
+fi
+
+if [ "$BlueTooth" = "" ]; then
+ BlueTooth="FALSE"
+fi
 
 ## Determine the number of processor cores
 Cores=$(cat /proc/cpuinfo | grep 'processor' | tail --lines=1 | awk -F ': ' '{print $2}')
 Cores=$(($Cores + 1))
 
-## Determine if we have an ISO to boot
+## Set the window title for QEMU depending on if we are booting an ISO or a DISK
+if [ "$BootISO" != "" ]; then
+ ISOName="$(echo "$BootISO" | awk -F '/' '{print $NF}')"
+ SetName=( "-name" "$ISOName" )
+else
+ SetName=( "-name" "$Disk" )
+fi
+
+## Use /dev/cdrom if no ISO is specified
 if [ "$BootISO" = "" ]; then
  BootISO=$(echo "/dev/cdrom")
 fi
@@ -405,20 +548,30 @@ if [ "$VideoOutput" = "spice" ]; then
 fi
 
 if [ "$Disk" != "" ]; then
- HardDisk=$(echo "-drive file="$HOME/.procurator/disks/$Disk",cache=none,media=disk,if=$DiskDriver")
-elif [ "$TabletMode" = "TRUE" ]; then
- EnableTablet=$(echo "-tablet")
-elif [ "$FullScreen" = "TRUE" ]; then
- EnableFullScreen=$(echo "-full-screen")
-elif [ "$BlueTooth" = "TRUE" ]; then
- EnableBlueTooth=$(echo "-bt hci")
+ HardDisk=( "-drive" "file="$HOME/.procurator/disks/$Disk",cache=none,media=disk,if=$DiskDriver" )
 fi
 
-kvm $EnableTablet $EnableFullScreen $EnableBlueTooth -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO $HardDisk
+if [ "$TabletMode" = "TRUE" ]; then
+ EnableTablet=( "-tablet" )
+fi
+
+if [ "$FullScreen" = "TRUE" ]; then
+ EnableFullScreen=( "-full-screen" )
+fi
+
+if [ "$BlueTooth" = "TRUE" ]; then
+ EnableBlueTooth=( "-bt hci" )
+fi
+
+## Just a bit of debugging information
+echo "These are the options being sent to KVM "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -cpu host -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO $HardDisk"
+
+kvm "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -boot order=dc -m $RamSize -smp $Cores -cpu host -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO "${HardDisk[@]}"
+
+MainMenu
 
 
 }
-
 
 
 MainMenu4 () {
