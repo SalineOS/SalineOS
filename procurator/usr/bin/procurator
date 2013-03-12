@@ -45,6 +45,7 @@ MainMenu () {
 
 ## Reset variables
 MainMenuArray=("")
+NewDiskName=""
 Operation=""
 BootISO=""
 Disk=""
@@ -66,9 +67,8 @@ elif [ "$ret" = "5" ]; then
 elif [ "$Selection" = "Boot Existing" ]; then
  Operation="Boot"
  SelectDrive
- MainMenu
  exit 0
-elif [ "$Selection" = "Clone Existing" ]; then
+elif [ "$Selection" = "Clone Drive" ]; then
  Operation="Clone"
  SelectDrive
  MainMenu
@@ -88,6 +88,7 @@ elif [ "$Selection" = "Boot ISO" ]; then
  MainMenu
  exit 0
 elif [ "$Selection" = "Create New" ]; then
+ Operation="Create"
  CreateNewDisk
  MainMenu
  exit 0
@@ -232,6 +233,7 @@ ret="$?"
 NewDiskName=$(echo "$NewDiskName" | sed -e 's| ||g')
 
 if [ "$ret" = "252" ]; then
+ MainMenu
  exit 0
 elif [ "$NewDiskName" = "" ]; then
  NewDiskName=$(date +%Y%m%d-%H%M)
@@ -246,7 +248,7 @@ if [ -f "$HOME/.procurator/disk/$NewDiskName" ]; then
 fi
 
 
-NewDiskNotes=$(yad --entry --width=250 --wrap --window-icon=kvm --title="Procurator" --text="$NOTES" --button=$"gtk-ok:2")
+NewDiskNotes=$(yad --entry --width=250 --wrap $Icon $Title --text="$NOTES" --button=$"gtk-ok:2")
 
 if [ -f "$HOME/.procurator/notes/$NewDiskName" ]; then
  rm -rf "$HOME/.procurator/notes/$NewDiskName"
@@ -259,13 +261,71 @@ else
 fi
 
 
+if [ "$Operation" = "Create" ]; then
+ qemu-img create -f raw -o size="$NewDiskSize"M $HOME/.procurator/disks/"$NewDiskName"
+ Disk="$NewDiskName"
+ ChangeOptions
+elif [ "$Operation" = "Rename" ]; then
+ mv -f "$HOME/.procurator/disks/$Disk" "$HOME/.procurator/disks/$NewDiskName"
+ mv -f "$HOME/.procurator/config/$Disk" "$HOME/.procurator/config/$NewDiskName"
+ rm -rf "$HOME/.procurator/notes/$Disk"
+ MainMenu
+ exit 0
+elif [ "$Operation" = "Clone" ]; then
+ CloneDrive
+ MainMenu
+ exit 0
+fi
 
-qemu-img create -f raw -o size="$NewDiskSize"M $HOME/.procurator/disks/"$NewDiskName"
+
+}
 
 
-Disk="$NewDiskName"
+CloneDrive () {
 
-ChangeOptions
+
+tail -f /usr/bin/procurator | yad --progress --pulsate $Title $Icon --auto-close --text="            Cloning $Disk to $NewDiskName            \n" &
+
+cp -f "$HOME/.procurator/disks/$Disk" "$HOME/.procurator/disks/$NewDiskName"
+cp -f "$HOME/.procurator/config/$Disk" "$HOME/.procurator/config/$NewDiskName"
+
+TailPID=$(pgrep -f "tail -f /usr/bin/procurator")
+
+sleep 2
+
+kill $TailPID
+
+
+}
+
+
+
+DeleteDisk () {
+
+
+## This should never actually run but just as a fail safe
+if [ "$Disk" = "" ]; then
+ MainMenu
+ exit 0
+fi
+
+
+## Get Confirmation before removing the drive
+yad $Title $Icon --image="dialog-warning" --width="275" --wrap --text="\n$WARNING1 $Disk $WARNING2\n" --button="gtk-no:3" --button="gtk-yes:5"
+
+ret="$?"
+
+if [ "$ret" = "3" ]; then
+ MainMenu
+ exit 0
+elif [ "$ret" = "252" ]; then
+ MainMenu
+ exit 0
+fi
+
+rm -rf "$HOME/.procurator/disks/$Disk"
+rm -rf "$HOME/.procurator/notes/$Disk"
+rm -rf "$HOME/.procurator/config/$Disk"
 
 
 }
@@ -418,7 +478,16 @@ yad --wrap --width=250 --title="Procurator Help" --text="$HELPTEXT" --button=$"g
 
 SelectDrive () {
 
+
 Menu=""
+
+## Kind of a dirty hax to get the text I want on the selection dialog
+if [ "$Operation" = "ISO" ]; then
+ OperationText="$MAKEAVAILABLE .iso $IFANY"
+else
+ BunchOfSpaces='                  '
+ OperationText="${Operation,,}"
+fi 
 
 for i in $(ls $HOME/.procurator/disks); do
  TempDisk="$i"
@@ -437,7 +506,7 @@ fi
  fi
 done
 
-Selection=$(yad --width="500" --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
+Selection=$(yad --text="          $BunchOfSpaces $SELECTDRIVETEXT $OperationText          \n" --width="625" --height=350 --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
 
 ret="$?"
 
@@ -473,7 +542,6 @@ elif [ "$Operation" = "Modify" ]; then
  fi
  ChangeOptions
 elif [ "$Operation" = "ISO" ]; then
- echo "This is Running"
  BootDrive
 elif [ "$Operation" = "Delete" ]; then
  if [ "$Disk" = "" ]; then
@@ -481,6 +549,18 @@ elif [ "$Operation" = "Delete" ]; then
   exit 0
  fi
  DeleteDisk
+elif [ "$Operation" = "Rename" ]; then
+ if [ "$Disk" = "" ]; then
+  SelectDrive
+  exit 0
+ fi
+ NameDisk
+elif [ "$Operation" = "Clone" ]; then
+ if [ "$Disk" = "" ]; then
+  SelectDrive
+  exit 0
+ fi
+ NameDisk
 fi
 
 
@@ -564,133 +644,24 @@ if [ "$BlueTooth" = "TRUE" ]; then
 fi
 
 ## Just a bit of debugging information
-echo "These are the options being sent to KVM "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -cpu host -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO $HardDisk"
+echo "These are the options being sent to KVM "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -cpu host -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO "${HardDisk[@]}""
 
 kvm "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -boot order=dc -m $RamSize -smp $Cores -cpu host -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO "${HardDisk[@]}"
 
+
+ret="$?"
+
+if [ "$ret" != "0" ]; then
+ DisplayHelp
+fi
+
 MainMenu
 
 
 }
 
 
-MainMenu4 () {
-
-Menu=""
-
-for i in $(ls $HOME/.procurator/disks); do
- TempDisk="$i"
- DiskSize=$(du -c --apparent-size "$HOME/.procurator/disks/$i" | grep "total" | awk '{print $1}')
- DiskSize=$(($DiskSize / 1024))
- DiskSize="$DiskSize"M
-if [ -f $HOME/.procurator/notes/$i ]; then
- Note=$(cat "$HOME/.procurator/notes/$i")
-else
- Note="None"
-fi
- if [ "$Menu" = "" ]; then
-  Menu=( "$TempDisk" "$DiskSize" "$Note" )
- else
-  Menu=( "${Menu[@]}" "$TempDisk" "$DiskSize" "$Note" )
- fi
-done
-
-if [ "$Input" != "" ]; then
-Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" --title=Procurator --window-icon=kvm --text="$MAKEAVAILABLE $ISOName" --button=$"gtk-help:3" --button=$"$DELSELECTED:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:9" "${Menu[@]}" )
-
-ret="$?"
-
-Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
-
-if [ "$ret" = "252" ]; then
- exit 0 
-elif [ "$ret" = "3" ]; then
- yad --wrap --width=250 --title="Procurator Help" --text="$HELPTEXT" --button=$"gtk-ok:1"
- MainMenu
- exit 0
-elif [ "$ret" = "5" ]; then
- if [ "$Selection" = "" ]; then
-  $Info --text="$NODISK"  --button=$"gtk-ok:1"
-  MainMenu
-  exit 0
- fi
- $Question --width=250 --text="$WARNING1 "$Selection" $WARNING2"
- if [ "$?" = "0" ]; then
-  rm "$HOME/.procurator/disks/$Selection"
-  rm "$HOME/.procurator/notes/$Selection"
-  MainMenu
-  exit 0
- else
-  MainMenu
-  exit 0
- fi
-elif [ "$ret" = "7" ]; then
- CreateNewDisk
- exit 0
-elif [ "$ret" = "9" ]; then
- if [ "$Selection" != "" ]; then
-  HardDisk=$(echo "-drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk")
- fi
- kvm  -boot order=dc -m $RamSize -smp maxcpus=maxcpus -soundhw ac97 -sdl -cdrom $Input $HardDisk 
- exit 0
-fi
-
-
-else
-
-Selection=$(yad --height=350 --wrap --always-print-result --center --list --column="$VDISKS" --column="$SIZE"  --column="$NOTES1" --title=Procurator --window-icon=kvm --button=$"gtk-help:3" --button=$"$DELSELECTED:5" --button=$"$CREATENEW:7" --button=$"$BOOTSELECTED:9" "${Menu[@]}")
-
-ret="$?"
-
-Selection=$(echo "$Selection" | awk -F '|' '{print $1}')
-
-if [ "$ret" = "252" ]; then
- exit 0 
-elif [ "$ret" = "3" ]; then
- $Info --wrap --width=250 --text="$HELPTEXT" --button=$"gtk-ok:1"
- MainMenu
- exit 0
-elif [ "$ret" = "5" ]; then
- if [ "$Selection" = "" ]; then
-  $Info --text="$NODISK" --button=$"gtk-ok:1"
-  MainMenu
-  exit 0
- fi
- $Question --width=250 --text="$WARNING1 "$Selection" $WARNING2"
- if [ "$?" = "0" ]; then
-  rm "$HOME/.procurator/disks/$Selection"
-  rm "$HOME/.procurator/notes/$Selection"
-  MainMenu
-  exit 0
- else
-  MainMenu
-  exit 0
- fi
-elif [ "$ret" = "7" ]; then
- CreateNewDisk
- exit 0
-elif [ "$ret" = "9" ]; then
- if [ "$Selection" = "" ]; then
-  $Info --text="$MUSTSELECT"
-  MainMenu
-  exit 0
- fi
-if [ -a /dev/cdrom ]; then
-kvm  -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97  -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -cdrom /dev/cdrom -name $Selection
-else
-kvm -boot order=dc -m "$RamSize" -sdl -smp maxcpus=maxcpus -soundhw ac97 -drive file="$HOME/.procurator/disks/$Selection",cache=none,media=disk -name $Selection
-fi
- 
-
-exit 0
-fi
-
-fi
-
-
-}
-
 MainMenu
 
-exit 0
 
+exit 0
