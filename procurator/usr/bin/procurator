@@ -506,7 +506,7 @@ fi
  fi
 done
 
-Selection=$(yad --text="          $BunchOfSpaces $SELECTDRIVETEXT $OperationText          \n" --width="625" --height=350 --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
+Selection=$(yad --text="       $BunchOfSpaces $SELECTDRIVETEXT $OperationText          \n" --width="625" --height=350 --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
 
 ret="$?"
 
@@ -617,9 +617,17 @@ else
  SetName=( "-name" "$Disk" )
 fi
 
-## Use /dev/cdrom if no ISO is specified
+## Use the first CDRom if no ISO is specified
 if [ "$BootISO" = "" ]; then
- BootISO=$(echo "/dev/cdrom")
+ BootISO=$(ls /dev | grep "cdrom" | awk '{print $1}')
+ if [ "$BootISO" != "" ]; then
+  BootISO=$(echo "/dev/$BootISO")
+ fi
+fi
+
+## Make a proper CDROM array depending on if BootISO is still blank
+if [ "$BootISO" != "" ]; then
+ CDRomArray=( "-cdrom" "$BootISO" )
 fi
 
 ## Force QXL if we are using spice
@@ -644,9 +652,9 @@ if [ "$BlueTooth" = "TRUE" ]; then
 fi
 
 ## Just a bit of debugging information
-echo "These are the options being sent to KVM "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -cpu host -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO "${HardDisk[@]}""
+echo "These are the options being sent to KVM "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -cpu host -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver "${CDRomArray[@]}" "${HardDisk[@]}""
 
-kvm "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -boot order=dc -m $RamSize -smp $Cores -cpu host -soundhw ac97 -$VideoOutput -vga $VideoDriver -cdrom $BootISO "${HardDisk[@]}"
+kvm "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -boot order=dc -m $RamSize -smp $Cores -cpu host -soundhw ac97 -$VideoOutput -vga $VideoDriver "${CDRomArray[@]}" "${HardDisk[@]}"
 
 
 ret="$?"
