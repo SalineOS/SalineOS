@@ -581,6 +581,11 @@ if [ "$RamSize" = "" ]; then
  RamSize=$(($SystemRam / 3))
 fi
 
+## Make sure RamSize is less than 2047
+if [ "$RamSize" > "2046" ]; then
+ RamSize="2046"
+fi
+
 if [ "$DiskDriver" = "" ]; then
  DiskDriver="ide"
 fi
