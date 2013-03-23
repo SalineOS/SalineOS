@@ -84,12 +84,14 @@ if [ "$Delete" = "Yes" ]; then
  progressbar "       $SYNCING $Input $TO $Destination      \n" &
  rsync --delete -a -u -H "$Input/" "$Destination"
  sleep 5
- killall -KILL tail
+ TailPID=$(pgrep -f "tail -f /usr/bin/sync-folder-ca")
+ kill $TailPID
 else
  progressbar "       $SYNCING $Input $TO $Destination      \n" &
  rsync -a -u -H "$Input/" "$Destination"
  sleep 5
- killall -KILL tail
+ TailPID=$(pgrep -f "tail -f /usr/bin/sync-folder-ca")
+ kill $TailPID
 fi
 
 notify-send -u normal -i folder -t 15000 '

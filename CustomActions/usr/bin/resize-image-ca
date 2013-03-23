@@ -93,7 +93,9 @@ done
 
 sleep 5
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/resize-image-ca")
+
+kill $TailPID
 
 notify-send -u normal -i image-x-generic -t 15000 '
 $RESIZECOMPLETE'

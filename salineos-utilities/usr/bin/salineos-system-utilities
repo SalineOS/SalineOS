@@ -63,7 +63,10 @@ tail -f /tmp/SOS-Utils-Restricted | yad --progress --pulsate --title="SOS-Utils"
 apt-get update
 
 sleep 1
-killall -KILL tail
+
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-system-utilities")
+
+kill $TailPID
 
 ## Codecs
 for i in $CodecPackages; do

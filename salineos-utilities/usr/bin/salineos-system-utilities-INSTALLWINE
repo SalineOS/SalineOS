@@ -43,7 +43,9 @@ done
 
 sleep 1
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-system-utilities-INSTALLWINE")
+
+kill $TailPID
 
 /usr/bin/packagekit-url 'pkgkit://wine'
 

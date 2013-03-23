@@ -150,7 +150,9 @@ dd if="$Iso" of=/dev/$UseDrive
 sync
 
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/image-to-usb")
+
+kill $TailPID
 
 notify-send -u normal -i drive-removable-media-usb -t 20000 "
 $DisplayName $TO USB $COMPLETED"

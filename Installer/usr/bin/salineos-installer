@@ -112,7 +112,9 @@ mkdir -p /Target
 
 sleep 2
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID
 
 tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="                   Mounting $TargetPart                   " &
 
@@ -120,7 +122,9 @@ mount /dev/$TargetPart /Target -o rw
 
 sleep 3
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID
 
 tail -f /usr/bin/salineos-installer | $Progress --wrap --width="300" --pulsate --text="$PCONFIGFILESYSTEM" &
 
@@ -130,7 +134,9 @@ sleep 3
 
 rm -rf /Target/lost+found
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID
 
 if [ "$TargetHomePart" = "" ]; then
  TargetHomePart="root"
@@ -152,7 +158,9 @@ if [ "$TargetHomePart" != "root" ]; then
   if [ "$LabelHome" != "" ]; then
    tune2fs -L "$LabelHome" /dev/$TargetHomePart
   fi
-  killall -KILL tail
+  TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
  fi
 
  tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="              Mounting $TargetHomePart              " &
@@ -170,7 +178,9 @@ if [ "$TargetHomePart" != "root" ]; then
  ## Get fs type for the home partition in case the user chose not to format it
  HomeFilesystemType=$(mount | grep "/dev/$TargetHomePart" | awk '{print $5}' | awk -F ' ' '{print $1}')
 
- killall -KILL tail
+ TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 fi
 
 tail -f /usr/bin/salineos-installer | $Progress --pulsate --text="               $PUUID               " &
@@ -180,7 +190,9 @@ TargetCDRom="/dev/cdrom"
 
 sleep 3
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 ## Install language packages and restricted codecs ################################################################
 if [ "$Internet" != "Continue" ]; then
@@ -213,7 +225,9 @@ apt-get update
 
 sleep 1
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 ## Codecs
 for i in $CodecPackages; do
@@ -267,7 +281,9 @@ mkdir -p /Target/{proc,mnt,sys,media/cdrom}
 
 sleep 3
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 tail -f /usr/bin/salineos-installer | $Progress --text="                    $PSWAP                    " --pulsate &
 
@@ -292,7 +308,9 @@ else
  SwapFstab="UUID=$TargetSwapUUID"
 fi
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 tail -f /usr/bin/salineos-installer | $Progress --text="$PCONFIGFILES" --pulsate &
 
@@ -373,7 +391,9 @@ touch /Target/etc/resolv.conf
 
 sleep 2
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 tail -f /usr/bin/salineos-installer | $Progress --text="             $PUSER             " --pulsate &
 
@@ -422,7 +442,9 @@ sleep 2
 rm /Target/usr/bin/TempScript
 sleep 3
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 
 ## Install GRUB2
@@ -434,7 +456,9 @@ chroot /Target update-grub
 sleep 2
 
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 ## Unmount the target partition  
 tail -f /usr/bin/salineos-installer | $Progress --text="                  Unmounting $TargetPart                  " --pulsate &
@@ -451,7 +475,9 @@ sleep 2
 umount /Target
 sleep 2
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 $Question --wrap --width=250 --text="$LASTDIALOG" 
 
@@ -1384,7 +1410,9 @@ Internet="$(echo "$TestInternet" | grep "0.00% failed")"
 rm -rf /etc/skel/Desktop/salineos-installer.desktop
 
 sleep 4
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/salineos-installer")
+
+kill $TailPID 
 
 if [ "$Internet" = "" ]; then 
  InternetTest2

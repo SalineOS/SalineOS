@@ -1,9 +1,9 @@
 Package: procurator
-Version: 2.0-5
+Version: 2.0-6
 Architecture: all
 Maintainer: Anthony Nordquist <salinelinux@gmail.com>
 Installed-Size: 94
-Depends: coreutils, findutils, bash, sed, util-linux, kvm
+Depends: coreutils, findutils, bash, sed, util-linux, kvm, spice-client-gtk
 Section: system
 Priority: optional
 Description: Simple disk manager for Kernel Virtual Machine.

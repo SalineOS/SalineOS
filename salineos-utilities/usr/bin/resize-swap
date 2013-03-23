@@ -51,7 +51,10 @@ mkswap /swap/salineos-swap
 swapon /swap/salineos-swap
 sleep 2
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/resize-swap")
+
+kill $TailPID
+
 yad --title="Resize Swap" --window-icon="preferences-system" --text="          Swap resized to $SwapFileSize megabytes.         \n" --button=$"gtk-ok:1"
 
 exit 0

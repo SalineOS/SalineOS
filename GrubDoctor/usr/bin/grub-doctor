@@ -196,9 +196,11 @@ if [ "$GrubDir" != "/" ]; then
 ## Check to ensure that the partition was mounted properly.
 
 if [ "$(mount | grep "/dev/$RootPart" | awk '{print $3}')" != "/tmp/remmnt/Target" ]; then
+if [ "$GrubDir" != "/" ]; then
  killall -KILL tail
  yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Failed to mount $RootPart, please ensure there are no files in use on the partition and then run Grub Doctor again." --button=$"gtk-quit:1"
  exit 0
+fi
 fi
 
 ## Check the archetecture of host system and root partition matches.
@@ -236,7 +238,9 @@ fi
 umount -l /tmp/remmnt/Target
 
 ## Stop the progress bar
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/grub-doctor")
+
+kill $TailPID
 
 ## Tell the user we are done now
 $Info --text="             Grub installation complete.             \n" --button=$"gtk-ok:1"

@@ -152,7 +152,9 @@ fi
 
 sleep 3
 
-killall -KILL tail
+TailPID=$(pgrep -f "tail -f /usr/bin/Clean")
+
+kill $TailPID
 
 MainMenu () {
 
