@@ -31,9 +31,6 @@ Icon='--window-icon=kvm'
 
 Title='--title=Procurator'
 
-Input="$1"
-ISOName="$2"
-
 ## Ensure needed directories exist
 mkdir -p $HOME/.procurator/disks
 mkdir -p $HOME/.procurator/notes
@@ -674,7 +671,33 @@ MainMenu
 }
 
 
-MainMenu
+StartHere () {
 
+
+if [ "$Input" = "" ]; then
+ MainMenu
+fi
+
+TestISO="$(echo "$Input" | grep ".iso")"
+
+TestVMDK="$(echo "$Input" | grep ".vmdk")"
+
+if [ "$TestISO" != "" ]; then
+ BootISO="$TestISO"
+ Operation="ISO"
+ SelectDrive
+fi
+
+if [ "$TestVMDK" != "" ]; then
+ ToImport="$TestVMDK"
+ NewDiskName=$(echo "$ToImport" | awk -F '/' '{print $NF}')
+ ImportNotes
+fi
+
+}
+
+Input="$1"
+
+StartHere
 
 exit 0
