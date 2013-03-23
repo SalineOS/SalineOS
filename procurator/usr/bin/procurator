@@ -258,22 +258,24 @@ else
 fi
 
 
-if [ "$Operation" = "Create" ]; then
- qemu-img create -f raw -o size="$NewDiskSize"M $HOME/.procurator/disks/"$NewDiskName"
- Disk="$NewDiskName"
- ChangeOptions
-elif [ "$Operation" = "Rename" ]; then
+
+if [ "$Operation" = "Rename" ]; then
  mv -f "$HOME/.procurator/disks/$Disk" "$HOME/.procurator/disks/$NewDiskName"
  mv -f "$HOME/.procurator/config/$Disk" "$HOME/.procurator/config/$NewDiskName"
  rm -rf "$HOME/.procurator/notes/$Disk"
  MainMenu
  exit 0
-elif [ "$Operation" = "Clone" ]; then
+fi
+
+if [ "$Operation" = "Clone" ]; then
  CloneDrive
  MainMenu
  exit 0
 fi
 
+qemu-img create -f raw -o size="$NewDiskSize"M $HOME/.procurator/disks/"$NewDiskName"
+Disk="$NewDiskName"
+ChangeOptions
 
 }
 
@@ -503,7 +505,7 @@ fi
  fi
 done
 
-Selection=$(yad --text="       $BunchOfSpaces $SELECTDRIVETEXT $OperationText          \n" --width="625" --height=350 --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
+Selection=$(yad --text="    $BunchOfSpaces $SELECTDRIVETEXT $OperationText          \n" --width="625" --height=350 --always-print-result --center --list --column="$VDISKS" --column="$SIZE" --column="$NOTES1" $Title $Icon --button=$"gtk-help:3" --button=$"gtk-cancel:5" --button=$"$CREATENEW:7" --button=$"gtk-ok:2" "${Menu[@]}" )
 
 ret="$?"
 
@@ -632,9 +634,11 @@ if [ "$BootISO" != "" ]; then
  CDRomArray=( "-cdrom" "$BootISO" )
 fi
 
-## Force QXL if we are using spice
+## Force QXL if using spice and set spice options.
 if [ "$VideoOutput" = "spice" ]; then
  VideoDriver="qxl"
+ SpiceArray=( "port=7063,addr=127.0.0.1,disable-ticketing" )
+ SpiceViewer=( "spicy" "-h" "127.0.0.1" "-p" "7063" )
 fi
 
 if [ "$Disk" != "" ]; then
@@ -654,9 +658,19 @@ if [ "$BlueTooth" = "TRUE" ]; then
 fi
 
 ## Just a bit of debugging information
-echo "These are the options being sent to KVM "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -cpu host -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput -vga $VideoDriver "${CDRomArray[@]}" "${HardDisk[@]}""
+echo "These are the options being sent to KVM "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -cpu host -boot order=dc -m $RamSize -smp $Cores -soundhw ac97 -$VideoOutput "${SpiceArray[@]}" -vga $VideoDriver "${CDRomArray[@]}" "${HardDisk[@]}""
 
-kvm "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -boot order=dc -m $RamSize -smp $Cores -cpu host -soundhw ac97 -$VideoOutput -vga $VideoDriver "${CDRomArray[@]}" "${HardDisk[@]}"
+## Not the cleanest of code.
+if [ "$VideoOutput" = "spice" ]; then
+while [ "$Wait" != "Go" ]; do
+ sleep 2
+ Wait=Go
+ "${SpiceViewer[@]}"
+done &
+fi
+
+
+kvm "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -boot order=dc -m $RamSize -smp $Cores -cpu host -soundhw ac97 -$VideoOutput "${SpiceArray[@]}" -vga $VideoDriver "${CDRomArray[@]}" "${HardDisk[@]}"
 
 
 ret="$?"
@@ -694,7 +708,9 @@ if [ "$TestVMDK" != "" ]; then
  ImportNotes
 fi
 
+
 }
+
 
 Input="$1"
 
