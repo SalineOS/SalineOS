@@ -375,7 +375,7 @@ NameDisk
 SelectISO () {
 
 
-BootISO="$(yad $Title $Icon --width="725" --height="525" --file --text="                    $SELECTISOTEXT                    \n" --file-filter="*.iso" --filename="$HOME/*" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")"
+BootISO="$(yad $Title $Icon --width="725" --height="525" --file --text="                                               $SELECTISOTEXT                    \n" --file-filter="*.iso" --filename="$HOME/*" --button=$"gtk-cancel:3" --button=$"gtk-ok:2")"
 
 ret="$?"
 
