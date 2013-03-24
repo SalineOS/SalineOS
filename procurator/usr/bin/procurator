@@ -439,6 +439,8 @@ else
  echo "Drive imported on $(date +%Y%m%d-%H%M)">>"$HOME/.procurator/notes/$NewDiskName"
 fi
 
+## Set the Disk variable 
+Disk="$NewDiskName"
 
 ## Change options first so we can use existing functions and return to main menu when finished
 ChangeOptions
@@ -451,7 +453,7 @@ ImportDrive
 ImportDrive () {
 
 
-tail -f /usr/bin/procurator | yad $Icon $Title --progress --pulsate --auto-close --text="          Importing $ToImport          /n" --no-buttons &
+tail -f /usr/bin/procurator | yad $Icon $Title --progress --pulsate --auto-close --text="               Importing $NewDiskName               \n" --no-buttons &
 
 cp -f "$ToImport" $HOME/.procurator/disks
 
@@ -704,7 +706,7 @@ fi
 
 if [ "$TestVMDK" != "" ]; then
  ToImport="$TestVMDK"
- NewDiskName=$(echo "$ToImport" | awk -F '/' '{print $NF}')
+ NewDiskName="$(echo "$ToImport" | awk -F '/' '{print $NF}')"
  ImportNotes
 fi
 
