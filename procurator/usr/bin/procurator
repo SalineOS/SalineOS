@@ -675,12 +675,6 @@ fi
 kvm "${EnableTablet[@]}" "${EnableFullScreen[@]}" "${EnableBlueTooth[@]}" "${SetName[@]}" -boot order=dc -m $RamSize -smp $Cores -cpu host -soundhw ac97 -$VideoOutput "${SpiceArray[@]}" -vga $VideoDriver "${CDRomArray[@]}" "${HardDisk[@]}"
 
 
-ret="$?"
-
-if [ "$ret" != "0" ]; then
- DisplayHelp
-fi
-
 MainMenu
 
 
