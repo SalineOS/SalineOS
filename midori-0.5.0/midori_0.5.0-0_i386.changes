@@ -1,0 +1,32 @@
+Format: 1.8
+Date: Wed, 10 April 2013 19:24:02 -0400
+Source: midori
+Binary: midori
+Architecture: source i386
+Version: 0.5.0-0
+Distribution: UNRELEASED
+Urgency: low
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Changed-By: AnthonyNordquist <salinelinux@gmail.com>
+Description: 
+ midori     - Web browser based  on webkit, that uses the Xfce libraries.
+Closes: 0
+Changes: 
+ midori (0.5.0-0) UNRELEASED; urgency=low
+ .
+   * New upstream release. (Closes: #0)
+Checksums-Sha1: 
+ 9e5fa48457321f5f4471a4f356c2842b4d28ea48 907 midori_0.5.0-0.dsc
+ 10d28c0f844e6042cf61fbd4680ec79b5ed475c1 1656469 midori_0.5.0.orig.tar.gz
+ 3c1b88be4e0cb2e4428980c8591c51774a4d2e31 329227 midori_0.5.0-0.debian.tar.gz
+ 55bb88e0d2a952b4efe546d09e7bd523f514958d 1441604 midori_0.5.0-0_i386.deb
+Checksums-Sha256: 
+ 2425fb5b5d6d6d7469b728cde037abcaf61c9d6c857c149ef2eb69f93c51c049 907 midori_0.5.0-0.dsc
+ 6b563feed34f52893367647d010823371a4c2c8c514917a24b2efbf318059241 1656469 midori_0.5.0.orig.tar.gz
+ 21ba34a0cc3612ce9ca776a5c5a1d33a90f09be09547d53d3178706250dbb49a 329227 midori_0.5.0-0.debian.tar.gz
+ e6bb5ada41f5cbc8700ac004b1b4944795cd9ce914749a1555da2d91c503f19e 1441604 midori_0.5.0-0_i386.deb
+Files: 
+ e3207c26efe3d89ef6906a828051b7b8 907 misc optional midori_0.5.0-0.dsc
+ 4656c1b9a12df6b862d36faf2070c0d2 1656469 misc optional midori_0.5.0.orig.tar.gz
+ a64c6c058906867d52ffae0fa425c6f2 329227 misc optional midori_0.5.0-0.debian.tar.gz
+ d0931d72f79ca0c1ff2f88351fbc560d 1441604 misc optional midori_0.5.0-0_i386.deb
