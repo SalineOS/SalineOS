@@ -62,10 +62,13 @@ elif [ "$ret" = "5" ]; then
   rm /etc/salineos-backup/excludes
  fi
  echo "$CurrentExcludes">>/etc/salineos-backup/excludes
- NewExclude=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --directory --text="\n                     $SELECTFORF\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ NewExclude=$(yad --file-selection --title="SalineOS-Backup" --height=450 --width=600 --directory --text="\n                     $SELECTFORF\n" --button=$"gtk-quit:3" --button=$"gtk-cancel:5" --button=$"gtk-ok:2")
  ret="$?"
 
  if [ "$ret" = "252" ]; then
+  SetExcludes
+  exit 0
+ elif [ "$ret" = "5" ]; then
   SetExcludes
   exit 0
  elif [ "$ret" = "3" ]; then
@@ -703,7 +706,7 @@ GrubSelect () {
 GrubLocation=""
 GrubLoc=""
 
-GrubLoc=$($Menu --width=300 --height=250 --column='$LOCATIONRES' --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="$GRUBSELECT\n" "${GrubMenu[@]}")
+GrubLoc=$($Menu --width=300 --height=250 --column="$LOCATIONRES" --column=' ' --button=$"gtk-quit:3" --button=$"gtk-ok:2" --text="$GRUBSELECT\n" "${GrubMenu[@]}")
 
 ret="$?"
 
@@ -1269,13 +1272,16 @@ elif [ "$ret" = "5" ]; then
   rm /etc/salineos-backup/excludes
  fi
  echo "$CurrentExcludes">>/etc/salineos-backup/excludes
- NewExclude=$(yad --file-selection --title="SalineOS Backup" --height=450 --width=600 --directory --text="\n                     $SELECTFORF\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ NewExclude=$(yad --file-selection --title="SalineOS Backup" --height=450 --width=600 --directory --text="\n                     $SELECTFORF\n" --button=$"gtk-quit:3" --button=$"gtk-cancel:5" --button=$"gtk-ok:2")
  ret="$?"
 
  if [ "$ret" = "252" ]; then
   ExcludesPartClone
   exit 0
  elif [ "$ret" = "3" ]; then
+  exit 0
+ elif [ "$ret" = "5" ]; then
+  ExcludesPartClone
   exit 0
  else
   echo "$NewExclude">>/etc/salineos-backup/excludes
@@ -2134,10 +2140,13 @@ elif [ "$ret" = "5" ]; then
   rm /etc/salineos-backup/excludes
  fi
  echo "$CurrentExcludes">>/etc/salineos-backup/excludes
- NewExclude=$(yad --file-selection --title="SalineOS Backup" --height=450 --width=600 --directory --text="\n                     $SELECTFORF\n" --button=$"gtk-quit:3" --button=$"gtk-ok:2")
+ NewExclude=$(yad --file-selection --title="SalineOS Backup" --height=450 --width=600 --directory --text="\n                     $SELECTFORF\n" --button=$"gtk-quit:3" --button=$"gtk-cancel:5" --button=$"gtk-ok:2")
  ret="$?"
 
  if [ "$ret" = "252" ]; then
+  ExcludesUSBClone
+  exit 0
+ elif [ "$ret" = "5" ]; then
   ExcludesUSBClone
   exit 0
  elif [ "$ret" = "3" ]; then
