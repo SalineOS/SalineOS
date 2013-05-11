@@ -1,0 +1,27 @@
+#!/bin/bash
+
+ToKillPid=$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Search --width=565 --height=270")
+
+kill $ToKillPid
+
+
+SearchTerms=$(yad --width="250" --entry --title="Wikipedia" --window-icon="/usr/share/actions/Icons/Wiki.png")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "1" ]; then
+ exit 0
+fi
+
+SearchTerms=$(echo "$SearchTerms" | sed 's| |+|g')
+
+SearchArray=( "$SearchTerms" )
+
+Language=$(echo "$LANG" | awk -F '_' '{print $1}')
+
+exo-open --launch WebBrowser "http://$Language.wikipedia.org/w/index.php?search="${SearchArray[@]}"&title=Special%3ASearch" &
+
+
+exit

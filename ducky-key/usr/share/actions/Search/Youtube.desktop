@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Youtube
+Comment=Search Youtube
+Exec=/usr/share/actions/Scripts/Run-Youtube
+Icon=/usr/share/actions/Icons/YouTube_logo_stacked_dark.png
+Terminal=false
+StartupNotify=false

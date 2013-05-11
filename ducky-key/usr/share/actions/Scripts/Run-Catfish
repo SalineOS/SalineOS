@@ -1,0 +1,9 @@
+#!/bin/bash
+
+ToKillPid=$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Search --width=565 --height=270")
+
+kill $ToKillPid
+
+catfish --large-icons --iso-time --path="$HOME"
+
+exit

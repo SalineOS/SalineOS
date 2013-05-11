@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Documents
+Comment=Documents
+Exec=/usr/share/actions/Scripts/Run-Documents
+Icon=folder-documents
+Terminal=false
+StartupNotify=false

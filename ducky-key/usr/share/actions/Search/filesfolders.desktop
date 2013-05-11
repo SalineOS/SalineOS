@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Files
+Comment=Search for files
+Exec=/usr/share/actions/Scripts/Run-Catfish
+Icon=folder-saved-search
+Terminal=false
+StartupNotify=false

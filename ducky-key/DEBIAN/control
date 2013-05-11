@@ -1,0 +1,9 @@
+Package: ducky-key
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 93
+Depends: coreutils, findutils, bash, sed, util-linux, exo-utils, yet-another-dialog
+Section: system
+Priority: optional
+Description: Simple touch screen friendly menu system.

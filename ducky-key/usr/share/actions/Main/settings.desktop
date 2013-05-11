@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Settings
+Comment=Settings Manager
+Exec=/usr/share/actions/Scripts/Run-Settings
+Icon=preferences-desktop
+Terminal=false
+StartupNotify=false

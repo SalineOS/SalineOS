@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Videos
+Comment=Videos
+Exec=/usr/share/actions/Scripts/Run-Videos
+Icon=folder-videos
+Terminal=false
+StartupNotify=false

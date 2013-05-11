@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Applications
+Comment=Launch an application
+Exec=/usr/share/actions/Scripts/Run-Launcher
+Icon=xfce4-appfinder
+Terminal=false
+StartupNotify=false

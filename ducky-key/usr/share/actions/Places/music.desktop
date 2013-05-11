@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Music
+Comment=Music
+Exec=/usr/share/actions/Scripts/Run-Music
+Icon=folder-music
+Terminal=false
+StartupNotify=false

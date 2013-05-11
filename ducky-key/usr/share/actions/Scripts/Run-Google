@@ -1,0 +1,23 @@
+#!/bin/bash
+
+ToKillPid=$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Search --width=565 --height=270")
+
+kill $ToKillPid
+
+SearchTerms=$(yad --width="250" --entry --title="Google" --window-icon="stock_internet")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "1" ]; then
+ exit 0
+fi
+
+SearchTerms=$(echo "$SearchTerms" | sed 's| |+|g')
+
+SearchArray=( "$SearchTerms" )
+
+exo-open --launch WebBrowser "https://google.com/search?q="${SearchArray[@]}"&ie=utf-8" &
+
+exit

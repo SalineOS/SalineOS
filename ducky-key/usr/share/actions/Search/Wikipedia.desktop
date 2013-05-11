@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Wikipedia
+Comment=Search Wikipedia
+Exec=/usr/share/actions/Scripts/Run-Wiki
+Icon=/usr/share/actions/Icons/Wiki.png
+Terminal=false
+StartupNotify=false

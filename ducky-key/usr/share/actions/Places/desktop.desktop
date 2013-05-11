@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Desktop
+Comment=Desktop
+Exec=/usr/share/actions/Scripts/Run-Desktop
+Icon=user-desktop
+Terminal=false
+StartupNotify=false

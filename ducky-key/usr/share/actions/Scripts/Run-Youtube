@@ -1,0 +1,27 @@
+#!/bin/bash
+
+ToKillPid=$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Search --width=565 --height=270")
+
+kill $ToKillPid
+
+
+SearchTerms=$(yad --width="250" --entry --title="Youtube" --window-icon="/usr/share/actions/Icons/YouTube_logo_stacked_dark.png")
+
+ret="$?"
+
+if [ "$ret" = "252" ]; then
+ exit 0
+elif [ "$ret" = "1" ]; then
+ exit 0
+fi
+
+SearchArray=( "$SearchTerms" )
+
+SearchTerms=$(echo "${SearchArray[@]}" | sed 's| |+|g' | sed 's|,|%2C+|g')
+
+SearchArray=( "$SearchTerms" )
+
+exo-open --launch WebBrowser "http://www.youtube.com/results?search_query="${SearchArray[@]}"" &
+
+
+exit

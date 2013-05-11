@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Search
+Comment=Open search menu
+Exec=/usr/share/actions/Scripts/Run-Search
+Icon=stock_search
+Terminal=false
+StartupNotify=false

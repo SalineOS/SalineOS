@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Pictures
+Comment=Pictures
+Exec=/usr/share/actions/Scripts/Run-Pictures
+Icon=folder-pictures
+Terminal=false
+StartupNotify=false

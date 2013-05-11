@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Places
+Comment=Browse places on the filesystem
+Exec=/usr/share/actions/Scripts/Run-Places
+Icon=user-home
+Terminal=false
+StartupNotify=false

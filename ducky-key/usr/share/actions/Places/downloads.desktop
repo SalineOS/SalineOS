@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Downloads
+Comment=Downloads
+Exec=/usr/share/actions/Scripts/Run-Downloads
+Icon=folder-downloads
+Terminal=false
+StartupNotify=false

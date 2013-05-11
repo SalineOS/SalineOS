@@ -1,0 +1,8 @@
+#!/bin/bash
+ToKillPid=$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Main --width=480 --height=160")
+
+kill $ToKillPid
+
+/usr/bin/ducky-key-places
+
+exit

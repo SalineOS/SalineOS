@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Amazon.com
+Comment=Search for products at Amazon
+Exec=/usr/share/actions/Scripts/Run-Amazon
+Icon=/usr/share/actions/Icons/Amazon.png
+Terminal=false
+StartupNotify=false
