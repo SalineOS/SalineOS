@@ -1,5 +1,28 @@
 #!/bin/bash
 
+## End all running versions and exit if ducky-key was already running
+
+ToKill="$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Main --width=480 --height=160")"
+
+if [ "$ToKill" != "" ]; then
+ kill $ToKill
+ exit 0
+fi
+
+ToKill="$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Search --width=565 --height=270")"
+
+if [ "$ToKill" != "" ]; then
+ kill $ToKill
+ exit 0
+fi
+
+ToKill="$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Places --width=380 --height=250")"
+
+if [ "$ToKill" != "" ]; then
+ kill $ToKill
+ exit 0
+fi
+
 yad --no-buttons --skip-taskbar --icons --undecorated --on-top --read-dir=/usr/share/actions/Main --width=480 --height=160
 
 exit

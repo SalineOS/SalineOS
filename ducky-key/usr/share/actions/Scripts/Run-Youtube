@@ -5,7 +5,7 @@ ToKillPid=$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on
 kill $ToKillPid
 
 
-SearchTerms=$(yad --width="250" --entry --title="Youtube" --window-icon="/usr/share/actions/Icons/YouTube_logo_stacked_dark.png")
+SearchTerms=$(yad --width="350" --entry --title="Search Youtube" --window-icon="/usr/share/actions/Icons/YouTube_logo_stacked_dark.png" --image="/usr/share/actions/Icons/YouTube_logo_stacked_dark.png")
 
 ret="$?"
 

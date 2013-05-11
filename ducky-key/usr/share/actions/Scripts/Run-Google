@@ -4,7 +4,7 @@ ToKillPid=$(pgrep -f "yad --no-buttons --skip-taskbar --icons --undecorated --on
 
 kill $ToKillPid
 
-SearchTerms=$(yad --width="250" --entry --title="Google" --window-icon="stock_internet")
+SearchTerms=$(yad --width="350" --entry --title="Google Search" --window-icon="stock_internet" --image="stock_internet")
 
 ret="$?"
 
