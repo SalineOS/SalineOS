@@ -1,0 +1,5 @@
+#!/bin/bash
+
+gksudo /usr/bin/packagekit-url "$@"
+
+exit
