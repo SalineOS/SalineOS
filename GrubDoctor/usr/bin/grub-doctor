@@ -44,7 +44,7 @@ fi
 
 ## Need to get the root partition from the user.
 
-Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | awk '{ print $4}')
+Drives=$(cat /proc/partitions | grep -v loop | grep -v "Extended" | grep -v "extended" | grep -v "swap" | grep -v "Swap" | grep -v "Hidden" | grep -v major | grep -v "^$" | grep -v "sr"| awk '{ print $4}')
 
 for i in $Drives; do
   PartDrive="$i"
@@ -114,8 +114,8 @@ elif [ "$RootPart" = "" ]; then
  exit 0
 fi
 
-RootPart=$(echo "$RootPart" | awk -F '|' '{print $1}')
 
+RootPart=$(echo "$RootPart" | awk -F '|' '{print $1}')
 
 
 }
@@ -177,9 +177,13 @@ fi
 ## Start Progress bar
 tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --title="Grub Doctor" --no-buttons --window-icon=/usr/share/pixmaps/grub-doctor.png --text="     Installing and setting up grub...Please Wait     \n" &
 
-GrubDir="$(mount | grep $RootPart | awk '{print$3}')"
+## Test to see if we are installing from a running system
 
-if [ "$GrubDir" != "/" ]; then
+GrubTest1=$(mount | grep ' / ')
+GrubTest2=$(blkid | grep "$RootPart" | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+GrubTest3=$(echo "$GrubTest1" | grep "$GrubTest2")
+ 
+if [ "$GrubTest3" = "" ]; then
  umount "$GrubDir"
  umount -l "$GrubDir"
  GrubDir="/tmp/remmnt/Target"
@@ -196,7 +200,7 @@ if [ "$GrubDir" != "/" ]; then
 ## Check to ensure that the partition was mounted properly.
 
 if [ "$(mount | grep "/dev/$RootPart" | awk '{print $3}')" != "/tmp/remmnt/Target" ]; then
-if [ "$GrubDir" != "/" ]; then
+if [ "$GrubTest3" = "" ]; then
  killall -KILL tail
  yad --width="250" --wrap --window-icon="/usr/share/pixmaps/grub-doctor" --title="Grub Doctor" --text="Failed to mount $RootPart, please ensure there are no files in use on the partition and then run Grub Doctor again." --button=$"gtk-quit:1"
  exit 0
