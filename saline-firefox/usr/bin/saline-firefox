@@ -41,11 +41,11 @@ done | shuf | head -8 | tr --delete \\n)
 mkdir -p "$HOME/.mozilla/firefox/Crash Reports"
 
 ## Copy default config to place
-cp -rf /etc/firefox-profile "$HOME/.mozilla/$RandomName.default"
+cp -rf /etc/firefox-profile "$HOME/.mozilla/firefox/$RandomName.default"
 
 ## Write out profile.ini for Firefox
 
-cat > "$HOME/.mozilla/firefox/profile.ini" <<FOO
+cat > "$HOME/.mozilla/firefox/profiles.ini" <<FOO
 [General]
 StartWithLastProfile=1
 

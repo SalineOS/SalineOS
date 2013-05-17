@@ -18,6 +18,45 @@
 # Copyright 2013 Under the GNU GPL2 License
 # Authors Anthony Nordquist http://www.salineos.com salinelinux@gmail.com 
 
+## Check if the user invoking this script already has a firefox profile
+
+TestProfile=$(ls "$HOME/.mozilla/firefox" | grep '.default')
+
+if [ "$TestProfile" != "" ]; then
+ exec "$HOME/.firefox/firefox" -silent -new-window "$@" &
+ sleep 3
+ exit 0
+fi
+
+## If no profile exists copy the SalineOS default profile to the proper place
+## Use a random string of 8 chars just like firefox does to mask
+## The users private info
+ToUseArray=(a b c d e f g h i j k l m n o p q r s t u v w x y z 1 2 3 4 5 6 7 8 9 0)
+
+RandomName=$(for i in "${ToUseArray[@]}"; do
+ echo $i
+done | shuf | head -8 | tr --delete \\n)
+
+## Make directory if needed
+mkdir -p "$HOME/.mozilla/firefox/Crash Reports"
+
+## Copy default config to place
+cp -rf /etc/firefox-profile "$HOME/.mozilla/firefox/$RandomName.default"
+
+## Write out profile.ini for Firefox
+
+cat > "$HOME/.mozilla/firefox/profiles.ini" <<FOO
+[General]
+StartWithLastProfile=1
+
+[Profile0]
+Name=default
+IsRelative=1
+Path=$RandomName.default
+
+FOO
+
+
 ## Start Firefox with the proper options
 exec "$HOME/.firefox/firefox" -silent -new-window "$@" &
 sleep 3
