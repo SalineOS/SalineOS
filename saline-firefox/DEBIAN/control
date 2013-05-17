@@ -1,0 +1,9 @@
+Package: saline-firefox
+Version: 2.0-0
+Architecture: all
+Maintainer: Anthony Nordquist <salinelinux@gmail.com>
+Installed-Size: 94
+Depends: coreutils, findutils, bash, sed, util-linux
+Section: system
+Priority: optional
+Description: Simple script to handle Firefox being installed in the users home folder.

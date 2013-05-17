@@ -1,0 +1,9 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Exec=/usr/bin/saline-firefox %u
+Name=Firefox
+Comment=Firefox Web Browser
+Categories=Network
+Icon=web-browser

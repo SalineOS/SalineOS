@@ -1,0 +1,21 @@
+#!/bin/sh
+#
+# see: dh_installdeb(1)
+
+set -e
+
+if [ "$1" = "configure" ] || [ "$1" = "abort-upgrade" ] ; then
+ update-alternatives --install /usr/bin/x-www-browser \
+ x-www-browser /usr/bin/saline-firefox 70 
+ update-alternatives --install /usr/bin/gnome-www-browser \
+ gnome-www-browser /usr/bin/saline-firefox 70 
+fi
+
+# Automatically added by dh_installmenu
+if [ "$1" = "configure" ] && [ -x "`which update-menus 2>/dev/null`" ]; then
+	update-menus
+fi
+
+exit 0
+
+
