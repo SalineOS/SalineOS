@@ -180,7 +180,7 @@ tail -f /usr/bin/grub-doctor | yad --center --pulsate --progress --auto-close --
 ## Test to see if we are installing from a running system
 
 GrubTest1=$(mount | grep ' / ')
-GrubTest2=$(blkid | grep "$RootPart" | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
+GrubTest2=$(blkid /dev/"$RootPart" | awk -F 'UUID="' '{print $2}' | awk -F '"' '{print $1}')
 GrubTest3=$(echo "$GrubTest1" | grep "$GrubTest2")
  
 if [ "$GrubTest3" = "" ]; then
