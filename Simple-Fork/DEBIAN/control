@@ -1,9 +1,0 @@
-Package: simple-fork-icon-theme
-Version: 2.0-2
-Architecture: all
-Maintainer: Anthony Nordquist <salinelinux@gmail.com>
-Installed-Size: 23000
-Depends: coreutils
-Section: system
-Priority: optional
-Description: Default icon theme for SalineOS.
